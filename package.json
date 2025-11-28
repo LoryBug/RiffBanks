@@ -24,7 +24,10 @@
     "start": "npm start -w server",
     "install:all": "npm install"
   },
-    "devDependencies": {
+  "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "mongoose": "^9.0.0"
   }
 }
