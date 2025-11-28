@@ -1,0 +1,30 @@
+{
+  "name": "riffbanks",
+  "version": "1.0.0",
+  "description": "Web project",
+  "keywords": [
+    "music",
+    "bands"
+  ],
+  "homepage": "https://github.com/LoryBug/RiffBanks#readme",
+  "bugs": {
+    "url": "https://github.com/LoryBug/RiffBanks/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoryBug/RiffBanks.git"
+  },
+  "license": "ISC",
+  "author": "Lorenzo Leoni",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "npm run dev -w client",
+    "dev:server": "npm run dev -w server",
+    "build": "npm run build -w client",
+    "start": "npm start -w server",
+    "install:all": "npm install"
+  },
+    "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
