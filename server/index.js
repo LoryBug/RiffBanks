@@ -23,4 +23,4 @@ mongoose.connect(MONGODB_URI)
     process.exit(1);
   });
 
-module.exports = { app, io };
+module.exports = { app };
