@@ -1,4 +1,18 @@
-const Band = require('../model/Band');
+const Band = require('../models/Band');
+// Get user's bands
+exports.list = async (req, res) => {
+  try {
+    const bands = await Band.find({
+      'members.userId': req.userId,
+      active: true
+    }).populate('members.userId', 'username avatar');
+
+    res.json(bands);
+  } catch (err) {
+    console.error('List bands error:', err);
+    res.status(500).json({ error: 'Failed to fetch bands' });
+  }
+};
 
 // Create a new band
 exports.create = async (req, res) => {

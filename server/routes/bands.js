@@ -9,3 +9,5 @@ router.get('/', bandController.list);
 router.post('/', bandController.create);
 router.post('/join', bandController.join);
 router.get('/:id', bandController.get);
+
+module.exports = router;
