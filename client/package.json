@@ -17,7 +17,10 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "axios": "^1.13.2",
+    "lucide-vue-next": "^0.555.0",
     "pinia": "^3.0.4",
+    "tailwind": "^4.0.0",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3"
   },
