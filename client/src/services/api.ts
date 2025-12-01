@@ -7,7 +7,9 @@ const api = axios.create({
   }
 });
 
-// Bands API (Phase 2)
+// Bands API
 export const bandsAPI = {
   list: () => api.get('/bands')
 };
+
+export default api;
