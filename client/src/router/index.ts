@@ -8,6 +8,12 @@ const routes = [
     component: () => import('@/views/AuthView.vue'),
     meta: { requiresGuest: true }
   },
+   {
+    path: '/onboarding',
+    name: 'onboarding',
+    component: () => import('@/views/OnboardingView.vue'),
+    meta: { requiresAuth: true }
+  },
     {
     path: '/',
     name: 'dashboard',
