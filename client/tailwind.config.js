@@ -1,9 +1,7 @@
-/** @type {import('tailwindcss').Config} */
+import preset from '@tailwindcss/preset'
+
 export default {
-  content: [
-    './index.html',
-    './src/**/*.{vue,js}'
-  ],
+  presets: [preset],
   theme: {
     extend: {
       colors: {
@@ -14,6 +12,5 @@ export default {
         darker: '#13131a'
       }
     }
-  },
-  plugins: []
+  }
 };
