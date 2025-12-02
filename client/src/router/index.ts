@@ -20,6 +20,36 @@ const routes = [
     component: () => import('@/views/DashboardView.vue'),
     meta: { requiresAuth: true, requiresOnboarding: true }
   },
+    {
+    path: '/band/new',
+    name: 'create-band',
+    component: () => import('@/views/JoinCreateBandView.vue'),
+    meta: { requiresAuth: true, requiresOnboarding: true }
+  },
+    {
+    path: '/band/:id',
+    name: 'band-info',
+    component: () => import('@/views/BandInfoView.vue'),
+    meta: { requiresAuth: true, requiresOnboarding: true }
+  },
+  // {
+  //   path: '/band/:bandId/songs',
+  //   name: 'songs',
+  //   component: () => import('@/views/SongListView.vue'),
+  //   meta: { requiresAuth: true, requiresOnboarding: true }
+  // },
+  // {
+  //   path: '/band/:bandId/songs/new',
+  //   name: 'create-song',
+  //   component: () => import('@/views/CreateSongView.vue'),
+  //   meta: { requiresAuth: true, requiresOnboarding: true }
+  // },
+  // {
+  //   path: '/song/:id',
+  //   name: 'song-detail',
+  //   component: () => import('@/views/SongDetailView.vue'),
+  //   meta: { requiresAuth: true, requiresOnboarding: true }
+  // },
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

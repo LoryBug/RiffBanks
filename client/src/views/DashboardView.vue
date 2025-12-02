@@ -1,162 +1,247 @@
 <template>
-  <div class="min-h-screen bg-black text-zinc-100 font-sans selection:bg-indigo-500/30 pb-20 overflow-x-hidden animate-fade-in" style="padding-bottom: env(safe-area-inset-bottom, 5rem)">
-    <div role="status" aria-live="polite" aria-atomic="true" class="sr-only">
-      {{ liveMessage }}
-    </div>
+  <div class="h-screen w-screen overflow-hidden flex flex-col relative bg-bg-zero">
+    <!-- Scanlines Overlay -->
+    <ScanlineOverlay />
 
-    <header role="banner" class="sticky z-20 bg-black/80 backdrop-blur-md border-b border-zinc-800 px-4 py-3 flex items-center justify-between" style="top: env(safe-area-inset-top, 0)">
-      <div class="flex items-center gap-3">
-        <h1 class="text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">
-          RiffBank
-        </h1>
+    <!-- Header -->
+    <header class="h-16 bg-bg-zero/90 backdrop-blur-md border-b border-border-zero z-30 shrink-0 sticky top-0">
+      <div class="container-zero h-full flex items-center justify-between">
+      <!-- Band Selector -->
+      <div class="flex items-center gap-4 cursor-pointer group" @click="toggleBandMenu">
+        <div class="w-2 h-2 bg-accent group-hover:shadow-glow transition-all"></div>
+        <div class="flex flex-col">
+          <span class="font-bold text-lg leading-none tracking-tight text-text-main">
+            {{ activeBand ? activeBand.name : 'Seleziona Unit' }}
+          </span>
+          <span class="font-tech text-[0.6rem] text-text-dim uppercase group-hover:text-text-main transition-colors">
+            Select Unit <i class="ph-bold ph-caret-down"></i>
+          </span>
+        </div>
       </div>
-      <div class="flex items-center gap-3">
-        <button
+
+      <!-- Right Side: Theme Toggle & User -->
+      <div class="flex items-center gap-4">
+        <ThemeToggle />
+        <div
           @click="authStore.logout(); router.push({ name: 'auth' })"
-          :aria-label="`Profilo utente ${authStore.user?.username || 'Utente'}`"
-          class="min-w-[44px] min-h-[44px] rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold border-2 border-zinc-900 active:scale-95 transition-transform"
+          class="relative group cursor-pointer"
+          :aria-label="`Logout ${authStore.user?.username || 'Utente'}`"
         >
-          <span aria-hidden="true">{{ authStore.user?.username?.[0] || 'U' }}</span>
-        </button>
+          <div class="w-8 h-8 bg-surface-zero border border-border-zero flex items-center justify-center font-tech text-xs text-text-dim group-hover:text-accent group-hover:border-accent transition-colors">
+            {{ authStore.user?.username?.substring(0, 2).toUpperCase() || 'US' }}
+          </div>
+          <div class="absolute -top-1 -right-1 w-1.5 h-1.5 bg-accent"></div>
+        </div>
+      </div>
       </div>
     </header>
 
-<!-- Main Content -->
-    <main role="main" class="p-4 mx-auto space-y-4 max-w-md">
-      <div v-if="loading" class="flex items-center justify-center py-20" role="status" aria-label="Caricamento in corso">
-        <Loader2 class="w-10 h-10 text-indigo-500 animate-spin" aria-hidden="true" />
-      </div>
+    <!-- Band Selection Modal -->
+    <div
+      v-if="showBandMenu"
+      class="absolute inset-0 z-50 bg-bg-zero/95 backdrop-blur-xl flex items-start justify-center animate-fade-in"
+      @click.self="showBandMenu = false"
+    >
+      <div class="container-zero flex flex-col h-full py-8">
+        <div class="flex justify-between items-center mb-12 border-b border-border-zero pb-4">
+          <h2 class="text-3xl font-bold text-text-main">SELECT UNIT</h2>
+          <button @click="showBandMenu = false" class="text-text-dim hover:text-text-main" aria-label="Chiudi">
+            <i class="ph ph-x text-2xl"></i>
+          </button>
+        </div>
 
-      <div v-else-if="error" role="alert" class="bg-red-500/10 border border-red-500/50 rounded-xl p-4 text-zinc-300 text-sm">
-        {{ error }}
-      </div>
+        <div v-if="loading" class="flex items-center justify-center py-20">
+          <LoadingSpinner />
+        </div>
 
-      <div v-else class="space-y-6 animate-fade-in">
-        <!-- Profile Card -->
-        <div class="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full"></div>
-          <h2 class="text-2xl font-bold mb-2">
-            Ciao, {{ authStore.user?.username }}!
-          </h2>
-          <p class="text-zinc-400 text-sm mb-3">
-            Bentornato!
-            {{ authStore.user?.instruments?.length > 0
-              ? `Sei loggato come ${authStore.user.instruments[0]}.`
-              : 'Pronto a suonare?' }}
-          </p>
-          <div v-if="authStore.user?.instruments?.length > 0" class="flex gap-2 flex-wrap">
-            <span
-              v-for="inst in authStore.user.instruments"
-              :key="inst"
-              class="px-2 py-1 bg-zinc-800 rounded-md text-xs border border-zinc-700"
-            >
-              {{ inst }}
-            </span>
+        <div v-else class="space-y-4 flex-1 overflow-y-auto">
+          <div
+            v-for="band in bands"
+            :key="band._id"
+            @click="selectBand(band)"
+            class="group flex items-center justify-between p-6 border border-border-zero hover:border-accent hover:bg-accent-dim cursor-pointer transition-all duration-300"
+            :class="activeBand?._id === band._id ? 'border-accent bg-accent-dim' : ''"
+          >
+            <div class="flex items-center gap-4">
+              <span class="font-tech text-xs text-text-dim group-hover:text-accent">
+                {{ String(bands.indexOf(band) + 1).padStart(2, '0') }}
+              </span>
+              <span class="text-xl font-bold uppercase tracking-tight text-text-main">{{ band.name }}</span>
+              <span
+                v-if="unreadCounts[band._id] > 0"
+                class="px-2 py-0.5 bg-accent text-bg-zero text-xs font-tech font-bold"
+              >
+                {{ unreadCounts[band._id] > 9 ? '9+' : unreadCounts[band._id] }}
+              </span>
+            </div>
+            <i class="ph-bold ph-arrow-right opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-accent"></i>
+          </div>
+
+          <div v-if="bands.length === 0" class="text-center py-12">
+            <p class="font-tech text-text-dim text-sm uppercase">No units found</p>
           </div>
         </div>
 
-        <!-- Bands Section -->
-        <section aria-labelledby="bands-heading">
-          <h2 id="bands-heading" class="text-sm font-bold text-zinc-400 uppercase tracking-wider mb-3">
-            Le tue Band
-          </h2>
+        <button
+          @click="router.push({ name: 'create-band' }); showBandMenu = false"
+          class="mt-auto w-full py-4 border border-dashed border-border-zero text-text-dim font-tech text-xs uppercase hover:text-text-main hover:border-text-main transition-colors"
+        >
+          + Initialize New Unit
+        </button>
+      </div>
+    </div>
 
-          <!-- Empty State -->
-          <div v-if="bands.length === 0" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 text-center">
-            <div class="w-14 h-14 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-              <Users :size="28" class="text-zinc-500" />
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto overflow-x-hidden relative pb-24">
+      <div class="container-zero py-6">
+        <!-- Loading State -->
+        <div v-if="loading" class="flex items-center justify-center py-20">
+          <LoadingSpinner />
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="border border-accent/50 p-4 font-tech text-sm text-text-main">
+          {{ error }}
+        </div>
+
+        <!-- Content -->
+        <div v-else class="animate-fade-in">
+          <!-- Status Strip -->
+          <div class="grid grid-cols-3 gap-4 mb-10">
+            <div class="p-3 border border-border-zero">
+              <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Status</span>
+              <span class="block text-accent font-bold text-sm">ONLINE</span>
             </div>
-            <h3 class="text-lg font-bold mb-2">Nessuna band</h3>
-            <p class="text-zinc-400 text-sm mb-6">
-              Crea una nuova band o unisciti con un codice invito
+            <div class="p-3 border border-border-zero">
+              <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Units</span>
+              <span class="block text-text-main font-bold text-sm">{{ bands.length }}</span>
+            </div>
+            <div class="p-3 border border-border-zero">
+              <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">User</span>
+              <span class="block text-text-main font-bold text-sm font-tech">{{ authStore.user?.username?.substring(0, 6).toUpperCase() || 'USR' }}</span>
+            </div>
+          </div>
+
+          <!-- Welcome Message -->
+          <div class="border-l-2 border-accent pl-4 mb-8">
+            <h2 class="text-2xl font-bold text-text-main mb-1">
+              Benvenuto, {{ authStore.user?.username }}
+            </h2>
+            <p class="font-tech text-xs text-text-dim uppercase">
+              {{ authStore.user?.instruments?.length > 0
+                ? authStore.user.instruments.join(' // ')
+                : 'Ready to create' }}
             </p>
           </div>
 
-          <!-- Band List -->
-          <ul v-else class="grid gap-3" role="list">
-            <li v-for="band in bands" :key="band._id">
-              <button
-                @click="router.push({ name: 'songs', params: { bandId: band._id } })"
-                :aria-label="`Apri band ${band.name}${unreadCounts[band._id] > 0 ? `, ${unreadCounts[band._id]} messaggi non letti` : ''}`"
-                class="w-full bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded-2xl p-4 min-h-[80px] transition-all hover:border-zinc-600 cursor-pointer active:scale-[0.98] active:bg-zinc-800 group text-left relative"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-4">
-                    <div class="min-w-[48px] min-h-[48px] rounded-lg bg-gradient-to-r from-indigo-900 to-purple-900 flex items-center justify-center text-white opacity-80 relative" aria-hidden="true">
-                      <Users :size="20" />
-                      <span
-                        v-if="unreadCounts[band._id] > 0"
-                        class="absolute -top-1 -right-1 min-w-[20px] min-h-[20px] bg-red-500 rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-black px-1"
-                      >
-                        {{ unreadCounts[band._id] > 9 ? '9+' : unreadCounts[band._id] }}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 class="font-bold text-lg">{{ band.name }}</h3>
-                      <p class="text-xs text-zinc-400">
-                        {{ band.members?.length }} Membri - {{ band.genre }}
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronRight
-                    :size="20"
-                    class="text-zinc-600 group-hover:text-indigo-400 transition-colors"
-                    aria-hidden="true"
-                  />
-                </div>
-              </button>
-            </li>
-          </ul>
-
-          <!-- Action Buttons -->
-          <div class="flex flex-col gap-3 mt-4">
+          <!-- Band List Section -->
+          <div class="flex justify-between items-end mb-6 border-b border-border-zero pb-2">
+            <h3 class="font-tech text-xs text-text-dim uppercase tracking-widest">Unit Index</h3>
             <button
               @click="router.push({ name: 'create-band' })"
-              aria-label="Unisciti o crea una nuova band"
-              class="w-full min-h-[56px] border-2 border-dashed border-zinc-800 rounded-2xl text-zinc-400 hover:border-zinc-600 hover:text-zinc-300 transition-all active:scale-[0.98] flex items-center justify-center gap-2 font-medium"
+              class="text-accent hover:text-text-main transition-colors"
+              aria-label="Crea nuova band"
             >
-              <Plus :size="20" aria-hidden="true" />
-              <span>Unisciti o Crea Band</span>
+              <i class="ph ph-plus text-xl"></i>
             </button>
           </div>
-        </section>
+
+          <!-- Band List -->
+          <div v-if="bands.length > 0" class="space-y-px bg-border-zero">
+            <div
+              v-for="band in bands"
+              :key="band._id"
+              @click="router.push({ name: 'songs', params: { bandId: band._id } })"
+              class="bg-bg-zero p-5 flex justify-between items-center group cursor-pointer hover:bg-surface-zero transition-colors"
+            >
+              <div>
+                <div class="flex items-center gap-3 mb-1">
+                  <h4 class="text-lg font-bold uppercase group-hover:text-text-main transition-colors text-text-main">
+                    {{ band.name }}
+                  </h4>
+                  <span
+                    v-if="unreadCounts[band._id] > 0"
+                    class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"
+                  ></span>
+                </div>
+                <p class="font-tech text-[0.6rem] text-text-dim uppercase">
+                  MEMBERS: {{ band.members?.length || 0 }} // <span class="text-text-main">{{ band.genre || 'N/A' }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div v-else class="border border-border-zero p-8 text-center">
+            <i class="ph ph-users text-4xl text-text-dim mb-4"></i>
+            <h3 class="text-lg font-bold text-text-main mb-2">No Units Found</h3>
+            <p class="font-tech text-xs text-text-dim uppercase mb-6">
+              Initialize a new unit or join with invite code
+            </p>
+            <button
+              @click="router.push({ name: 'create-band' })"
+              class="px-6 py-3 bg-surface-zero border border-border-zero font-tech text-xs uppercase text-text-main hover:bg-text-main hover:text-bg-zero transition-colors"
+            >
+              + Initialize Unit
+            </button>
+          </div>
+        </div>
       </div>
     </main>
+
+    <!-- Bottom Navigation -->
+    <BottomNavigation />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Users, Plus, ChevronRight, Loader2 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { bandsAPI } from '@/services/api'
+import ScanlineOverlay from '@/components/ScanlineOverlay.vue'
+import ThemeToggle from '@/components/ThemeToggle.vue'
+import BottomNavigation from '@/components/BottomNavigation.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()
-
-const bands = ref([])
-const loading = ref(true)
-const error = ref('')
-const liveMessage = ref('')
 const authStore = useAuthStore()
 
+const bands = ref([])
+const activeBand = ref(null)
+const loading = ref(true)
+const error = ref('')
+const showBandMenu = ref(false)
+
 onMounted(async () => {
-  await loadBands()
+  await Promise.all([
+    loadBands(),
+  ])
 })
 
 async function loadBands() {
   try {
     loading.value = true
-    liveMessage.value = 'Caricamento band in corso...'
     const res = await bandsAPI.list()
     bands.value = res.data
-    liveMessage.value = `${res.data.length} band caricate`
+    if (res.data.length > 0) {
+      activeBand.value = res.data[0]
+    }
   } catch (err) {
-    const errorMsg = err.response?.data?.error || 'Errore nel caricamento delle band'
-    error.value = errorMsg
-    liveMessage.value = errorMsg
+    error.value = err.response?.data?.error || 'Errore nel caricamento delle band'
   } finally {
     loading.value = false
   }
+}
+
+
+function toggleBandMenu() {
+  showBandMenu.value = !showBandMenu.value
+}
+
+function selectBand(band) {
+  activeBand.value = band
+  showBandMenu.value = false
+  router.push({ name: 'songs', params: { bandId: band._id } })
 }
 </script>
