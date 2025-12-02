@@ -90,3 +90,13 @@ body {
 div, button, span, i, header, nav, main, section, article {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
+
+/* Container for centered content on large screens */
+.container-zero {
+  width: 100%;
+  max-width: 56rem; /* 896px - equivalente a max-w-4xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
