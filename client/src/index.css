@@ -1,102 +1,108 @@
-:root {
-  /* DARK THEME (DEFAULT) */
-  --bg-zero: #050505;
-  --surface-zero: #121212;
-  --border-zero: #333333;
-  --text-main: #EDEDED;
-  --text-dim: #666666;
-  --accent: #FF3300;
-  --accent-dim: rgba(255, 51, 0, 0.1);
-  --scanline-color: rgba(0,0,0,0.2);
-  --shadow-glow: rgba(255, 51, 0, 0.15);
-  --scanline-opacity: 0.3;
+@import "tailwindcss";
+
+@theme {
+  /* Colori */
+  --color-bg-zero: var(--bg-zero);
+  --color-surface-zero: var(--surface-zero);
+  --color-border-zero: var(--border-zero);
+  --color-text-main: var(--text-main);
+  --color-text-dim: var(--text-dim);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-scanline: var(--scanline-color);
+  
+  /* Font */
+  --font-tech: "Space Mono", monospace;
+  --font-sans: "Inter", sans-serif;
+  
+  /* Ombre */
+  --shadow-glow: 0 0 20px var(--shadow-glow);
 }
 
-/* LIGHT THEME (CLINICAL/LAB) */
-.light-theme {
-  --bg-zero: #FAFAFA;
-  --surface-zero: #FFFFFF;
-  --border-zero: #E5E5E5;
-  --text-main: #0A0A0A;
-  --text-dim: #999999;
-  --accent: #FF3300;
-  --accent-dim: rgba(255, 51, 0, 0.08);
-  --scanline-color: rgba(0,0,0,0.05);
-  --shadow-glow: rgba(255, 51, 0, 0.25);
-  --scanline-opacity: 0.15;
+@layer base {
+  :root {
+    /* DARK THEME (DEFAULT) */
+    --bg-zero: #050505;
+    --surface-zero: #121212;
+    --border-zero: #333333;
+    --text-main: #EDEDED;
+    --text-dim: #666666;
+    --accent: #FF3300;
+    --accent-dim: rgba(255, 51, 0, 0.1);
+    --scanline-color: rgba(0,0,0,0.2);
+    --shadow-glow: rgba(255, 51, 0, 0.15);
+    --scanline-opacity: 0.3;
+  }
+
+  /* LIGHT THEME */
+  .light-theme {
+    --bg-zero: #FAFAFA;
+    --surface-zero: #FFFFFF;
+    --border-zero: #E5E5E5;
+    --text-main: #0A0A0A;
+    --text-dim: #999999;
+    --accent: #FF3300;
+    --accent-dim: rgba(255, 51, 0, 0.08);
+    --scanline-color: rgba(0,0,0,0.05);
+    --shadow-glow: rgba(255, 51, 0, 0.25);
+    --scanline-opacity: 0.15;
+  }
+
+  body {
+    background-color: var(--bg-zero);
+    color: var(--text-main);
+    font-family: var(--font-sans); /* Usa la variabile definita nel tema */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+@layer components {
+  /* Container Zero - Replica esatta del tuo stile */
+  .container-zero {
+    width: 100%;
+    max-width: 56rem; 
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  /* Scanlines Overlay */
+  .scanlines {
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, var(--scanline-color) 50%, var(--scanline-color));
+    background-size: 100% 4px;
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    opacity: var(--scanline-opacity);
+    transition: opacity 0.3s;
+  }
+
+  /* Input Zero */
+  .input-zero {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-zero);
+    border-radius: 0;
+    padding: 12px 0;
+    transition: border-color 0.3s;
+    color: var(--text-main);
+    outline: none;
+    width: 100%;
+  }
+  .input-zero:focus {
+    border-color: var(--accent);
+  }
+  .input-zero::placeholder {
+    color: var(--text-dim);
+  }
 }
 
-body {
-  margin: 0;
-  background-color: var(--bg-zero);
-  color: var(--text-main);
-  font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-#app {
-  min-height: 100vh;
-}
-
-/* Utility: Sharp transitions */
-.hover-sharp {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Utility: Hide Scrollbar */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* Scanlines Overlay */
-.scanlines {
-  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, var(--scanline-color) 50%, var(--scanline-color));
-  background-size: 100% 4px;
-  pointer-events: none;
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  opacity: var(--scanline-opacity);
-  transition: opacity 0.3s;
-}
-
-/* Minimal Input Styles */
-.input-zero {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border-zero);
-  border-radius: 0;
-  padding: 12px 0;
-  transition: border-color 0.3s;
-  color: var(--text-main);
-  outline: none;
-  width: 100%;
-}
-.input-zero:focus {
-  border-color: var(--accent);
-}
-.input-zero::placeholder {
-  color: var(--text-dim);
-}
-
-/* Mono typography for data */
-.font-tech {
-  font-family: 'Space Mono', monospace;
-}
-
-/* Smooth color transitions for elements */
-div, button, span, i, header, nav, main, section, article {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-}
-
-/* Container for centered content on large screens */
-.container-zero {
-  width: 100%;
-  max-width: 56rem; /* 896px - equivalente a max-w-4xl */
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+@layer utilities {
+  .hover-sharp {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }

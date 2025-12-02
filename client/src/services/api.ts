@@ -40,7 +40,7 @@ export const authAPI = {
 // Bands API
 export const bandsAPI = {
   list: () => api.get('/bands'),
-    create: (data: any) => api.post('/bands', data),
+  create: (data: any) => api.post('/bands', data),
   join: (inviteCode: any, instrument: any) => api.post('/bands/join', { inviteCode, instrument }),
   get: (id: any) => api.get(`/bands/${id}`),
   update: (id: any, data: any) => api.patch(`/bands/${id}`, data),
