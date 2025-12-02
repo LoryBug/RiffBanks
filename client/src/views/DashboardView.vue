@@ -67,12 +67,12 @@
                 {{ String(bands.indexOf(band) + 1).padStart(2, '0') }}
               </span>
               <span class="text-xl font-bold uppercase tracking-tight text-text-main">{{ band.name }}</span>
-              <span
+              <!--<span
                 v-if="unreadCounts[band._id] > 0"
                 class="px-2 py-0.5 bg-accent text-bg-zero text-xs font-tech font-bold"
               >
                 {{ unreadCounts[band._id] > 9 ? '9+' : unreadCounts[band._id] }}
-              </span>
+              </span>-->
             </div>
             <i class="ph-bold ph-arrow-right opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-accent"></i>
           </div>
