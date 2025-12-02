@@ -1,18 +1,92 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+  /* DARK THEME (DEFAULT) */
+  --bg-zero: #050505;
+  --surface-zero: #121212;
+  --border-zero: #333333;
+  --text-main: #EDEDED;
+  --text-dim: #666666;
+  --accent: #FF3300;
+  --accent-dim: rgba(255, 51, 0, 0.1);
+  --scanline-color: rgba(0,0,0,0.2);
+  --shadow-glow: rgba(255, 51, 0, 0.15);
+  --scanline-opacity: 0.3;
+}
+
+/* LIGHT THEME (CLINICAL/LAB) */
+.light-theme {
+  --bg-zero: #FAFAFA;
+  --surface-zero: #FFFFFF;
+  --border-zero: #E5E5E5;
+  --text-main: #0A0A0A;
+  --text-dim: #999999;
+  --accent: #FF3300;
+  --accent-dim: rgba(255, 51, 0, 0.08);
+  --scanline-color: rgba(0,0,0,0.05);
+  --shadow-glow: rgba(255, 51, 0, 0.25);
+  --scanline-opacity: 0.15;
+}
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  background-color: var(--bg-zero);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #000000;
-  color: #ffffff;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-#root {
+#app {
   min-height: 100vh;
+}
+
+/* Utility: Sharp transitions */
+.hover-sharp {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Utility: Hide Scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Scanlines Overlay */
+.scanlines {
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, var(--scanline-color) 50%, var(--scanline-color));
+  background-size: 100% 4px;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  opacity: var(--scanline-opacity);
+  transition: opacity 0.3s;
+}
+
+/* Minimal Input Styles */
+.input-zero {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-zero);
+  border-radius: 0;
+  padding: 12px 0;
+  transition: border-color 0.3s;
+  color: var(--text-main);
+  outline: none;
+  width: 100%;
+}
+.input-zero:focus {
+  border-color: var(--accent);
+}
+.input-zero::placeholder {
+  color: var(--text-dim);
+}
+
+/* Mono typography for data */
+.font-tech {
+  font-family: 'Space Mono', monospace;
+}
+
+/* Smooth color transitions for elements */
+div, button, span, i, header, nav, main, section, article {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
