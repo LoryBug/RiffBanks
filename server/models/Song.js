@@ -40,7 +40,6 @@ const songSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for band queries
 songSchema.index({ bandId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Song', songSchema);
