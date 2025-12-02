@@ -14,22 +14,25 @@ import { ref, onMounted } from 'vue'
 const isDark = ref(true)
 
 onMounted(() => {
-  // Check if light theme was previously set
-  const savedTheme = localStorage.getItem('riffbank-theme')
+  const savedTheme = localStorage.getItem('riffbanks-theme')
+  // Se era salvato light, applichiamo la classe e aggiorniamo lo stato
   if (savedTheme === 'light') {
     isDark.value = false
-    document.body.classList.add('light-theme')
+    document.documentElement.classList.add('light-theme') // <--- CAMBIATO QUI
   }
 })
 
 function toggleTheme() {
   isDark.value = !isDark.value
+  
   if (isDark.value) {
-    document.body.classList.remove('light-theme')
-    localStorage.setItem('riffbank-theme', 'dark')
+    // Torna a Dark (Rimuovi la classe light)
+    document.documentElement.classList.remove('light-theme') // <--- CAMBIATO QUI
+    localStorage.setItem('riffbanks-theme', 'dark')
   } else {
-    document.body.classList.add('light-theme')
-    localStorage.setItem('riffbank-theme', 'light')
+    // Passa a Light (Aggiungi la classe light)
+    document.documentElement.classList.add('light-theme') // <--- CAMBIATO QUI
+    localStorage.setItem('riffbanks-theme', 'light')
   }
 }
 </script>
