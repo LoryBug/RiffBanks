@@ -57,4 +57,15 @@ export const songsAPI = {
   delete: (id: any) => api.delete(`/songs/${id}`)
 };
 
+// Assets API
+export const assetsAPI = {
+  list: (songId: any) => api.get(`/assets?songId=${songId}`),
+  upload: (formData: any) => api.post('/assets', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  createText: (data: any) => api.post('/assets/text', data),
+  vote: (id: any) => api.post(`/assets/${id}/vote`),
+  delete: (id: any) => api.delete(`/assets/${id}`)
+};
+
 export default api;

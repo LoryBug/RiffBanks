@@ -1,24 +1,21 @@
 <template>
-  <div class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-6 animate-fade-in">
-    <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 blur-[100px] animate-pulse-slow"></div>
+  <div class="min-h-screen bg-bg-zero flex flex-col items-center justify-center p-8 relative">
+    <!-- Scanlines -->
+    <ScanlineOverlay />
 
-    <div class="w-full max-w-md space-y-8 relative z-10">
+    <div class="w-full max-w-md space-y-8 relative z-10 animate-fade-in">
       <!-- Header -->
-      <div class="text-center space-y-2">
-        <div class="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-2xl shadow-indigo-600/30">
-          <Music v-if="step === 1" :size="32" class="text-white" />
-          <Zap v-else :size="32" class="text-white" />
-        </div>
-        <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-          {{ step === 1 ? `Ciao, ${authStore.user?.username || 'Musicista'}!` : 'I tuoi gusti' }}
+      <div class="border-l-2 border-accent pl-6">
+        <h2 class="text-3xl font-bold text-text-main mb-1">
+          {{ step === 1 ? `Init_Profile` : 'Define_Sound' }}
         </h2>
-        <p class="text-zinc-400">
-          {{ step === 1 ? 'Quali sono le tue armi preferite?' : 'Definisci il tuo sound.' }}
+        <p class="font-tech text-xs text-text-dim uppercase">
+          {{ step === 1 ? `Welcome, ${authStore.user?.username || 'User'}` : 'Select your genres' }}
         </p>
       </div>
 
-      <!-- Instruments -->
-      <div v-if="step === 1" class="grid grid-cols-2 gap-3 animate-slide-up" role="group" aria-labelledby="instruments-label">
+      <!-- Step 1: Instruments -->
+      <div v-if="step === 1" class="grid grid-cols-2 gap-3" role="group" aria-labelledby="instruments-label">
         <span id="instruments-label" class="sr-only">Seleziona i tuoi strumenti</span>
         <button
           v-for="instrument in INSTRUMENTS"
@@ -26,21 +23,20 @@
           type="button"
           @click="toggleInstrument(instrument.name)"
           :aria-pressed="selectedInstruments.includes(instrument.name)"
-          :aria-label="`${instrument.name}${selectedInstruments.includes(instrument.name) ? ', selezionato' : ''}`"
           :class="[
-            'min-h-[80px] p-4 rounded-xl border flex flex-col items-center gap-2 transition-all active:scale-95',
+            'min-h-[80px] p-4 border flex flex-col items-center gap-2 transition-all active:scale-95',
             selectedInstruments.includes(instrument.name)
-              ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg'
-              : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+              ? 'bg-accent-dim border-accent text-text-main'
+              : 'bg-surface-zero border-border-zero text-text-dim hover:border-text-dim'
           ]"
         >
-          <component :is="instrument.icon" :size="24" aria-hidden="true" />
-          <span class="text-sm font-bold">{{ instrument.name }}</span>
+          <i :class="['ph text-2xl', instrument.icon]" aria-hidden="true"></i>
+          <span class="font-tech text-xs uppercase">{{ instrument.name }}</span>
         </button>
       </div>
 
-      <!-- Genres -->
-      <div v-if="step === 2" class="flex flex-wrap gap-3 justify-center animate-slide-up" role="group" aria-labelledby="genres-label">
+      <!-- Step 2: Genres -->
+      <div v-if="step === 2" class="flex flex-wrap gap-3 justify-center" role="group" aria-labelledby="genres-label">
         <span id="genres-label" class="sr-only">Seleziona i tuoi generi musicali</span>
         <button
           v-for="genre in GENRES"
@@ -48,19 +44,18 @@
           type="button"
           @click="toggleGenre(genre)"
           :aria-pressed="selectedGenres.includes(genre)"
-          :aria-label="`${genre}${selectedGenres.includes(genre) ? ', selezionato' : ''}`"
           :class="[
-            'min-h-[44px] px-4 py-2 rounded-full border text-sm font-bold transition-all active:scale-95',
+            'min-h-[44px] px-4 py-2 border font-tech text-xs uppercase transition-all active:scale-95',
             selectedGenres.includes(genre)
-              ? 'bg-white text-black border-white'
-              : 'bg-transparent border-zinc-700 text-zinc-400 hover:border-zinc-500'
+              ? 'bg-text-main text-bg-zero border-text-main'
+              : 'bg-transparent border-border-zero text-text-dim hover:border-text-dim hover:text-text-main'
           ]"
         >
           {{ genre }}
         </button>
       </div>
 
-      <div v-if="error" role="alert" class="bg-red-500/10 border border-red-500/50 rounded-xl p-3 text-zinc-300 text-sm">
+      <div v-if="error" role="alert" class="border border-accent/50 p-3 font-tech text-sm text-text-main">
         {{ error }}
       </div>
 
@@ -70,25 +65,21 @@
           v-if="step === 2"
           type="button"
           @click="step = 1"
-          aria-label="Torna al passo precedente"
-          class="flex-1 min-h-[56px] py-4 rounded-xl font-bold text-zinc-400 hover:bg-zinc-900 active:scale-95 transition-all"
+          aria-label="Torna indietro"
+          class="flex-1 min-h-[56px] py-4 border border-border-zero font-tech text-xs uppercase text-text-dim hover:text-text-main hover:border-text-dim active:scale-95 transition-all"
         >
-          Indietro
+          Back
         </button>
         <button
           type="button"
           @click="step === 1 ? handleNext() : handleFinish()"
           :disabled="(step === 1 && selectedInstruments.length === 0) || (step === 2 && selectedGenres.length === 0) || loading"
-          :aria-label="loading ? 'Salvataggio in corso' : (step === 1 ? 'Continua al passo successivo' : 'Completa configurazione e inizia')"
-          class="flex-[2] min-h-[56px] py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-lg shadow-indigo-900/40 transition-all active:scale-95 flex items-center justify-center gap-2"
+          class="flex-[2] min-h-[56px] py-4 bg-surface-zero border border-border-zero font-tech text-sm uppercase text-text-main hover:bg-text-main hover:text-bg-zero hover:border-text-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2"
         >
-          <template v-if="loading">
-            <Loader2 :size="20" class="animate-spin" aria-hidden="true" />
-            <span>Salvataggio...</span>
-          </template>
+          <span v-if="loading" class="animate-pulse">Processing...</span>
           <template v-else>
-            <span>{{ step === 1 ? 'Continua' : 'Inizia a Suonare' }}</span>
-            <ArrowRight :size="18" aria-hidden="true" />
+            {{ step === 1 ? 'Continue' : 'Start_Session' }}
+            <i class="ph-bold ph-arrow-right"></i>
           </template>
         </button>
       </div>
@@ -96,12 +87,12 @@
       <!-- Step Indicators -->
       <div class="flex gap-2 justify-center mt-6" role="group" aria-label="Progresso wizard">
         <div
-          :class="['h-1.5 rounded-full transition-all', step === 1 ? 'w-8 bg-indigo-500' : 'w-2 bg-zinc-800']"
+          :class="['h-[2px] transition-all', step === 1 ? 'w-8 bg-accent' : 'w-2 bg-border-zero']"
           aria-label="Passo 1: Strumenti"
           :aria-current="step === 1 ? 'step' : undefined"
         />
         <div
-          :class="['h-1.5 rounded-full transition-all', step === 2 ? 'w-8 bg-indigo-500' : 'w-2 bg-zinc-800']"
+          :class="['h-[2px] transition-all', step === 2 ? 'w-8 bg-accent' : 'w-2 bg-border-zero']"
           aria-label="Passo 2: Generi"
           :aria-current="step === 2 ? 'step' : undefined"
         />
@@ -113,19 +104,19 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { Music, Guitar, Mic, Drum, Activity, ArrowRight, Zap, Loader2 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import ScanlineOverlay from '@/components/ScanlineOverlay.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const INSTRUMENTS = [
-  { id: 'guitar', name: 'Chitarra', icon: Guitar },
-  { id: 'bass', name: 'Basso', icon: Music },
-  { id: 'drums', name: 'Batteria', icon: Drum },
-  { id: 'voice', name: 'Voce', icon: Mic },
-  { id: 'keyboard', name: 'Tastiere', icon: Music },
-  { id: 'producer', name: 'Producer', icon: Activity }
+  { id: 'guitar', name: 'Chitarra', icon: 'ph-guitar' },
+  { id: 'bass', name: 'Basso', icon: 'ph-music-note' },
+  { id: 'drums', name: 'Batteria', icon: 'ph-metronome' },
+  { id: 'voice', name: 'Voce', icon: 'ph-microphone-stage' },
+  { id: 'keyboard', name: 'Tastiere', icon: 'ph-piano-keys' },
+  { id: 'producer', name: 'Producer', icon: 'ph-equalizer' }
 ]
 
 const GENRES = [
