@@ -44,12 +44,12 @@ const routes = [
     component: () => import('@/views/CreateSongView.vue'),
     meta: { requiresAuth: true, requiresOnboarding: true }
   },
-  // {
-  //   path: '/song/:id',
-  //   name: 'song-detail',
-  //   component: () => import('@/views/SongDetailView.vue'),
-  //   meta: { requiresAuth: true, requiresOnboarding: true }
-  // },
+  {
+    path: '/song/:id',
+    name: 'song-detail',
+    component: () => import('@/views/SongDetailView.vue'),
+    meta: { requiresAuth: true, requiresOnboarding: true }
+  },
   {
     path: '/gigs',
     name: 'gigs',
