@@ -1,5 +1,6 @@
 const Song = require('../models/Song');
 const Band = require('../models/Band');
+const Asset = require('../models/Asset');
 
 // Get songs by band
 exports.list = async (req, res) => {
@@ -10,6 +11,7 @@ exports.list = async (req, res) => {
       return res.status(400).json({ error: 'Band ID is required' });
     }
 
+    // Verify user is member of band
     const band = await Band.findById(bandId);
     if (!band) {
       return res.status(404).json({ error: 'Band not found' });
@@ -60,6 +62,13 @@ exports.create = async (req, res) => {
     await song.save();
     await song.populate('createdBy', 'username avatar');
 
+    // Emit socket notification
+    req.io.to(`band:${bandId}`).emit('song_created', {
+      songId: song._id,
+      title: song.title,
+      createdBy: req.user.username
+    });
+
     res.status(201).json(song);
   } catch (err) {
     console.error('Create song error:', err);
@@ -76,12 +85,14 @@ exports.get = async (req, res) => {
     if (!song) {
       return res.status(404).json({ error: 'Song not found' });
     }
-    
+
+    // Verify user is member of band
     const band = await Band.findById(song.bandId);
     if (!band || !band.isMember(req.userId)) {
       return res.status(403).json({ error: 'You do not have access to this song' });
     }
 
+    // Get assets count
     const assetsCount = await Asset.countDocuments({ songId: song._id });
 
     res.json({ ...song.toJSON(), assetsCount });
@@ -100,6 +111,7 @@ exports.update = async (req, res) => {
       return res.status(404).json({ error: 'Song not found' });
     }
 
+    // Verify user is member of band
     const band = await Band.findById(song.bandId);
     if (!band || !band.isMember(req.userId)) {
       return res.status(403).json({ error: 'You do not have access to this song' });
@@ -132,10 +144,14 @@ exports.delete = async (req, res) => {
       return res.status(404).json({ error: 'Song not found' });
     }
 
+    // Verify user is admin of band
     const band = await Band.findById(song.bandId);
     if (!band || !band.isAdmin(req.userId)) {
       return res.status(403).json({ error: 'Only band admins can delete songs' });
     }
+
+    // Delete associated assets
+    await Asset.deleteMany({ songId: song._id });
 
     await song.deleteOne();
 
