@@ -11,10 +11,10 @@
         <div class="w-2 h-2 bg-accent group-hover:shadow-glow transition-all"></div>
         <div class="flex flex-col">
           <span class="font-bold text-lg leading-none tracking-tight text-text-main">
-            {{ activeBand ? activeBand.name : 'Seleziona Unit' }}
+            {{ activeBand ? activeBand.name : 'Seleziona Band' }}
           </span>
           <span class="font-tech text-[0.6rem] text-text-dim uppercase group-hover:text-text-main transition-colors">
-            Select Unit <i class="ph-bold ph-caret-down"></i>
+            Select Band <i class="ph-bold ph-caret-down"></i>
           </span>
         </div>
       </div>
@@ -44,7 +44,7 @@
     >
       <div class="container-zero flex flex-col h-full py-8">
         <div class="flex justify-between items-center mb-12 border-b border-border-zero pb-4">
-          <h2 class="text-3xl font-bold text-text-main">SELECT UNIT</h2>
+          <h2 class="text-3xl font-bold text-text-main">SELECT BAND</h2>
           <button @click="showBandMenu = false" class="text-text-dim hover:text-text-main" aria-label="Chiudi">
             <i class="ph ph-x text-2xl"></i>
           </button>
@@ -67,18 +67,18 @@
                 {{ String(bands.indexOf(band) + 1).padStart(2, '0') }}
               </span>
               <span class="text-xl font-bold uppercase tracking-tight text-text-main">{{ band.name }}</span>
-              <span
+              <!--<span
                 v-if="unreadCounts[band._id] > 0"
                 class="px-2 py-0.5 bg-accent text-bg-zero text-xs font-tech font-bold"
               >
                 {{ unreadCounts[band._id] > 9 ? '9+' : unreadCounts[band._id] }}
-              </span>
+              </span>-->
             </div>
             <i class="ph-bold ph-arrow-right opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-accent"></i>
           </div>
 
           <div v-if="bands.length === 0" class="text-center py-12">
-            <p class="font-tech text-text-dim text-sm uppercase">No units found</p>
+            <p class="font-tech text-text-dim text-sm uppercase">No bands found</p>
           </div>
         </div>
 
@@ -86,7 +86,7 @@
           @click="router.push({ name: 'create-band' }); showBandMenu = false"
           class="mt-auto w-full py-4 border border-dashed border-border-zero text-text-dim font-tech text-xs uppercase hover:text-text-main hover:border-text-main transition-colors"
         >
-          + Initialize New Unit
+          + Initialize New Band
         </button>
       </div>
     </div>
@@ -113,7 +113,7 @@
               <span class="block text-accent font-bold text-sm">ONLINE</span>
             </div>
             <div class="p-3 border border-border-zero">
-              <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Units</span>
+              <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Bands</span>
               <span class="block text-text-main font-bold text-sm">{{ bands.length }}</span>
             </div>
             <div class="p-3 border border-border-zero">
@@ -136,7 +136,7 @@
 
           <!-- Band List Section -->
           <div class="flex justify-between items-end mb-6 border-b border-border-zero pb-2">
-            <h3 class="font-tech text-xs text-text-dim uppercase tracking-widest">Unit Index</h3>
+            <h3 class="font-tech text-xs text-text-dim uppercase tracking-widest">Band Index</h3>
             <button
               @click="router.push({ name: 'create-band' })"
               class="text-accent hover:text-text-main transition-colors"
@@ -159,10 +159,10 @@
                   <h4 class="text-lg font-bold uppercase group-hover:text-text-main transition-colors text-text-main">
                     {{ band.name }}
                   </h4>
-                  <span
+                  <!--<span
                     v-if="unreadCounts[band._id] > 0"
                     class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"
-                  ></span>
+                  ></span> -->
                 </div>
                 <p class="font-tech text-[0.6rem] text-text-dim uppercase">
                   MEMBERS: {{ band.members?.length || 0 }} // <span class="text-text-main">{{ band.genre || 'N/A' }}</span>
@@ -174,15 +174,15 @@
           <!-- Empty State -->
           <div v-else class="border border-border-zero p-8 text-center">
             <i class="ph ph-users text-4xl text-text-dim mb-4"></i>
-            <h3 class="text-lg font-bold text-text-main mb-2">No Units Found</h3>
+            <h3 class="text-lg font-bold text-text-main mb-2">No Bands Found</h3>
             <p class="font-tech text-xs text-text-dim uppercase mb-6">
-              Initialize a new unit or join with invite code
+              Initialize a new band or join with invite code
             </p>
             <button
               @click="router.push({ name: 'create-band' })"
               class="px-6 py-3 bg-surface-zero border border-border-zero font-tech text-xs uppercase text-text-main hover:bg-text-main hover:text-bg-zero transition-colors"
             >
-              + Initialize Unit
+              + Initialize Band
             </button>
           </div>
         </div>

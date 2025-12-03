@@ -33,7 +33,7 @@
             <div class="w-px h-6 bg-border-zero"></div>
             <div class="flex flex-col">
               <span class="font-bold text-lg leading-none tracking-tight text-text-main">{{ band?.name }}</span>
-              <span class="font-tech text-[0.6rem] text-text-dim uppercase">Unit_Info</span>
+              <span class="font-tech text-[0.6rem] text-text-dim uppercase">Band_Info</span>
             </div>
           </div>
           <ThemeToggle />
@@ -110,7 +110,7 @@
                 </button>
               </div>
               <p class="font-tech text-[0.6rem] text-text-dim uppercase mt-3">
-                Share this code to invite members to the unit
+                Share this code to invite members to the band
               </p>
             </div>
 
@@ -156,7 +156,7 @@
                 class="flex items-center gap-2 px-6 py-3 border border-accent/50 text-accent font-tech text-xs uppercase hover:bg-accent-dim transition-all"
               >
                 <i class="ph ph-sign-out"></i>
-                Leave_Unit
+                Leave_Band
               </button>
             </div>
           </div>
@@ -208,7 +208,7 @@ async function loadBand() {
     const res = await bandsAPI.get(route.params.id)
     band.value = res.data
   } catch (err) {
-    error.value = err.response?.data?.error || 'Failed to load unit'
+    error.value = err.response?.data?.error || 'Failed to load band'
   } finally {
     loading.value = false
   }
@@ -235,13 +235,13 @@ async function regenerateCode() {
 }
 
 async function handleLeave() {
-  if (!window.confirm('Are you sure you want to leave this unit?')) return
+  if (!window.confirm('Are you sure you want to leave this band?')) return
 
   try {
     await bandsAPI.leave(route.params.id)
     router.push({ name: 'dashboard' })
   } catch (err) {
-    error.value = err.response?.data?.error || 'Failed to leave unit'
+    error.value = err.response?.data?.error || 'Failed to leave band'
   }
 }
 </script>

@@ -14,7 +14,7 @@
             <i class="ph-bold ph-arrow-left"></i> Back
           </button>
           <div class="w-px h-6 bg-border-zero"></div>
-          <span class="font-bold text-lg leading-none tracking-tight text-text-main">Unit_Config</span>
+          <span class="font-bold text-lg leading-none tracking-tight text-text-main">Band_Config</span>
         </div>
         <ThemeToggle />
       </div>
@@ -25,8 +25,8 @@
       <div class="container-zero py-6 space-y-8 animate-fade-in">
         <!-- Section Header -->
         <div class="border-l-2 border-accent pl-4">
-          <h1 class="text-3xl font-bold uppercase leading-none mb-1 text-text-main">Unit_Config</h1>
-          <p class="font-tech text-xs text-text-dim">Join or initialize a new unit</p>
+          <h1 class="text-3xl font-bold uppercase leading-none mb-1 text-text-main">Band_Config</h1>
+          <p class="font-tech text-xs text-text-dim">Join or initialize a new band</p>
         </div>
 
         <!-- Tabs -->
@@ -36,14 +36,14 @@
             class="pb-2 px-4 font-tech text-xs font-bold uppercase transition-all"
             :class="activeTab === 'join' ? 'text-accent border-b-2 border-accent' : 'text-text-dim hover:text-text-main'"
           >
-            Join_Unit
+            Join_Band
           </button>
           <button
             @click="activeTab = 'create'; error = ''"
             class="pb-2 px-4 font-tech text-xs font-bold uppercase transition-all"
             :class="activeTab === 'create' ? 'text-accent border-b-2 border-accent' : 'text-text-dim hover:text-text-main'"
           >
-            Init_Unit
+            Init_Band
           </button>
         </div>
 
@@ -54,7 +54,7 @@
               <i class="ph ph-key text-4xl text-accent"></i>
               <h2 class="text-xl font-bold text-text-main">Enter Invite Code</h2>
               <p class="font-tech text-xs text-text-dim uppercase">
-                Input the code received from unit admin
+                Input the code received from band admin
               </p>
             </div>
 
@@ -94,7 +94,7 @@
               >
                 <span v-if="loading" class="animate-pulse">Connecting...</span>
                 <template v-else>
-                  Connect_Unit <i class="ph-bold ph-arrow-right"></i>
+                  Connect_Band <i class="ph-bold ph-arrow-right"></i>
                 </template>
               </button>
             </form>
@@ -106,7 +106,7 @@
           <div class="border border-border-zero p-6 space-y-6">
             <div class="text-center space-y-2">
               <i class="ph ph-plus text-4xl text-accent"></i>
-              <h2 class="text-xl font-bold text-text-main">Initialize New Unit</h2>
+              <h2 class="text-xl font-bold text-text-main">Initialize New Band</h2>
               <p class="font-tech text-xs text-text-dim uppercase">
                 Become admin and invite members
               </p>
@@ -115,7 +115,7 @@
             <form @submit.prevent="handleCreate" class="space-y-5">
               <div>
                 <label class="font-tech text-xs text-accent uppercase block mb-1">
-                  Unit_Name <span class="text-accent">*</span>
+                  Band_Name <span class="text-accent">*</span>
                 </label>
                 <input
                   v-model="createForm.name"
@@ -151,7 +151,7 @@
                 <label class="font-tech text-xs text-accent uppercase block mb-1">Bio</label>
                 <textarea
                   v-model="createForm.bio"
-                  placeholder="Unit description and mission..."
+                  placeholder="Band description and mission..."
                   rows="3"
                   class="input-zero font-tech text-sm resize-none"
                 />
@@ -180,7 +180,7 @@
               >
                 <span v-if="loading" class="animate-pulse">Initializing...</span>
                 <template v-else>
-                  Init_Unit <i class="ph-bold ph-arrow-right"></i>
+                  Init_Band <i class="ph-bold ph-arrow-right"></i>
                 </template>
               </button>
             </form>
@@ -221,7 +221,7 @@ const joinInstrument = ref('')
 
 async function handleCreate() {
   if (!createForm.name.trim()) {
-    error.value = 'Unit name is required'
+    error.value = 'Band name is required'
     return
   }
 
@@ -232,7 +232,7 @@ async function handleCreate() {
     const res = await bandsAPI.create(createForm)
     router.push({ name: 'band-info', params: { id: res.data._id } })
   } catch (err) {
-    error.value = err.response?.data?.error || 'Failed to create unit'
+    error.value = err.response?.data?.error || 'Failed to create band'
   } finally {
     loading.value = false
   }
@@ -251,7 +251,7 @@ async function handleJoin() {
     const res = await bandsAPI.join(inviteCode.value, joinInstrument.value)
     router.push({ name: 'band-info', params: { id: res.data._id } })
   } catch (err) {
-    error.value = err.response?.data?.error || 'Failed to join unit'
+    error.value = err.response?.data?.error || 'Failed to join band'
   } finally {
     loading.value = false
   }

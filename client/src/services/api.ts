@@ -57,4 +57,39 @@ export const songsAPI = {
   delete: (id: any) => api.delete(`/songs/${id}`)
 };
 
+// Assets API
+export const assetsAPI = {
+  list: (songId: any) => api.get(`/assets?songId=${songId}`),
+  upload: (formData: any) => api.post('/assets', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  createText: (data: any) => api.post('/assets/text', data),
+  vote: (id: any) => api.post(`/assets/${id}/vote`),
+  delete: (id: any) => api.delete(`/assets/${id}`)
+};
+
+// Gigs API 
+export const gigsAPI = {
+  list: (params: any = {}) => {
+    const query = new URLSearchParams();
+    if (params.type) query.append('type', params.type);
+    if (params.role) query.append('role', params.role);
+    if (params.genre) query.append('genre', params.genre);
+    if (params.search) query.append('search', params.search);
+    const queryStr = query.toString();
+    return api.get(`/gigs${queryStr ? `?${queryStr}` : ''}`);
+  },
+  myGigs: () => api.get('/gigs/my-gigs'),
+  get: (id: any) => api.get(`/gigs/${id}`),
+  create: (data: any) => api.post('/gigs', data),
+  update: (id: any, data: any) => api.patch(`/gigs/${id}`, data),
+  delete: (id: any) => api.delete(`/gigs/${id}`),
+  apply: (id: any, message: any) => api.post(`/gigs/${id}/apply`, { message }),
+  withdraw: (id: any) => api.post(`/gigs/${id}/withdraw`),
+  respond: (id: any, applicantId: any, action: any) => api.post(`/gigs/${id}/respond`, { applicantId, action }),
+  getNewGigsCount: () => api.get('/gigs/notifications/new-count'),
+  markGigBoardVisited: () => api.post('/gigs/notifications/mark-visited')
+};
+
+
 export default api;
