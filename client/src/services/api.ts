@@ -68,6 +68,17 @@ export const assetsAPI = {
   delete: (id: any) => api.delete(`/assets/${id}`)
 };
 
+// Messages API
+export const messagesAPI = {
+  list: (songId: any, before = null, limit = 50) => {
+    let url = `/messages?songId=${songId}&limit=${limit}`;
+    if (before) url += `&before=${before}`;
+    return api.get(url);
+  },
+  getUnreadCounts: () => api.get('/messages/unread-counts'),
+  markAsRead: (songId: any) => api.post('/messages/mark-read', { songId })
+};
+
 // Gigs API 
 export const gigsAPI = {
   list: (params: any = {}) => {
