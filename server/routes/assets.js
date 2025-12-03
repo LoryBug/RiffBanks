@@ -8,6 +8,7 @@ router.use(authMiddleware);
 
 router.get('/', assetController.list);
 router.post('/', upload.single('file'), handleUploadError, assetController.upload);
+router.post('/text', assetController.createText);
 router.post('/:id/vote', assetController.vote);
 router.delete('/:id', assetController.delete);
 
