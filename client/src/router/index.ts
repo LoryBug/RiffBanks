@@ -50,6 +50,12 @@ const routes = [
   //   component: () => import('@/views/SongDetailView.vue'),
   //   meta: { requiresAuth: true, requiresOnboarding: true }
   // },
+  {
+    path: '/gigs',
+    name: 'gigs',
+    component: () => import('@/views/GigsView.vue'),
+    meta: { requiresAuth: true, requiresOnboarding: true }
+  }
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
