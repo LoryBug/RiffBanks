@@ -87,6 +87,53 @@ exports.upload = async (req, res) => {
     res.status(500).json({ error: 'Failed to upload asset' });
   }
 };
+// Create text asset
+exports.createText = async (req, res) => {
+  try {
+    const { songId, title, content } = req.body;
+
+    if (!songId || !content) {
+      return res.status(400).json({ error: 'Song ID and content are required' });
+    }
+
+    // Verify access
+    const song = await Song.findById(songId);
+    if (!song) {
+      return res.status(404).json({ error: 'Song not found' });
+    }
+
+    const band = await Band.findById(song.bandId);
+    if (!band || !band.isMember(req.userId)) {
+      return res.status(403).json({ error: 'You do not have access to this song' });
+    }
+
+    const asset = new Asset({
+      songId,
+      uploaderId: req.userId,
+      type: 'text',
+      title: title || 'Lyrics',
+      content,
+      authorName: req.user.username
+    });
+
+    await asset.save();
+    await asset.populate('uploaderId', 'username avatar');
+
+    // Emit socket notification
+    req.io.to(`song:${songId}`).emit('asset_uploaded', {
+      asset: asset.toJSON(),
+      uploadedBy: req.user.username
+    });
+
+    res.status(201).json({
+      ...asset.toJSON(),
+      votedByMe: false
+    });
+  } catch (err) {
+    console.error('Create text asset error:', err);
+    res.status(500).json({ error: 'Failed to create text asset' });
+  }
+};
 
 // Toggle vote
 exports.vote = async (req, res) => {
