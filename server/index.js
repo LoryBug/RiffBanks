@@ -43,7 +43,7 @@ app.use('/api/assets', require('./routes/assets'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/gigs', require('./routes/gigs'));
 
-// Socket.io handlers (will be added in Phase 4)
+// Socket.io handlers
 require('./socket')(io);
 
 // Error handling middleware
