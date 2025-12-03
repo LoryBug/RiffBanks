@@ -11,10 +11,10 @@
         <div class="w-2 h-2 bg-accent group-hover:shadow-glow transition-all"></div>
         <div class="flex flex-col">
           <span class="font-bold text-lg leading-none tracking-tight text-text-main">
-            {{ activeBand ? activeBand.name : 'Seleziona Band' }}
+            {{ activeBand ? activeBand.name : 'Seleziona Unit' }}
           </span>
           <span class="font-tech text-[0.6rem] text-text-dim uppercase group-hover:text-text-main transition-colors">
-            Select Band <i class="ph-bold ph-caret-down"></i>
+            Select Unit <i class="ph-bold ph-caret-down"></i>
           </span>
         </div>
       </div>
@@ -44,7 +44,7 @@
     >
       <div class="container-zero flex flex-col h-full py-8">
         <div class="flex justify-between items-center mb-12 border-b border-border-zero pb-4">
-          <h2 class="text-3xl font-bold text-text-main">SELECT BAND</h2>
+          <h2 class="text-3xl font-bold text-text-main">SELECT UNIT</h2>
           <button @click="showBandMenu = false" class="text-text-dim hover:text-text-main" aria-label="Chiudi">
             <i class="ph ph-x text-2xl"></i>
           </button>
@@ -78,7 +78,7 @@
           </div>
 
           <div v-if="bands.length === 0" class="text-center py-12">
-            <p class="font-tech text-text-dim text-sm uppercase">No bands found</p>
+            <p class="font-tech text-text-dim text-sm uppercase">No units found</p>
           </div>
         </div>
 
@@ -86,7 +86,7 @@
           @click="router.push({ name: 'create-band' }); showBandMenu = false"
           class="mt-auto w-full py-4 border border-dashed border-border-zero text-text-dim font-tech text-xs uppercase hover:text-text-main hover:border-text-main transition-colors"
         >
-          + Initialize New Band
+          + Initialize New Unit
         </button>
       </div>
     </div>
@@ -106,14 +106,14 @@
 
         <!-- Content -->
         <div v-else class="animate-fade-in">
-          <!-- Status Strip -->
+          <!-- KPI / Status Strip -->
           <div class="grid grid-cols-3 gap-4 mb-10">
             <div class="p-3 border border-border-zero">
               <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Status</span>
               <span class="block text-accent font-bold text-sm">ONLINE</span>
             </div>
             <div class="p-3 border border-border-zero">
-              <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Bands</span>
+              <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Units</span>
               <span class="block text-text-main font-bold text-sm">{{ bands.length }}</span>
             </div>
             <div class="p-3 border border-border-zero">
@@ -136,7 +136,7 @@
 
           <!-- Band List Section -->
           <div class="flex justify-between items-end mb-6 border-b border-border-zero pb-2">
-            <h3 class="font-tech text-xs text-text-dim uppercase tracking-widest">Band Index</h3>
+            <h3 class="font-tech text-xs text-text-dim uppercase tracking-widest">Unit Index</h3>
             <button
               @click="router.push({ name: 'create-band' })"
               class="text-accent hover:text-text-main transition-colors"
@@ -168,21 +168,31 @@
                   MEMBERS: {{ band.members?.length || 0 }} // <span class="text-text-main">{{ band.genre || 'N/A' }}</span>
                 </p>
               </div>
+
+              <div class="flex items-center gap-4">
+                <span
+                  v-if="unreadCounts[band._id] > 0"
+                  class="px-2 py-1 bg-accent text-bg-zero font-tech text-[0.6rem] font-bold"
+                >
+                  {{ unreadCounts[band._id] > 9 ? '9+' : unreadCounts[band._id] }} MSG
+                </span>
+                <i class="ph-bold ph-caret-right text-text-dim group-hover:text-text-main"></i>
+              </div>
             </div>
           </div>
 
           <!-- Empty State -->
           <div v-else class="border border-border-zero p-8 text-center">
             <i class="ph ph-users text-4xl text-text-dim mb-4"></i>
-            <h3 class="text-lg font-bold text-text-main mb-2">No Bands Found</h3>
+            <h3 class="text-lg font-bold text-text-main mb-2">No Units Found</h3>
             <p class="font-tech text-xs text-text-dim uppercase mb-6">
-              Initialize a new band or join with invite code
+              Initialize a new unit or join with invite code
             </p>
             <button
               @click="router.push({ name: 'create-band' })"
               class="px-6 py-3 bg-surface-zero border border-border-zero font-tech text-xs uppercase text-text-main hover:bg-text-main hover:text-bg-zero transition-colors"
             >
-              + Initialize Band
+              + Initialize Unit
             </button>
           </div>
         </div>
@@ -198,7 +208,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { bandsAPI } from '@/services/api'
+import { useSocketStore } from '@/stores/socket'
+import { bandsAPI, messagesAPI, gigsAPI } from '@/services/api'
 import ScanlineOverlay from '@/components/ScanlineOverlay.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
@@ -206,17 +217,33 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const socketStore = useSocketStore()
 
 const bands = ref([])
 const activeBand = ref(null)
 const loading = ref(true)
 const error = ref('')
+const unreadCounts = ref({})
+const newGigsCount = ref(0)
 const showBandMenu = ref(false)
 
 onMounted(async () => {
   await Promise.all([
     loadBands(),
+    loadUnreadCounts(),
+    loadNewGigsCount()
   ])
+
+  if (authStore.isAuthenticated && !socketStore.connected) {
+    socketStore.connect()
+  }
+
+  if (socketStore.socket) {
+    socketStore.socket.on('unread_count_update', loadUnreadCounts)
+    socketStore.socket.on('new_gig', () => {
+      newGigsCount.value++
+    })
+  }
 })
 
 async function loadBands() {
@@ -234,6 +261,23 @@ async function loadBands() {
   }
 }
 
+async function loadUnreadCounts() {
+  try {
+    const res = await messagesAPI.getUnreadCounts()
+    unreadCounts.value = res.data
+  } catch (err) {
+    console.error('Failed to load unread counts:', err)
+  }
+}
+
+async function loadNewGigsCount() {
+  try {
+    const res = await gigsAPI.getNewGigsCount()
+    newGigsCount.value = res.data.count
+  } catch (err) {
+    console.error('Failed to load new gigs count:', err)
+  }
+}
 
 function toggleBandMenu() {
   showBandMenu.value = !showBandMenu.value
