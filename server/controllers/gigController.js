@@ -1,6 +1,7 @@
 const Gig = require('../models/Gig');
 const Band = require('../models/Band');
 const User = require('../models/User');
+const { createNotification, emitNotification } = require('./notificationController');
 
 // List all open gigs (public)
 exports.list = async (req, res) => {
@@ -51,6 +52,38 @@ exports.list = async (req, res) => {
   }
 };
 
+// List gigs where user has applied
+exports.myApplications = async (req, res) => {
+  try {
+    const gigs = await Gig.find({
+      'applicants.userId': req.userId
+    })
+      .sort({ createdAt: -1 })
+      .populate('bandId', 'name genre coverImage')
+      .populate('createdBy', 'username')
+      .lean();
+
+    // Add user's application status to each gig
+    const gigsWithStatus = gigs.map(gig => {
+      const myApplication = gig.applicants.find(a => a.userId.toString() === req.userId);
+      return {
+        ...gig,
+        myApplicationStatus: myApplication?.status || 'pending',
+        myApplicationMessage: myApplication?.message || '',
+        myApplicationDate: myApplication?.appliedAt,
+        applicantCount: gig.applicants?.length || 0,
+        // Remove other applicants for privacy
+        applicants: undefined
+      };
+    });
+
+    res.json(gigsWithStatus);
+  } catch (err) {
+    console.error('My applications error:', err);
+    res.status(500).json({ error: 'Failed to fetch your applications' });
+  }
+};
+
 // List gigs created by user's bands
 exports.myGigs = async (req, res) => {
   try {
@@ -59,7 +92,7 @@ exports.myGigs = async (req, res) => {
       'members': {
         $elemMatch: {
           userId: req.userId,
-          role: 'admin'
+          role: 'Admin'
         }
       }
     });
@@ -94,7 +127,7 @@ exports.get = async (req, res) => {
     // Check if user is band admin to show applicants
     const band = gig.bandId;
     const isAdmin = band.members?.some(m =>
-      m.userId.toString() === req.userId && m.role === 'admin'
+      m.userId.toString() === req.userId && m.role === 'Admin'
     );
 
     const gigData = gig.toJSON();
@@ -251,6 +284,28 @@ exports.apply = async (req, res) => {
 
     await gig.save();
 
+    // Get applicant username for notification
+    const applicant = await User.findById(req.userId).select('username');
+
+    // Notify band admins about new applicant
+    if (band) {
+      const admins = band.members.filter(m => m.role === 'Admin' || m.role === 'admin');
+      for (const admin of admins) {
+        const notification = await createNotification(
+          admin.userId,
+          'new_applicant',
+          'Nuovo candidato',
+          `${applicant?.username || 'Qualcuno'} si e' candidato per "${gig.role}"`,
+          gig._id,
+          'gig',
+          `/gigs`
+        );
+        if (notification && req.io) {
+          emitNotification(req.io, admin.userId, notification);
+        }
+      }
+    }
+
     res.json({ message: 'Application submitted successfully' });
   } catch (err) {
     console.error('Apply to gig error:', err);
@@ -337,6 +392,27 @@ exports.respondToApplicant = async (req, res) => {
 
     await gig.save();
     await gig.populate('applicants.userId', 'username instruments genres profilePic');
+
+    // Notify the applicant about the decision
+    const notificationType = action === 'accept' ? 'application_accepted' : 'application_rejected';
+    const notificationTitle = action === 'accept' ? 'Candidatura accettata!' : 'Candidatura rifiutata';
+    const notificationMessage = action === 'accept'
+      ? `Sei stato accettato per "${gig.role}" in ${band.name}`
+      : `La tua candidatura per "${gig.role}" non e' stata accettata`;
+
+    const notification = await createNotification(
+      applicant.userId,
+      notificationType,
+      notificationTitle,
+      notificationMessage,
+      gig._id,
+      'gig',
+      action === 'accept' ? `/gigs` : null
+    );
+
+    if (notification && req.io) {
+      emitNotification(req.io, applicant.userId, notification);
+    }
 
     res.json({
       message: `Application ${action}ed successfully`,
