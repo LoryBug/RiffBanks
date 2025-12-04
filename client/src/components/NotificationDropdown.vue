@@ -177,7 +177,6 @@ async function handleNotificationClick(notification) {
     }
   }
 
-  // Navigate if there's a link
   if (notification.link) {
     isOpen.value = false
     router.push(notification.link)
