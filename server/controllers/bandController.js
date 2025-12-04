@@ -1,4 +1,6 @@
 const Band = require('../models/Band');
+const User = require('../models/User');
+
 // Get user's bands
 exports.list = async (req, res) => {
   try {
@@ -14,7 +16,7 @@ exports.list = async (req, res) => {
   }
 };
 
-// Create a new band
+// Create new band
 exports.create = async (req, res) => {
   try {
     const { name, genre, bio, location, instrument } = req.body;
@@ -58,7 +60,7 @@ exports.create = async (req, res) => {
   }
 };
 
-// Join bad with invite code
+// Join band with invite code
 exports.join = async (req, res) => {
   try {
     const { inviteCode, instrument } = req.body;
@@ -151,6 +153,7 @@ exports.update = async (req, res) => {
     res.status(500).json({ error: 'Failed to update band' });
   }
 };
+
 // Leave band
 exports.leave = async (req, res) => {
   try {
@@ -164,15 +167,9 @@ exports.leave = async (req, res) => {
       return res.status(400).json({ error: 'You are not a member of this band' });
     }
 
-    // Check if user is the only admin
-    const isOnlyAdmin = band.isAdmin(req.userId) &&
-      band.members.filter(m => m.role === 'Admin').length === 1;
-
-    if (isOnlyAdmin && band.members.length > 1) {
-      return res.status(400).json({
-        error: 'You must promote another member to admin before leaving'
-      });
-    }
+    // Check if user is admin
+    const isAdmin = band.isAdmin(req.userId);
+    const adminCount = band.members.filter(m => m.role === 'Admin').length;
 
     // Remove member
     band.members = band.members.filter(m => !m.userId.equals(req.userId));
@@ -180,6 +177,12 @@ exports.leave = async (req, res) => {
     // If no members left, deactivate band
     if (band.members.length === 0) {
       band.active = false;
+    } else if (isAdmin && adminCount === 1) {
+      // User was the only admin - transfer admin role to the oldest member (by join date)
+      const sortedMembers = [...band.members].sort((a, b) =>
+        new Date(a.joinedAt) - new Date(b.joinedAt)
+      );
+      sortedMembers[0].role = 'Admin';
     }
 
     await band.save();
@@ -220,5 +223,46 @@ exports.regenerateCode = async (req, res) => {
   } catch (err) {
     console.error('Regenerate code error:', err);
     res.status(500).json({ error: 'Failed to regenerate code' });
+  }
+};
+
+// Remove member (admin only)
+exports.removeMember = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const band = await Band.findById(req.params.id);
+
+    if (!band) {
+      return res.status(404).json({ error: 'Band not found' });
+    }
+
+    if (!band.isAdmin(req.userId)) {
+      return res.status(403).json({ error: 'Only admins can remove members' });
+    }
+
+    // Cannot remove yourself
+    if (userId === req.userId) {
+      return res.status(400).json({ error: 'Use leave function to remove yourself' });
+    }
+
+    // Check if target is a member
+    const memberToRemove = band.members.find(m => m.userId.equals(userId));
+    if (!memberToRemove) {
+      return res.status(404).json({ error: 'Member not found' });
+    }
+
+    // Cannot remove another admin
+    if (memberToRemove.role === 'Admin') {
+      return res.status(400).json({ error: 'Cannot remove another admin' });
+    }
+
+    // Remove member
+    band.members = band.members.filter(m => !m.userId.equals(userId));
+    await band.save();
+
+    res.json({ message: 'Member removed successfully' });
+  } catch (err) {
+    console.error('Remove member error:', err);
+    res.status(500).json({ error: 'Failed to remove member' });
   }
 };
