@@ -5,7 +5,7 @@
         v-for="item in navItems"
         :key="item.id"
         @click="handleNavClick(item.id)"
-        class="flex flex-col items-center justify-center flex-1 h-full gap-2 group"
+        class="flex flex-col items-center justify-center flex-1 h-full gap-2 group btn-press"
         :aria-label="item.label"
         :aria-current="currentView === item.id ? 'page' : undefined"
       >
@@ -36,18 +36,16 @@ const route = useRoute()
 const navItems = [
   { id: 'dashboard', label: 'Console', mobileLabel: 'Console', route: 'dashboard' },
   { id: 'gigs', label: 'Gig_Net', mobileLabel: 'Network', route: 'gigs' },
+  { id: 'profile', label: 'Profile', mobileLabel: 'Profile', route: 'profile' },
 ]
 
 const currentView = computed(() => {
   if (route.name === 'gigs') return 'gigs'
+  if (route.name === 'profile') return 'profile'
   return 'dashboard'
 })
 
 function handleNavClick(viewId) {
-  if (viewId === 'gigs') {
-    router.push({ name: 'gigs' })
-  } else {
-    router.push({ name: 'dashboard' })
-  }
+  router.push({ name: viewId })
 }
 </script>
