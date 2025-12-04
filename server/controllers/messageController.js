@@ -12,6 +12,7 @@ exports.list = async (req, res) => {
       return res.status(400).json({ error: 'songId is required' });
     }
 
+    // Verify song exists and user has access
     const song = await Song.findById(songId);
     if (!song) {
       return res.status(404).json({ error: 'Song not found' });
@@ -29,7 +30,7 @@ exports.list = async (req, res) => {
 
     // Get messages with pagination
     const limit = parseInt(req.query.limit) || 50;
-    const before = req.query.before;
+    const before = req.query.before; // cursor for pagination
 
     let query = { songId };
     if (before) {
@@ -42,6 +43,7 @@ exports.list = async (req, res) => {
       .populate('userId', 'username profilePic')
       .lean();
 
+    // Format messages
     const formattedMessages = messages.map(msg => ({
       _id: msg._id,
       songId: msg.songId,
@@ -90,10 +92,12 @@ exports.getUnreadCounts = async (req, res) => {
     const songIds = songs.map(s => s._id);
 
     // Aggregate unread messages by band
+    // Exclude user's own messages from unread count
     const unreadMessages = await Message.aggregate([
       {
         $match: {
           songId: { $in: songIds },
+          userId: { $ne: new mongoose.Types.ObjectId(userId) }, // Exclude own messages
           readBy: { $ne: new mongoose.Types.ObjectId(userId) }
         }
       },
@@ -116,6 +120,7 @@ exports.getUnreadCounts = async (req, res) => {
       }
     ]);
 
+    // Format response as { bandId: count }
     const counts = {};
     unreadMessages.forEach(item => {
       counts[item._id.toString()] = item.count;
@@ -124,6 +129,65 @@ exports.getUnreadCounts = async (req, res) => {
     res.json(counts);
   } catch (err) {
     console.error('Get unread counts error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Get unread message counts per song for a band
+exports.getUnreadCountsBySong = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { bandId } = req.query;
+
+    if (!bandId) {
+      return res.status(400).json({ error: 'bandId is required' });
+    }
+
+    // Verify user is member of this band
+    const band = await Band.findById(bandId);
+    if (!band) {
+      return res.status(404).json({ error: 'Band not found' });
+    }
+
+    const isMember = band.members.some(m => m.userId.toString() === userId.toString());
+    if (!isMember) {
+      return res.status(403).json({ error: 'Not a band member' });
+    }
+
+    // Get all songs for this band
+    const songs = await Song.find({ bandId }).lean();
+    if (songs.length === 0) {
+      return res.json({});
+    }
+
+    const songIds = songs.map(s => s._id);
+
+    // Aggregate unread messages by song
+    const unreadMessages = await Message.aggregate([
+      {
+        $match: {
+          songId: { $in: songIds },
+          userId: { $ne: new mongoose.Types.ObjectId(userId) },
+          readBy: { $ne: new mongoose.Types.ObjectId(userId) }
+        }
+      },
+      {
+        $group: {
+          _id: '$songId',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Format response as { songId: count }
+    const counts = {};
+    unreadMessages.forEach(item => {
+      counts[item._id.toString()] = item.count;
+    });
+
+    res.json(counts);
+  } catch (err) {
+    console.error('Get unread counts by song error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
@@ -138,6 +202,7 @@ exports.markAsRead = async (req, res) => {
       return res.status(400).json({ error: 'songId is required' });
     }
 
+    // Verify access
     const song = await Song.findById(songId);
     if (!song) {
       return res.status(404).json({ error: 'Song not found' });
