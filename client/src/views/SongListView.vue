@@ -20,9 +20,7 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-4">
-        <ThemeToggle />
-      </div>
+      <ThemeToggle />
       </div>
     </header>
 
@@ -42,7 +40,7 @@
         <!-- Content -->
         <div v-else class="animate-fade-in">
           <!-- KPI Strip -->
-          <div class="grid grid-cols-3 gap-4 mb-10">
+          <div class="grid grid-cols-4 gap-3 mb-10">
             <div class="p-3 border border-border-zero">
               <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Status</span>
               <span class="block text-accent font-bold text-sm">ACTIVE</span>
@@ -55,6 +53,15 @@
               <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Genre</span>
               <span class="block text-text-main font-bold text-sm font-tech">{{ band?.genre?.substring(0, 6).toUpperCase() || 'N/A' }}</span>
             </div>
+            <button
+              @click="router.push({ name: 'band-info', params: { id: route.params.bandId } })"
+              class="p-3 border border-border-zero hover:border-accent hover:bg-accent-dim transition-colors text-left group"
+            >
+              <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1 group-hover:text-accent">Unit</span>
+              <span class="block text-text-main font-bold text-sm group-hover:text-accent flex items-center gap-1">
+                <i class="ph ph-gear"></i> INFO
+              </span>
+            </button>
           </div>
 
           <!-- Section Header -->
@@ -72,10 +79,11 @@
           <!-- Song List -->
           <div v-if="songs.length > 0" class="space-y-px bg-border-zero">
             <div
-              v-for="song in songs"
+              v-for="(song, index) in songs"
               :key="song._id"
               @click="router.push({ name: 'song-detail', params: { id: song._id } })"
-              class="bg-bg-zero p-5 flex justify-between items-center group cursor-pointer hover:bg-surface-zero transition-colors"
+              class="bg-bg-zero p-5 flex justify-between items-center group cursor-pointer hover:bg-surface-zero transition-colors btn-press card-lift stagger-item"
+              :style="{ animationDelay: `${index * 0.05}s` }"
             >
               <div>
                 <div class="flex items-center gap-3 mb-1">
@@ -97,6 +105,15 @@
               </div>
 
               <div class="flex items-center gap-4">
+                <!-- Unread Messages Badge -->
+                <span
+                  v-if="unreadCounts[song._id]"
+                  class="px-2 py-1 bg-accent text-bg-zero font-tech text-[0.6rem] font-bold flex items-center gap-1 badge-pulse"
+                >
+                  <i class="ph ph-chat-centered-text"></i>
+                  {{ unreadCounts[song._id] }}
+                </span>
+
                 <!-- Status Badge -->
                 <span :class="['px-2 py-1 font-tech text-[0.6rem] uppercase border', getStatusClass(song.status)]">
                   {{ song.status }}
@@ -151,12 +168,15 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { songsAPI, bandsAPI } from '@/services/api'
+import { songsAPI, bandsAPI, messagesAPI } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import { useConfirm } from '@/composables/useConfirm'
 import ScanlineOverlay from '@/components/ScanlineOverlay.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+
+const { confirm } = useConfirm()
 
 const router = useRouter()
 const route = useRoute()
@@ -166,6 +186,7 @@ const band = ref(null)
 const songs = ref([])
 const loading = ref(true)
 const error = ref('')
+const unreadCounts = ref({})
 
 const isAdmin = computed(() => {
   return band.value?.members?.some(m => m.userId === authStore.user?._id && m.role === 'Admin')
@@ -206,7 +227,7 @@ function formatDate(dateStr) {
 }
 
 onMounted(async () => {
-  await Promise.all([loadBand(), loadSongs()])
+  await Promise.all([loadBand(), loadSongs(), loadUnreadCounts()])
 })
 
 async function loadBand() {
@@ -230,10 +251,25 @@ async function loadSongs() {
   }
 }
 
-async function handleDelete(songId) {
-  if (!window.confirm('Sei sicuro di voler eliminare questa canzone? Questa azione non puo essere annullata.')) {
-    return
+async function loadUnreadCounts() {
+  try {
+    const res = await messagesAPI.getUnreadCountsBySong(route.params.bandId)
+    unreadCounts.value = res.data
+  } catch (err) {
+    console.error('Failed to load unread counts:', err)
   }
+}
+
+async function handleDelete(songId) {
+  const confirmed = await confirm({
+    title: 'Elimina Progetto',
+    message: 'Sei sicuro di voler eliminare questa canzone? Questa azione non puo essere annullata.',
+    confirmText: 'Elimina',
+    cancelText: 'Annulla',
+    variant: 'danger'
+  })
+
+  if (!confirmed) return
 
   try {
     await songsAPI.delete(songId)
