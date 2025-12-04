@@ -12,5 +12,6 @@ router.get('/:id', bandController.get);
 router.patch('/:id', bandController.update);
 router.post('/:id/leave', bandController.leave);
 router.post('/:id/regenerate-code', bandController.regenerateCode);
+router.post('/:id/remove-member', bandController.removeMember);
 
 module.exports = router;
