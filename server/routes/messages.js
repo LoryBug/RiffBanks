@@ -8,5 +8,6 @@ router.use(authMiddleware);
 router.get('/', messageController.list);
 router.get('/unread-counts', messageController.getUnreadCounts);
 router.post('/mark-read', messageController.markAsRead);
+router.get('/unread-counts-by-song', messageController.getUnreadCountsBySong);
 
 module.exports = router;
