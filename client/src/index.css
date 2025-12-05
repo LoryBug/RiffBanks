@@ -11,11 +11,9 @@
   --color-accent-dim: var(--accent-dim);
   --color-scanline: var(--scanline-color);
   
-  /* Font */
   --font-tech: "Space Mono", monospace;
   --font-sans: "Inter", sans-serif;
   
-  /* Ombre */
   --shadow-glow: 0 0 20px var(--shadow-glow);
 }
 
