@@ -78,6 +78,30 @@ Lo stack tecnologico adottato e il MEVN, acronimo che identifica la combinazione
 
 Il backend e costruito su Node.js versione 18 o successiva, scelto per il suo modello asincrono non bloccante particolarmente adatto ad applicazioni con elevata concorrenza di connessioni. Express versione 4 fornisce il framework web per la definizione delle route e la gestione del middleware, offrendo la flessibilita necessaria per strutturare un'API RESTful ben organizzata.
 
-La persistenza dei dati e affidata a MongoDB versione 7, un database documentale NoSQL che si adatta naturalmente alla struttura flessibile dei dati musicali e collaborative. Mongoose versione 8 funge da ODM (Object Document Mapper), fornendo uno strato di astrazione che include validazione degli schema, middleware e query builder.
+La persistenza dei dati e affidata a MongoDB, un database documentale NoSQL che si adatta naturalmente alla struttura flessibile dei dati musicali e collaborative. Mongoose funge da ODM (Object Document Mapper), fornendo uno strato di astrazione che include validazione degli schema, middleware e query builder.
 
-La comunicazione in tempo reale e implementata attraverso Socket.io versione 4, che gestisce le connessioni WebSocket con fallback automatico su polling per garantire compatibilita con ambienti di rete restrittivi. Questa libreria permette l'organizzazione delle connessioni in "room" logiche, ciascuna corrispondente a una canzone specifica, ottimizzando la distribuzione dei messaggi.
+La comunicazione in tempo reale e implementata attraverso Socket.io, che gestisce le connessioni WebSocket con fallback automatico su polling per garantire compatibilita con ambienti di rete restrittivi. Questa libreria permette l'organizzazione delle connessioni in "room" logiche, ciascuna corrispondente a una canzone specifica, ottimizzando la distribuzione dei messaggi.
+
+L'autenticazione si basa su JSON Web Token attraverso la libreria jsonwebtoken, implementando un meccanismo stateless che non richiede storage lato server per le sessioni. Le password vengono processate con bcryptjs, che applica l'algoritmo bcrypt con un fattore di costo di 10 round per generare hash sicuri.
+
+La gestione dell'upload dei file e affidata a Multer, un middleware per Express specializzato nel parsing di richieste multipart/form-data. La configurazione prevede un limite di 50 megabyte per singolo file e un filtro che accetta esclusivamente formati audio (mp3, wav, ogg, webm) e immagini (jpg, png, gif).
+
+**sicuramente da migliorare e controllare meglio**
+
+### Frontend
+
+Il frontend e sviluppato con Vue.js, sfruttando appieno la Composition API attraverso la sintassi script setup che permette di scrivere logica reattiva in modo conciso ed espressivo. Questa scelta architetturale facilita la composizione di funzionalità complesse e migliora la manutenibilita del codice rispetto all'Options API delle versioni precedenti.
+
+La gestione dello stato applicativo e centralizzata attraverso Pinia, lo state manager ufficiale per Vue 3. Due store principali gestiscono rispettivamente lo stato di autenticazione (utente corrente, token, flag di onboarding) e la connessione Socket.io (istanza socket, stato di connessione, room attiva).
+
+Il routing client-side e implementato con Vue Router, configurato con navigation guard per proteggere le route che richiedono autenticazione e per gestire il reindirizzamento verso l'onboarding per gli utenti che non hanno completato la configurazione del profilo. Il caricamento delle viste avviene in modalita lazy attraverso import dinamici, riducendo il bundle iniziale e migliorando i tempi di caricamento.
+
+Vite costituisce il build tool del progetto, offrendo un server di sviluppo con Hot Module Replacement quasi istantaneo e producendo bundle ottimizzati per la produzione. La configurazione include un proxy che inoltra le richieste API al backend durante lo sviluppo, semplificando la gestione del CORS.
+
+Lo styling e realizzato interamente con Tailwind CSS, adottando l'approccio utility-first che permette di comporre stili direttamente nel markup senza dover gestire fogli di stile separati. Le icone provengono dalla libreria Lucide Vue Next, scelta per la coerenza stilistica e la leggerezza del bundle.
+
+Le comunicazioni HTTP con il backend sono gestite da Axios, configurato con interceptor che aggiungono automaticamente il token JWT alle richieste e gestiscono gli errori di autenticazione reindirizzando al login quando necessario.
+
+## Codice
+
+### Struttura del Progetto
