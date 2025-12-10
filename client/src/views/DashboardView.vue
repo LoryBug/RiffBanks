@@ -19,8 +19,9 @@
         </div>
       </div>
 
-      <!-- Right Side: Theme Toggle & User -->
+      <!-- Right Side: Notifications, Theme Toggle & User -->
       <div class="flex items-center gap-4">
+        <NotificationDropdown />
         <ThemeToggle />
         <div
           @click="authStore.logout(); router.push({ name: 'auth' })"
@@ -56,11 +57,12 @@
 
         <div v-else class="space-y-4 flex-1 overflow-y-auto">
           <div
-            v-for="band in bands"
+            v-for="(band, index) in bands"
             :key="band._id"
             @click="selectBand(band)"
-            class="group flex items-center justify-between p-6 border border-border-zero hover:border-accent hover:bg-accent-dim cursor-pointer transition-all duration-300"
+            class="group flex items-center justify-between p-6 border border-border-zero hover:border-accent hover:bg-accent-dim cursor-pointer transition-all duration-300 btn-press stagger-item"
             :class="activeBand?._id === band._id ? 'border-accent bg-accent-dim' : ''"
+            :style="{ animationDelay: `${index * 0.05}s` }"
           >
             <div class="flex items-center gap-4">
               <span class="font-tech text-xs text-text-dim group-hover:text-accent">
@@ -69,7 +71,7 @@
               <span class="text-xl font-bold uppercase tracking-tight text-text-main">{{ band.name }}</span>
               <span
                 v-if="unreadCounts[band._id] > 0"
-                class="px-2 py-0.5 bg-accent text-bg-zero text-xs font-tech font-bold"
+                class="px-2 py-0.5 bg-accent text-bg-zero text-xs font-tech font-bold badge-pulse"
               >
                 {{ unreadCounts[band._id] > 9 ? '9+' : unreadCounts[band._id] }}
               </span>
@@ -84,7 +86,7 @@
 
         <button
           @click="router.push({ name: 'create-band' }); showBandMenu = false"
-          class="mt-auto w-full py-4 border border-dashed border-border-zero text-text-dim font-tech text-xs uppercase hover:text-text-main hover:border-text-main transition-colors"
+          class="mt-auto w-full py-4 border border-dashed border-border-zero text-text-dim font-tech text-xs uppercase hover:text-text-main hover:border-text-main transition-colors btn-press"
         >
           + Initialize New Unit
         </button>
@@ -149,10 +151,11 @@
           <!-- Band List -->
           <div v-if="bands.length > 0" class="space-y-px bg-border-zero">
             <div
-              v-for="band in bands"
+              v-for="(band, index) in bands"
               :key="band._id"
               @click="router.push({ name: 'songs', params: { bandId: band._id } })"
-              class="bg-bg-zero p-5 flex justify-between items-center group cursor-pointer hover:bg-surface-zero transition-colors"
+              class="bg-bg-zero p-5 flex justify-between items-center group cursor-pointer hover:bg-surface-zero transition-colors btn-press card-lift stagger-item"
+              :style="{ animationDelay: `${index * 0.05}s` }"
             >
               <div>
                 <div class="flex items-center gap-3 mb-1">
@@ -172,7 +175,7 @@
               <div class="flex items-center gap-4">
                 <span
                   v-if="unreadCounts[band._id] > 0"
-                  class="px-2 py-1 bg-accent text-bg-zero font-tech text-[0.6rem] font-bold"
+                  class="px-2 py-1 bg-accent text-bg-zero font-tech text-[0.6rem] font-bold badge-pulse"
                 >
                   {{ unreadCounts[band._id] > 9 ? '9+' : unreadCounts[band._id] }} MSG
                 </span>
@@ -190,7 +193,7 @@
             </p>
             <button
               @click="router.push({ name: 'create-band' })"
-              class="px-6 py-3 bg-surface-zero border border-border-zero font-tech text-xs uppercase text-text-main hover:bg-text-main hover:text-bg-zero transition-colors"
+              class="px-6 py-3 bg-surface-zero border border-border-zero font-tech text-xs uppercase text-text-main hover:bg-text-main hover:text-bg-zero transition-colors btn-press hover-glow"
             >
               + Initialize Unit
             </button>
@@ -214,6 +217,7 @@ import ScanlineOverlay from '@/components/ScanlineOverlay.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import NotificationDropdown from '@/components/NotificationDropdown.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

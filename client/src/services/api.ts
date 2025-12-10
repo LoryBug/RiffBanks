@@ -45,7 +45,8 @@ export const bandsAPI = {
   get: (id: any) => api.get(`/bands/${id}`),
   update: (id: any, data: any) => api.patch(`/bands/${id}`, data),
   leave: (id: any) => api.post(`/bands/${id}/leave`),
-  regenerateCode: (id: any) => api.post(`/bands/${id}/regenerate-code`)
+  regenerateCode: (id: any) => api.post(`/bands/${id}/regenerate-code`),
+  removeMember: (bandId: any, userId: any) => api.post(`/bands/${bandId}/remove-member`, { userId })
 };
 
 // Songs API
@@ -76,7 +77,9 @@ export const messagesAPI = {
     return api.get(url);
   },
   getUnreadCounts: () => api.get('/messages/unread-counts'),
+  getUnreadCountsBySong: (bandId: any) => api.get(`/messages/unread-counts-by-song?bandId=${bandId}`),
   markAsRead: (songId: any) => api.post('/messages/mark-read', { songId })
+
 };
 
 // Gigs API 
@@ -91,6 +94,7 @@ export const gigsAPI = {
     return api.get(`/gigs${queryStr ? `?${queryStr}` : ''}`);
   },
   myGigs: () => api.get('/gigs/my-gigs'),
+  myApplications: () => api.get('/gigs/my-applications'),
   get: (id: any) => api.get(`/gigs/${id}`),
   create: (data: any) => api.post('/gigs', data),
   update: (id: any, data: any) => api.patch(`/gigs/${id}`, data),
@@ -100,6 +104,15 @@ export const gigsAPI = {
   respond: (id: any, applicantId: any, action: any) => api.post(`/gigs/${id}/respond`, { applicantId, action }),
   getNewGigsCount: () => api.get('/gigs/notifications/new-count'),
   markGigBoardVisited: () => api.post('/gigs/notifications/mark-visited')
+};
+
+// Notifications API
+export const notificationsAPI = {
+  list: (limit = 20, skip = 0) => api.get(`/notifications?limit=${limit}&skip=${skip}`),
+  getUnreadCount: () => api.get('/notifications/unread-count'),
+  markAsRead: (id: any) => api.patch(`/notifications/${id}/read`),
+  markAllAsRead: () => api.post('/notifications/mark-all-read'),
+  delete: (id: any) => api.delete(`/notifications/${id}`)
 };
 
 

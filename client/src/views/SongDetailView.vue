@@ -34,10 +34,33 @@
       <div class="border-b border-border-zero shrink-0">
         <div class="container-zero py-6">
           <h1 class="text-4xl font-bold uppercase mb-2 leading-none text-text-main">{{ song?.title }}</h1>
-          <div class="flex gap-4 font-tech text-[0.6rem] text-text-dim uppercase mb-4">
-            <span>BPM: {{ song?.bpm || 120 }}</span>
-            <span>Key: {{ song?.key || 'Am' }}</span>
-            <span>Status: {{ song?.status }}</span>
+          <div class="flex gap-4 font-tech text-[0.6rem] uppercase mb-4">
+            <span class="text-text-dim">BPM: <span class="text-accent">{{ song?.bpm || 120 }}</span></span>
+            <div class="relative">
+              <button
+                @click="statusDropdownOpen = !statusDropdownOpen"
+                class="flex items-center gap-1 text-text-dim hover:opacity-70 transition-opacity group"
+              >
+                Status: <span class="text-accent group-hover:opacity-70">{{ song?.status }}</span>
+                <i class="ph ph-caret-down text-[0.5rem] text-accent"></i>
+              </button>
+              <div
+                v-if="statusDropdownOpen"
+                class="absolute top-full left-0 mt-1 bg-surface-zero border border-border-zero z-20 min-w-[120px]"
+              >
+                <button
+                  v-for="status in STATUSES"
+                  :key="status"
+                  @click="updateStatus(status)"
+                  :class="[
+                    'w-full text-left px-3 py-2 font-tech text-[0.6rem] uppercase transition-colors',
+                    song?.status === status ? 'text-accent bg-accent-dim' : 'text-text-dim hover:text-text-main hover:bg-bg-zero'
+                  ]"
+                >
+                  {{ status }}
+                </button>
+              </div>
+            </div>
           </div>
           <p v-if="song?.description" class="text-sm text-text-dim">{{ song.description }}</p>
         </div>
@@ -58,8 +81,52 @@
               <span class="font-tech text-[0.6rem] text-text-dim">{{ assets.length }} files</span>
             </div>
 
+            <!-- Upload & Record Buttons -->
+            <input
+              ref="fileInputRef"
+              type="file"
+              accept="audio/*,image/*"
+              class="hidden"
+              @change="handleFileSelect"
+            />
+            <div class="flex gap-2">
+              <button
+                @click="fileInputRef?.click()"
+                :disabled="uploading || isRecording"
+                class="flex-1 py-4 text-center font-tech text-xs text-text-dim border border-dashed border-border-zero uppercase hover:border-text-main hover:text-text-main transition-colors disabled:opacity-50 disabled:cursor-not-allowed btn-press hover-glow"
+              >
+                <span v-if="uploading">[ Uploading... ]</span>
+                <span v-else>[ Upload File ]</span>
+              </button>
+              <div class="record-btn-wrapper">
+                <!-- Animated marching dashes border (only when recording) -->
+                <svg v-if="isRecording" class="marching-border" preserveAspectRatio="none" viewBox="0 0 100 100">
+                  <rect x="1" y="1" width="98" height="98" rx="0" vector-effect="non-scaling-stroke" />
+                </svg>
+                <button
+                  @click="isRecording ? stopRecording() : startRecording()"
+                  :disabled="uploading"
+                  :class="[
+                    'record-btn-content w-full py-4 text-center font-tech text-xs uppercase transition-colors btn-press',
+                    isRecording
+                      ? 'border border-transparent text-accent'
+                      : 'border border-dashed border-border-zero text-text-dim hover:border-text-main hover:text-text-main hover-glow'
+                  ]"
+                >
+                  <span v-if="isRecording" class="flex items-center justify-center gap-2">
+                    <span class="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
+                    [ {{ formatRecordingTime(recordingTime) }} - Stop ]
+                  </span>
+                  <span v-else class="flex items-center justify-center gap-2">
+                    <i class="ph ph-microphone"></i>
+                    [ Record Audio ]
+                  </span>
+                </button>
+              </div>
+            </div>
+
             <!-- Assets List -->
-            <div v-for="(asset, idx) in assets" :key="asset._id" class="border border-border-zero p-4 hover:border-text-dim transition-colors group">
+            <div v-for="(asset, idx) in assets" :key="asset._id" :id="`asset-${asset._id}`" class="border border-border-zero p-4 hover:border-text-dim transition-colors group btn-press card-lift stagger-item" :style="{ animationDelay: `${idx * 0.05}s` }">
               <div class="flex justify-between items-start mb-4">
                 <span class="font-tech text-[0.6rem] text-text-dim">TRK_{{ String(idx + 1).padStart(2, '0') }}</span>
                 <div class="flex gap-2">
@@ -71,7 +138,7 @@
                     {{ asset.voteCount || 0 }} Votes
                   </button>
                   <button
-                    v-if="asset.uploaderId === authStore.user?._id"
+                    v-if="(asset.uploaderId?._id || asset.uploaderId) === authStore.user?._id"
                     @click="handleDelete(asset._id)"
                     class="font-tech text-[0.6rem] uppercase text-text-dim hover:text-accent"
                   >
@@ -85,13 +152,17 @@
                 <button
                   v-if="asset.type === 'audio'"
                   @click="togglePlay(asset)"
-                  class="w-8 h-8 border border-text-main flex items-center justify-center hover:bg-text-main hover:text-bg-zero transition-colors text-text-main"
+                  class="w-8 h-8 border border-text-main flex items-center justify-center hover:bg-text-main hover:text-bg-zero transition-colors text-text-main btn-press"
                 >
                   <i class="ph-fill text-xs" :class="currentlyPlaying === asset._id ? 'ph-pause' : 'ph-play'"></i>
                 </button>
 
                 <!-- Image Preview -->
-                <div v-else-if="asset.type === 'image'" class="w-8 h-8 border border-border-zero overflow-hidden">
+                <div
+                  v-else-if="asset.type === 'image'"
+                  @click.stop="openImageModal(asset)"
+                  class="w-8 h-8 border border-border-zero overflow-hidden cursor-pointer hover:border-accent transition-colors"
+                >
                   <img :src="getAssetUrl(asset.url)" :alt="asset.title" class="w-full h-full object-cover" />
                 </div>
 
@@ -102,12 +173,15 @@
 
                 <div class="flex-1">
                   <div class="font-bold uppercase text-sm mb-1 text-text-main">{{ asset.title }}</div>
-                  <!-- Minimal Waveform for Audio -->
-                  <div v-if="asset.type === 'audio'" class="h-6 flex items-center gap-0.5 opacity-50">
+                  <!-- Animated Waveform for Audio -->
+                  <div v-if="asset.type === 'audio'" class="h-6 flex items-end gap-0.5">
                     <div
                       v-for="n in 20"
                       :key="n"
-                      class="w-1 bg-text-main group-hover:bg-accent transition-colors"
+                      :class="[
+                        'w-1 waveform-bar',
+                        currentlyPlaying === asset._id ? 'playing bg-accent' : 'bg-text-main group-hover:bg-accent'
+                      ]"
                       :style="{ height: getWaveformHeight(n) + '%' }"
                     ></div>
                   </div>
@@ -118,23 +192,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Upload Button -->
-            <input
-              ref="fileInputRef"
-              type="file"
-              accept="audio/*,image/*"
-              class="hidden"
-              @change="handleFileSelect"
-            />
-            <button
-              @click="fileInputRef?.click()"
-              :disabled="uploading"
-              class="w-full py-4 text-center font-tech text-xs text-text-dim border border-dashed border-border-zero uppercase hover:border-text-main hover:text-text-main transition-colors"
-            >
-              <span v-if="uploading">[ Uploading... ]</span>
-              <span v-else>[ Upload New Stem ]</span>
-            </button>
 
             <!-- Empty State -->
             <div v-if="assets.length === 0 && !uploading" class="border border-border-zero p-8 text-center">
@@ -188,7 +245,7 @@
                 :key="message._id"
                 :class="[
                   'flex flex-col gap-1',
-                  message.userId === authStore.user?._id ? 'items-end ml-auto' : 'items-start',
+                  message.userId === authStore.user?._id ? 'items-end ml-auto message-slide-right' : 'items-start message-slide-left',
                   'max-w-[85%]'
                 ]"
               >
@@ -267,7 +324,7 @@
     <button
       v-if="!chatOpen && song"
       @click="chatOpen = true"
-      class="fixed z-50 w-14 h-14 bg-accent flex items-center justify-center hover:bg-accent/80 transition-all active:scale-95"
+      class="fixed z-50 w-14 h-14 bg-accent flex items-center justify-center hover:bg-accent/80 transition-all btn-press hover-glow"
       :style="{ bottom: 'calc(6rem + env(safe-area-inset-bottom, 0))', right: '1.5rem' }"
       aria-label="Open chat"
     >
@@ -275,7 +332,7 @@
       <!-- Unread indicator -->
       <span
         v-if="unreadMessages > 0"
-        class="absolute -top-1 -right-1 w-5 h-5 bg-text-main text-bg-zero text-[0.6rem] font-tech font-bold flex items-center justify-center"
+        class="absolute -top-1 -right-1 w-5 h-5 bg-text-main text-bg-zero text-[0.6rem] font-tech font-bold flex items-center justify-center badge-pulse"
       >
         {{ unreadMessages > 9 ? '9+' : unreadMessages }}
       </span>
@@ -323,15 +380,22 @@
               :key="message._id"
               :class="[
                 'flex flex-col gap-1',
-                message.userId === authStore.user?._id ? 'items-end ml-auto' : 'items-start',
+                message.userId === authStore.user?._id ? 'items-end ml-auto message-slide-right' : 'items-start message-slide-left',
                 'max-w-[85%]'
               ]"
             >
               <!-- System Message -->
               <template v-if="message.type === 'system'">
-                <div class="w-full text-center">
-                  <span class="font-tech text-[0.6rem] text-text-dim uppercase">
-                    {{ message.text }}
+                <div class="w-full text-center py-1">
+                  <span
+                    v-if="message.relatedAssetId"
+                    @click="scrollToAsset(message.relatedAssetId)"
+                    class="font-tech text-[0.6rem] text-text-dim uppercase cursor-pointer hover:text-accent transition-colors"
+                  >
+                    <span class="text-accent">{{ message.username }}</span> {{ message.text }}
+                  </span>
+                  <span v-else class="font-tech text-[0.6rem] text-text-dim uppercase">
+                    <span class="text-accent">{{ message.username }}</span> {{ message.text }}
                   </span>
                 </div>
               </template>
@@ -390,6 +454,40 @@
         </div>
       </div>
     </Transition>
+
+    <!-- Image Lightbox Modal -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div
+          v-if="selectedImage"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-bg-zero/95 backdrop-blur-sm"
+          @click="closeImageModal"
+        >
+          <!-- Close Button -->
+          <button
+            @click="closeImageModal"
+            class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-text-dim hover:text-text-main transition-colors z-10"
+          >
+            <i class="ph ph-x text-2xl"></i>
+          </button>
+
+          <!-- Image Title -->
+          <div class="absolute top-4 left-4 z-10">
+            <span class="font-tech text-xs text-text-dim uppercase">{{ selectedImage.title }}</span>
+          </div>
+
+          <!-- Image Container -->
+          <div class="w-full h-full p-8 flex items-center justify-center" @click.stop>
+            <img
+              :src="getAssetUrl(selectedImage.url)"
+              :alt="selectedImage.title"
+              class="max-w-full max-h-full object-contain"
+              @click="closeImageModal"
+            />
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -399,14 +497,20 @@ import { useRouter, useRoute } from 'vue-router'
 import { songsAPI, assetsAPI, messagesAPI } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import { useSocketStore } from '@/stores/socket'
+import { useConfirm } from '@/composables/useConfirm'
 import ScanlineOverlay from '@/components/ScanlineOverlay.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+
+const { confirm } = useConfirm()
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const socketStore = useSocketStore()
+
+const STATUSES = ['Idea', 'In Progress', 'Mix', 'Master']
+const statusDropdownOpen = ref(false)
 
 // Song & Assets state
 const song = ref(null)
@@ -417,6 +521,14 @@ const error = ref('')
 const fileInputRef = ref(null)
 const audioRef = ref(null)
 const currentlyPlaying = ref(null)
+const selectedImage = ref(null)
+
+// Recording state
+const isRecording = ref(false)
+const recordingTime = ref(0)
+let mediaRecorder = null
+let audioChunks = []
+let recordingInterval = null
 
 // Chat state
 const chatOpen = ref(false)
@@ -460,6 +572,16 @@ function togglePlay(asset) {
   }
 }
 
+function openImageModal(asset) {
+  selectedImage.value = asset
+  document.body.style.overflow = 'hidden'
+}
+
+function closeImageModal() {
+  selectedImage.value = null
+  document.body.style.overflow = ''
+}
+
 // Handle resize
 function handleResize() {
   isDesktop.value = window.innerWidth >= 1024
@@ -479,6 +601,13 @@ onUnmounted(() => {
     audioRef.value.pause()
   }
   if (typingTimeoutId) clearTimeout(typingTimeoutId)
+  // Stop recording if active
+  if (isRecording.value) {
+    stopRecording()
+  }
+  if (recordingInterval) {
+    clearInterval(recordingInterval)
+  }
   // Leave room when unmounting
   if (route.params.id) {
     socketStore.leaveRoom(route.params.id)
@@ -564,6 +693,16 @@ async function loadData() {
     ])
     song.value = songRes.data
     assets.value = assetsRes.data
+
+    // Load unread message count for this song
+    if (song.value?.bandId) {
+      try {
+        const unreadRes = await messagesAPI.getUnreadCountsBySong(song.value.bandId)
+        unreadMessages.value = unreadRes.data[route.params.id] || 0
+      } catch (e) {
+        console.error('Failed to load unread count:', e)
+      }
+    }
   } catch (err) {
     error.value = err.response?.data?.error || 'Failed to load song'
   } finally {
@@ -579,6 +718,8 @@ watch(chatOpen, async (isOpen) => {
     try {
       const res = await messagesAPI.list(route.params.id)
       messages.value = res.data
+      // Mark messages as read when chat opens
+      await messagesAPI.markAsRead(route.params.id)
     } catch (err) {
       console.error('Failed to load messages:', err)
     } finally {
@@ -610,8 +751,8 @@ async function handleFileSelect(e) {
     formData.append('songId', route.params.id)
     formData.append('title', file.name)
 
-    const res = await assetsAPI.upload(formData)
-    assets.value = [res.data, ...assets.value]
+    await assetsAPI.upload(formData)
+    // Asset will be added via socket event 'asset_uploaded'
   } catch (err) {
     error.value = err.response?.data?.error || 'Failed to upload file'
   } finally {
@@ -619,6 +760,91 @@ async function handleFileSelect(e) {
     if (fileInputRef.value) {
       fileInputRef.value.value = ''
     }
+  }
+}
+
+// Recording functions
+function formatRecordingTime(seconds) {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+
+    mediaRecorder = new MediaRecorder(stream)
+    audioChunks = []
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        audioChunks.push(e.data)
+      }
+    }
+
+    mediaRecorder.onstop = async () => {
+      // Stop all tracks to release microphone
+      stream.getTracks().forEach(track => track.stop())
+
+      if (audioChunks.length > 0) {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
+        await uploadRecording(audioBlob)
+      }
+    }
+
+    mediaRecorder.start()
+    isRecording.value = true
+    recordingTime.value = 0
+
+    // Start timer
+    recordingInterval = setInterval(() => {
+      recordingTime.value++
+    }, 1000)
+
+  } catch (err) {
+    console.error('Recording error:', err)
+    if (err.name === 'NotAllowedError') {
+      error.value = 'Permesso microfono negato. Abilita il microfono nelle impostazioni del browser.'
+    } else {
+      error.value = 'Impossibile avviare la registrazione'
+    }
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && isRecording.value) {
+    mediaRecorder.stop()
+    isRecording.value = false
+
+    if (recordingInterval) {
+      clearInterval(recordingInterval)
+      recordingInterval = null
+    }
+  }
+}
+
+async function uploadRecording(audioBlob) {
+  uploading.value = true
+  error.value = ''
+
+  try {
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '')
+    const filename = `recording_${timestamp}.webm`
+    const file = new File([audioBlob], filename, { type: 'audio/webm' })
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('songId', route.params.id)
+    formData.append('title', `Recording ${formatRecordingTime(recordingTime.value)}`)
+
+    await assetsAPI.upload(formData)
+    // Asset will be added via socket event 'asset_uploaded'
+  } catch (err) {
+    error.value = err.response?.data?.error || 'Failed to upload recording'
+  } finally {
+    uploading.value = false
+    recordingTime.value = 0
   }
 }
 
@@ -636,7 +862,14 @@ async function handleVote(assetId) {
 }
 
 async function handleDelete(assetId) {
-  if (!window.confirm('Eliminare questo file?')) return
+  const confirmed = await confirm({
+    title: 'Elimina File',
+    message: 'Sei sicuro di voler eliminare questo file?',
+    confirmText: 'Elimina',
+    cancelText: 'Annulla',
+    variant: 'danger'
+  })
+  if (!confirmed) return
 
   try {
     await assetsAPI.delete(assetId)
@@ -679,6 +912,40 @@ async function handleSendMessage() {
   }
 }
 
+function scrollToAsset(assetId) {
+  // Close chat on mobile to show the asset
+  if (!isDesktop.value) {
+    chatOpen.value = false
+  }
+  // Find and scroll to the asset element
+  nextTick(() => {
+    const assetElement = document.getElementById(`asset-${assetId}`)
+    if (assetElement) {
+      assetElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      // Add temporary highlight
+      assetElement.classList.add('ring-2', 'ring-accent')
+      setTimeout(() => {
+        assetElement.classList.remove('ring-2', 'ring-accent')
+      }, 2000)
+    }
+  })
+}
+
+async function updateStatus(newStatus) {
+  if (newStatus === song.value?.status) {
+    statusDropdownOpen.value = false
+    return
+  }
+
+  try {
+    await songsAPI.update(route.params.id, { status: newStatus })
+    song.value.status = newStatus
+    statusDropdownOpen.value = false
+  } catch (err) {
+    error.value = err.response?.data?.error || 'Failed to update status'
+  }
+}
+
 function goBack() {
   if (song.value?.bandId) {
     router.push({ name: 'songs', params: { bandId: song.value.bandId } })
@@ -697,5 +964,15 @@ function goBack() {
 .slide-up-enter-from,
 .slide-up-leave-to {
   transform: translateY(100%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

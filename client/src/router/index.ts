@@ -55,6 +55,12 @@ const routes = [
     name: 'gigs',
     component: () => import('@/views/GigsView.vue'),
     meta: { requiresAuth: true, requiresOnboarding: true }
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/ProfileView.vue'),
+    meta: { requiresAuth: true, requiresOnboarding: true }
   }
 ]
 const router = createRouter({
@@ -65,7 +71,6 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  // Wait for auth to be checked on first load
   if (authStore.loading) {
     await authStore.checkAuth()
   }
@@ -73,7 +78,6 @@ router.beforeEach(async (to, from, next) => {
   const isAuthenticated = authStore.isAuthenticated
   const needsOnboarding = authStore.needsOnboarding
 
-  // Guest-only routes (login/register)
   if (to.meta.requiresGuest && isAuthenticated) {
     if (needsOnboarding) {
       return next({ name: 'onboarding' })
@@ -81,17 +85,14 @@ router.beforeEach(async (to, from, next) => {
     return next({ name: 'dashboard' })
   }
 
-  // Auth required routes
   if (to.meta.requiresAuth && !isAuthenticated) {
     return next({ name: 'auth' })
   }
 
-  // Onboarding required routes
   if (to.meta.requiresOnboarding && needsOnboarding) {
     return next({ name: 'onboarding' })
   }
 
-  // If on onboarding page but already completed
   if (to.name === 'onboarding' && isAuthenticated && !needsOnboarding) {
     return next({ name: 'dashboard' })
   }

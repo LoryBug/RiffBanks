@@ -33,23 +33,38 @@
             <div class="w-px h-6 bg-border-zero"></div>
             <div class="flex flex-col">
               <span class="font-bold text-lg leading-none tracking-tight text-text-main">{{ band?.name }}</span>
-              <span class="font-tech text-[0.6rem] text-text-dim uppercase">Band_Info</span>
+              <span class="font-tech text-[0.6rem] text-text-dim uppercase">Unit_Info</span>
             </div>
           </div>
           <ThemeToggle />
         </div>
       </header>
 
-      <!-- Band Info Header -->
-      <div class="container-zero py-6 border-b border-border-zero">
-        <div class="flex items-center gap-4 font-tech text-[0.6rem] text-text-dim uppercase">
-          <span v-if="band?.genre">Genre: {{ band.genre }}</span>
-          <span v-if="band?.location"><i class="ph ph-map-pin"></i> {{ band.location }}</span>
+      <!-- Band Info Strip -->
+      <div class="container-zero py-4 border-b border-border-zero">
+        <div class="grid grid-cols-3 gap-3">
+          <div class="p-3 border border-border-zero">
+            <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Genre</span>
+            <span class="block text-text-main font-bold text-sm font-tech">{{ band?.genre?.substring(0, 8).toUpperCase() || 'N/A' }}</span>
+          </div>
+          <div class="p-3 border border-border-zero">
+            <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1">Location</span>
+            <span class="block text-text-main font-bold text-sm font-tech">{{ band?.location?.substring(0, 8).toUpperCase() || 'N/A' }}</span>
+          </div>
+          <button
+            @click="router.push({ name: 'songs', params: { bandId: band?._id } })"
+            class="p-3 border border-border-zero hover:border-accent hover:bg-accent-dim transition-colors text-left group"
+          >
+            <span class="block font-tech text-[0.6rem] text-text-dim uppercase mb-1 group-hover:text-accent">Projects</span>
+            <span class="block text-text-main font-bold text-sm group-hover:text-accent flex items-center gap-1">
+              <i class="ph ph-music-notes"></i> VIEW
+            </span>
+          </button>
         </div>
       </div>
 
       <!-- Tabs -->
-      <div class="container-zero flex border-b border-border-zero">
+      <div class="container-zero flex border-b border-border-zero mt-3">
         <button
           @click="activeTab = 'overview'"
           class="pb-2 px-4 font-tech text-xs font-bold uppercase transition-all"
@@ -63,14 +78,6 @@
           :class="activeTab === 'members' ? 'text-accent border-b-2 border-accent' : 'text-text-dim hover:text-text-main'"
         >
           Members ({{ band?.members?.length }})
-        </button>
-        <button
-          v-if="isAdmin"
-          @click="activeTab = 'settings'"
-          class="pb-2 px-4 font-tech text-xs font-bold uppercase transition-all"
-          :class="activeTab === 'settings' ? 'text-accent border-b-2 border-accent' : 'text-text-dim hover:text-text-main'"
-        >
-          Config
         </button>
       </div>
 
@@ -110,18 +117,10 @@
                 </button>
               </div>
               <p class="font-tech text-[0.6rem] text-text-dim uppercase mt-3">
-                Share this code to invite members to the band
+                Share this code to invite members to the unit
               </p>
             </div>
 
-            <!-- View Songs Button -->
-            <button
-              @click="router.push({ name: 'songs', params: { bandId: band?._id } })"
-              class="w-full py-4 bg-surface-zero border border-border-zero font-tech text-sm uppercase text-text-main hover:bg-text-main hover:text-bg-zero hover:border-text-main transition-colors flex items-center justify-center gap-2"
-            >
-              <i class="ph ph-music-notes"></i>
-              View_Projects
-            </button>
           </div>
 
           <!-- Members Tab -->
@@ -141,22 +140,40 @@
                 </div>
                 <span v-if="member.instrument" class="font-tech text-xs text-text-dim uppercase">{{ member.instrument }}</span>
               </div>
-              <span class="font-tech text-[0.6rem] text-text-dim">
-                {{ new Date(member.joinedAt).toLocaleDateString('it-IT') }}
-              </span>
+              <div class="flex items-center gap-2">
+                <span class="font-tech text-[0.6rem] text-text-dim">
+                  {{ new Date(member.joinedAt).toLocaleDateString('it-IT') }}
+                </span>
+                <!-- Leave button for current user -->
+                <button
+                  v-if="member.userId._id === authStore.user?._id"
+                  @click="handleLeave"
+                  class="p-2 text-text-dim hover:text-accent transition-colors"
+                  title="Lascia unit"
+                >
+                  <i class="ph ph-sign-out text-lg"></i>
+                </button>
+                <!-- Remove button for admin (can remove others, not self) -->
+                <button
+                  v-else-if="isAdmin && member.role !== 'Admin'"
+                  @click="handleRemoveMember(member.userId._id, member.userId.username)"
+                  class="p-2 text-text-dim hover:text-accent transition-colors"
+                  title="Rimuovi membro"
+                >
+                  <i class="ph ph-user-minus text-lg"></i>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <!-- Settings Tab -->
-          <div v-if="activeTab === 'settings' && isAdmin" class="space-y-6">
-            <div class="border border-accent/50 p-4">
-              <h3 class="text-lg font-bold text-text-main mb-4">Danger_Zone</h3>
+            <!-- Leave Unit Section -->
+            <div class="border border-accent/30 p-4 mt-6">
+              <h3 class="font-tech text-xs text-accent uppercase mb-3">Actions</h3>
               <button
                 @click="handleLeave"
-                class="flex items-center gap-2 px-6 py-3 border border-accent/50 text-accent font-tech text-xs uppercase hover:bg-accent-dim transition-all"
+                class="flex items-center gap-2 px-4 py-3 border border-accent/50 text-accent font-tech text-xs uppercase hover:bg-accent-dim transition-all"
               >
                 <i class="ph ph-sign-out"></i>
-                Leave_Band
+                Leave_Unit
               </button>
             </div>
           </div>
@@ -178,10 +195,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { bandsAPI } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import { useConfirm } from '@/composables/useConfirm'
 import ScanlineOverlay from '@/components/ScanlineOverlay.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+
+const { confirm } = useConfirm()
 
 const router = useRouter()
 const route = useRoute()
@@ -208,7 +228,7 @@ async function loadBand() {
     const res = await bandsAPI.get(route.params.id)
     band.value = res.data
   } catch (err) {
-    error.value = err.response?.data?.error || 'Failed to load band'
+    error.value = err.response?.data?.error || 'Failed to load unit'
   } finally {
     loading.value = false
   }
@@ -221,7 +241,14 @@ function copyInviteCode() {
 }
 
 async function regenerateCode() {
-  if (!window.confirm('Are you sure? The old code will stop working.')) return
+  const confirmed = await confirm({
+    title: 'Rigenera Codice',
+    message: 'Sei sicuro? Il vecchio codice smettera di funzionare.',
+    confirmText: 'Rigenera',
+    cancelText: 'Annulla',
+    variant: 'default'
+  })
+  if (!confirmed) return
 
   regenerating.value = true
   try {
@@ -235,13 +262,38 @@ async function regenerateCode() {
 }
 
 async function handleLeave() {
-  if (!window.confirm('Are you sure you want to leave this band?')) return
+  const confirmed = await confirm({
+    title: 'Lascia Unit',
+    message: 'Sei sicuro di voler lasciare questa unit?',
+    confirmText: 'Lascia',
+    cancelText: 'Annulla',
+    variant: 'danger'
+  })
+  if (!confirmed) return
 
   try {
     await bandsAPI.leave(route.params.id)
     router.push({ name: 'dashboard' })
   } catch (err) {
-    error.value = err.response?.data?.error || 'Failed to leave band'
+    error.value = err.response?.data?.error || 'Failed to leave unit'
+  }
+}
+
+async function handleRemoveMember(userId, username) {
+  const confirmed = await confirm({
+    title: 'Rimuovi Membro',
+    message: `Sei sicuro di voler rimuovere ${username} dalla unit?`,
+    confirmText: 'Rimuovi',
+    cancelText: 'Annulla',
+    variant: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await bandsAPI.removeMember(route.params.id, userId)
+    await loadBand()
+  } catch (err) {
+    error.value = err.response?.data?.error || 'Failed to remove member'
   }
 }
 </script>

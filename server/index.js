@@ -42,6 +42,7 @@ app.use('/api/songs', require('./routes/songs'));
 app.use('/api/assets', require('./routes/assets'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/gigs', require('./routes/gigs'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 // Socket.io handlers
 require('./socket')(io);

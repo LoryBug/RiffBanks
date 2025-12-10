@@ -94,11 +94,13 @@ module.exports = (io) => {
         }
 
         // Create and save message
+        // Add sender to readBy so their own messages don't count as unread
         const message = new Message({
           songId,
           userId: socket.userId,
           type: 'user',
-          text: text.trim()
+          text: text.trim(),
+          readBy: [socket.userId]
         });
 
         await message.save();
@@ -167,12 +169,14 @@ module.exports = (io) => {
 module.exports.emitSystemNotification = async (io, songId, userId, text, relatedAssetId = null) => {
   try {
     // Save system message to DB
+    // Add creator to readBy so their own system messages don't count as unread
     const message = new Message({
       songId,
       userId,
       type: 'system',
       text,
-      relatedAssetId
+      relatedAssetId,
+      readBy: userId ? [userId] : []
     });
 
     await message.save();
