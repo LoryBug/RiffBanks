@@ -20,3 +20,31 @@ La prima persona è Marco, un chitarrista che suona stabilmente in una band rock
 La seconda persona è Giulia, una cantautrice che lavora principalmente in autonomia sulla scrittura di testi e melodie. Giulia cerca regolarmente musicisti a chiamata per le fasi di registrazione dei suoi brani e ha bisogno di strumenti che la aiutino a superare i momenti di blocco creativo. Si chiede spesso dove poter trovare un batterista disponibile per una sessione di registrazione senza dover contattare decine di conoscenti.
 
 La terza persona è Alessandro, un bassista freelance che lavora come musicista a chiamata per diverse band e progetti. Alessandro è costantemente alla ricerca di nuove opportunita di collaborazione e necessita di un modo efficiente per presentare il proprio profilo artistico. Attualmente deve monitorare numerose piattaforme e gruppi social per trovare offerte di lavoro, con un notevole dispendio di tempo.
+
+### Inserire diagramma
+
+### Requisiti Utente
+
+Dall'analisi dell'utenza emergono i requisiti che l'applicazione deve soddisfare dal punto di vista dell'esperienza utente. Gli utenti devono poter gestire un'area riservata personale contenente il proprio profilo con le preferenze musicali, inclusi gli strumenti suonati e i generi di riferimento. Devono poter creare nuove band e gestirne i membri attraverso un sistema di inviti basato su codici univoci, eliminando la necessita di condividere indirizzi email o altri dati personali.
+
+La gestione dei contenuti musicali rappresenta il cuore dell'applicazione: gli utenti devono poter caricare e organizzare file audio e immagini associandoli a specifici brani, comunicare in tempo reale con gli altri membri della band nel contesto di ciascuna canzone, e ricevere notifiche tempestive per nuovi messaggi e attivita rilevanti. Per quanto riguarda l'aspetto sociale, gli utenti devono poter cercare opportunita di collaborazione nella bacheca pubblica e candidarsi a quelle di interesse. Infine, devono poter accedere a strumenti di generazione testuale assistita per supportare il processo creativo.
+
+### Requisiti Funzionali
+
+Dal punto di vista funzionale, il sistema deve implementare un completo flusso di autenticazione che comprende la registrazione di nuovi utenti, il login sicuro con generazione di token JWT, e la gestione del profilo personale attraverso un wizard di onboarding che guida l'utente nella configurazione iniziale.
+
+La gestione delle band costituisce un modulo centrale dell'applicazione. Alla creazione di una nuova band, il sistema genera automaticamente un codice invito univoco nel formato XX-XXX-000 che puo essere condiviso con i potenziali membri. Chi riceve il codice puo unirsi alla band inserendolo nell'apposita sezione, e il sistema gestisce automaticamente i ruoli distinguendo tra amministratori e membri semplici.
+
+Per quanto riguarda i progetti musicali, il sistema implementa operazioni CRUD complete sulle canzoni, ciascuna caratterizzata da un workflow di stato che riflette le fasi tipiche della produzione musicale: Idea, In Progress, Mix e Master. Gli asset associati a ogni canzone possono essere di tre tipologie: file audio caricati dall'utente, immagini di riferimento, e testi generati tramite l'assistente AI o inseriti manualmente. Ogni asset e soggetto a un sistema di voto che permette ai membri della band di esprimere preferenze, con conteggio aggiornato in tempo reale.
+
+La comunicazione avviene attraverso una chat integrata per ogni canzone, che combina messaggi degli utenti e notifiche di sistema relative agli upload e ad altre attivita significative. Il modulo Gig Economy consente la pubblicazione di annunci di due tipologie: "member" per posizioni permanenti nella band, e "session" per collaborazioni temporanee su specifici progetti. Gli utenti possono candidarsi agli annunci e gli amministratori delle band possono gestire le candidature ricevute.
+
+### Requisiti Non Funzionali
+
+L'usabilita rappresenta un requisito fondamentale: l'interfaccia deve risultare intuitiva anche per utenti non esperti di tecnologia, con un design ottimizzato per dispositivi mobili secondo l'approccio mobile-first. L'accessibilita e stata curata seguendo le linee guida WCAG 2.1 livello AA, implementando supporto per screen reader attraverso attributi ARIA appropriati e garantendo touch target di dimensioni minime di 44x44 pixel per facilitare l'interazione su dispositivi touch.
+
+Sul fronte della sicurezza, l'autenticazione avviene tramite token JWT stateless con scadenza configurabile, le password vengono memorizzate dopo hashing con algoritmo bcrypt utilizzando 10 salt rounds, e tutti gli input utente sono sottoposti a validazione per prevenire injection e altri attacchi comuni.
+
+Le performance target prevedono tempi di risposta delle API inferiori ai 200 millisecondi, mentre l'architettura stateless del backend consente la scalabilita orizzontale per gestire carichi crescenti. Gli aggiornamenti in tempo reale per chat, notifiche e conteggio voti sono garantiti dall'utilizzo del protocollo WebSocket attraverso la libreria Socket.io.
+
+
