@@ -1,7 +1,11 @@
 @import "tailwindcss";
 
+/* CONFIGURAZIONE TEMA TAILWIND V4 
+  Qui mappiamo le variabili CSS alle utility di Tailwind (es. bg-bg-zero)
+  e definiamo le animazioni che generano automaticamente le classi.
+*/
 @theme {
-  /* Colori */
+  /* Mappatura Colori */
   --color-bg-zero: var(--bg-zero);
   --color-surface-zero: var(--surface-zero);
   --color-border-zero: var(--border-zero);
@@ -11,12 +15,73 @@
   --color-accent-dim: var(--accent-dim);
   --color-scanline: var(--scanline-color);
   
+  /* Font */
   --font-tech: "Space Mono", monospace;
   --font-sans: "Inter", sans-serif;
   
+  /* Ombre */
   --shadow-glow: 0 0 20px var(--shadow-glow);
+
+  /* ANIMAZIONI GENERATE AUTOMATICAMENTE 
+     Definendo queste, Tailwind crea classi come: animate-fade-in, animate-pulse-slow, etc.
+  */
+  --animate-fade-in: fadeIn 0.3s ease-out;
+  --animate-slide-up: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-down: slideDown 0.3s ease-out;
+  --animate-pulse-slow: pulseSlow 6s infinite ease-in-out;
+  --animate-float: float 3s infinite ease-in-out;
+  --animate-shake: shake 0.4s ease-out;
+  --animate-badge-bounce: badgeBounce 0.4s ease-out;
+  --animate-badge-pulse: badgePulse 1.5s infinite ease-out;
+  --animate-skeleton: skeletonShimmer 1.5s infinite;
+  
+  /* Keyframes per le animazioni del tema */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  @keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes pulseSlow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  @keyframes badgeBounce {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.2); }
+    50% { transform: scale(0.9); }
+    75% { transform: scale(1.1); }
+  }
+  @keyframes badgePulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--shadow-glow); }
+    50% { box-shadow: 0 0 0 6px transparent; }
+  }
+  @keyframes skeletonShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 }
 
+/* BASE LAYER 
+  Variabili CSS native e reset di base
+*/
 @layer base {
   :root {
     /* DARK THEME (DEFAULT) */
@@ -49,19 +114,43 @@
   body {
     background-color: var(--bg-zero);
     color: var(--text-main);
-    font-family: var(--font-sans); /* Usa la variabile definita nel tema */
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
     transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+  }
+
+  #app {
+    min-height: 100vh;
+  }
+
+  /* Element Transitions */
+  div, button, span, i, header, nav, main, section, article {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection {
+    background-color: rgba(255, 51, 0, 0.3);
   }
 }
+
+/* COMPONENTS LAYER
+  Classi complesse per UI specifica
+*/
 @layer components {
-  /* Container Zero - Replica esatta del tuo stile */
+  /* Container Zero */
   .container-zero {
     width: 100%;
     max-width: 56rem; 
     margin-inline: auto;
     padding-inline: 1.5rem;
+
+    /* CSS Nesting per media query */
+    @media (min-width: 1024px) {
+      padding-inline: 2rem;
+    }
   }
 
   /* Scanlines Overlay */
@@ -76,7 +165,7 @@
     transition: opacity 0.3s;
   }
 
-  /* Input Zero */
+  /* Minimal Input Styles */
   .input-zero {
     background: transparent;
     border: none;
@@ -87,62 +176,292 @@
     color: var(--text-main);
     outline: none;
     width: 100%;
+
+    &:focus {
+      border-color: var(--accent);
+    }
+    &::placeholder {
+      color: var(--text-dim);
+    }
   }
-  .input-zero:focus {
-    border-color: var(--accent);
+
+  /* Button Glitch Effect */
+  .btn-glitch:hover {
+    animation: glitch 0.3s ease-in-out;
   }
-  .input-zero::placeholder {
-    color: var(--text-dim);
+
+  /* Button Press Effect */
+  .btn-press {
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+
+  /* Border Flash */
+  .btn-flash:active {
+    animation: borderFlash 0.3s ease-out;
+  }
+
+  /* Glow Effect */
+  .hover-glow {
+    transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+    &:hover {
+      box-shadow: 0 0 12px var(--shadow-glow);
+      border-color: var(--accent);
+    }
+  }
+
+  /* Text Glitch */
+  .text-glitch:hover {
+    animation: textGlitch 0.2s ease-in-out;
+  }
+
+  /* Icon Spin */
+  .icon-spin:hover {
+    & i, & svg {
+      transition: transform 0.3s ease-out;
+      transform: rotate(90deg);
+    }
+  }
+
+  /* Cursor Blink */
+  .cursor-blink::after {
+    content: '|';
+    animation: cursorBlink 1s infinite;
+    color: var(--accent);
+    margin-left: 2px;
+  }
+
+  /* Card Lift */
+  .card-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  /* Underline Slide */
+  .underline-slide {
+    position: relative;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background-color: var(--accent);
+      transition: width 0.3s ease-out;
+    }
+    &:hover::after {
+      width: 100%;
+    }
+  }
+
+  /* Progress Glow */
+  .progress-glow {
+    animation: progressGlow 2s infinite ease-in-out;
+  }
+
+  /* Stagger Item (List animations) */
+  .stagger-item {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.3s ease-out forwards;
+    
+    /* nth-child loops are cleaner in native CSS/Sass, keeping raw here */
+    &:nth-child(1) { animation-delay: 0.05s; }
+    &:nth-child(2) { animation-delay: 0.1s; }
+    &:nth-child(3) { animation-delay: 0.15s; }
+    &:nth-child(4) { animation-delay: 0.2s; }
+    &:nth-child(5) { animation-delay: 0.25s; }
+    &:nth-child(6) { animation-delay: 0.3s; }
+    &:nth-child(7) { animation-delay: 0.35s; }
+    &:nth-child(8) { animation-delay: 0.4s; }
+    &:nth-child(9) { animation-delay: 0.45s; }
+    &:nth-child(10) { animation-delay: 0.5s; }
+  }
+
+  /* Ripple Effect */
+  .ripple {
+    position: relative;
+    overflow: hidden;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: var(--accent);
+      opacity: 0.3;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+    }
+    &:active::before {
+      width: 200%;
+      height: 200%;
+      opacity: 0;
+    }
+  }
+
+  /* Skeleton Loading */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--surface-zero) 25%,
+      var(--border-zero) 50%,
+      var(--surface-zero) 75%
+    );
+    background-size: 200% 100%;
+    /* Animation definita via utility --animate-skeleton nel theme, ma applicata qui per background specifico */
+    animation: skeletonShimmer 1.5s infinite;
+    border-radius: 2px;
+  }
+
+  /* Waveform Bars */
+  .waveform-bar {
+    transform-origin: bottom;
+    transition: background-color 0.2s ease;
+    
+    &.playing {
+      animation: waveformPulse 0.6s ease-in-out infinite;
+    }
+
+    /* Stagger manuale per realismo */
+    &:nth-child(1).playing { animation-delay: 0.00s; }
+    &:nth-child(2).playing { animation-delay: 0.05s; }
+    &:nth-child(3).playing { animation-delay: 0.10s; }
+    &:nth-child(4).playing { animation-delay: 0.15s; }
+    &:nth-child(5).playing { animation-delay: 0.20s; }
+    &:nth-child(6).playing { animation-delay: 0.08s; }
+    &:nth-child(7).playing { animation-delay: 0.13s; }
+    &:nth-child(8).playing { animation-delay: 0.18s; }
+    &:nth-child(9).playing { animation-delay: 0.03s; }
+    &:nth-child(10).playing { animation-delay: 0.12s; }
+    /* ...altri se necessari... */
+  }
+
+  /* Message Slides */
+  .message-slide-left {
+    animation: messageSlideInLeft 0.3s ease-out;
+  }
+  .message-slide-right {
+    animation: messageSlideInRight 0.3s ease-out;
+  }
+
+  /* Record Button Wrapper */
+  .record-btn-wrapper {
+    position: relative;
+    flex: 1;
+
+    & svg.marching-border {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+
+      & rect {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 1;
+        stroke-dasharray: 8 4;
+        animation: marchingDashes 0.8s linear infinite;
+      }
+    }
+
+    & .record-btn-content {
+      position: relative;
+      z-index: 1;
+    }
   }
 }
 
+/* UTILITIES LAYER
+  Piccole utility helper
+*/
 @layer utilities {
   .hover-sharp {
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar {
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .disabled-state {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+  
+  /* iOS Safe Area Utilities */
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0); }
+  .pt-safe { padding-top: env(safe-area-inset-top, 0); }
 }
 
+/* GLOBAL KEYFRAMES
+  Keyframes specifici usati dentro Components o Utilities ma non nel Theme globale
+*/
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(1px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0); }
+}
 
-/* ========================================
-   RECORDING BUTTON - MARCHING DASHES
-   ======================================== */
+@keyframes borderFlash {
+  0% { border-color: var(--border-zero); }
+  50% { border-color: var(--accent); box-shadow: 0 0 8px var(--shadow-glow); }
+  100% { border-color: var(--border-zero); }
+}
 
-/* Marching Dashes Animation for Recording */
+@keyframes textGlitch {
+  0%, 100% { opacity: 1; }
+  33% { opacity: 0.8; color: var(--accent); }
+  66% { opacity: 0.9; }
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes progressGlow {
+  0%, 100% { box-shadow: 0 0 4px var(--shadow-glow); }
+  50% { box-shadow: 0 0 8px var(--shadow-glow), 0 0 12px var(--shadow-glow); }
+}
+
+@keyframes waveformPulse {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes messageSlideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes messageSlideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 @keyframes marchingDashes {
-  0% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: -24;
-  }
-}
-
-.record-btn-wrapper {
-  position: relative;
-  flex: 1;
-}
-
-.record-btn-wrapper svg.marching-border {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: visible;
-}
-
-.record-btn-wrapper svg.marching-border rect {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 1;
-  stroke-dasharray: 8 4;
-  animation: marchingDashes 0.8s linear infinite;
-}
-
-.record-btn-wrapper .record-btn-content {
-  position: relative;
-  z-index: 1;
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -24; }
 }
