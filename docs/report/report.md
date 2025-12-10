@@ -47,4 +47,37 @@ Sul fronte della sicurezza, l'autenticazione avviene tramite token JWT stateless
 
 Le performance target prevedono tempi di risposta delle API inferiori ai 200 millisecondi, mentre l'architettura stateless del backend consente la scalabilita orizzontale per gestire carichi crescenti. Gli aggiornamenti in tempo reale per chat, notifiche e conteggio voti sono garantiti dall'utilizzo del protocollo WebSocket attraverso la libreria Socket.io.
 
+## Design
 
+### Metodologia
+
+Il sistema si basa su un database MongoDB organizzato in sei collezioni principali che modellano il dominio applicativo. La collezione "users" memorizza i profili dei musicisti con le relative credenziali di autenticazione e le preferenze musicali espresse in termini di strumenti suonati e generi di riferimento. La collezione "bands" rappresenta i gruppi di lavoro, contenendo il nome, il genere musicale, la localita geografica, il codice invito univoco e l'elenco dei membri con i rispettivi ruoli. La collezione "songs" archivia i progetti musicali associati a ciascuna band, con metadati quali titolo, BPM, genere e stato di avanzamento nel workflow produttivo. La collezione "assets" contiene i file e i contenuti testuali associati alle canzoni, includendo il riferimento all'uploader, la tipologia (audio, immagine o testo), l'eventuale URL del file e l'array dei voti ricevuti. La collezione "messages" gestisce la chat ibrida che combina messaggi degli utenti e log di sistema. Infine, la collezione "gigs" memorizza gli annunci pubblicati per il recruiting di musicisti, con le relative candidature.
+
+Le relazioni tra le entita seguono un modello orientato ai documenti tipico di MongoDB. Un utente puo appartenere a molteplici band attraverso l'array di membri embedded in ciascuna band. Ogni band contiene multiple canzoni, referenziate tramite il campo bandId. A sua volta, ogni canzone puo avere associati numerosi asset e messaggi, collegati tramite il campo songId. Gli annunci gig sono pubblicati da una band specifica e raccolgono candidature da parte degli utenti interessati.
+
+La struttura del database e le relazioni tra le entita sono rappresentate nel seguente diagramma:
+
+**Inserire diagramma ER del db**
+
+L'architettura generale segue il pattern REST per le operazioni CRUD, affiancato dal protocollo WebSocket per le funzionalita che richiedono aggiornamenti in tempo reale. Il frontend comunica con il backend attraverso chiamate HTTP per le operazioni transazionali e mantiene una connessione WebSocket persistente per ricevere notifiche push relative a nuovi messaggi, aggiornamenti dei voti e altre attivita collaborative.
+
+### Architettura delle Interfacce Utente
+
+Il design dell'interfaccia utente e stato sviluppato seguendo un approccio iterativo direttamente in codice, utilizzando Tailwind CSS come framework di styling. Questa scelta ha permesso di mantenere elevata flessibilita durante le fasi di raffinamento, evitando la rigidita che talvolta caratterizza i passaggi da mockup statici a implementazione.
+
+Le scelte estetiche si orientano verso un tema scuro **da fare e aggiornare con nuovo stile**
+
+L'applicazione si articola in sette viste principali. La schermata di autenticazione presenta un form animato per login e registrazione, accompagnato da elementi decorativi che introducono l'identita visiva del prodotto. Il wizard di onboarding guida i nuovi utenti attraverso due step per la selezione degli strumenti suonati e dei generi musicali preferiti. La dashboard mostra l'elenco delle band dell'utente attraverso card interattive e fornisce l'accesso alla bacheca dei gig. La vista dettaglio band organizza le informazioni in tre tab: panoramica, elenco membri e impostazioni con gestione del codice invito. La lista canzoni presenta i brani della band in formato griglia, con badge colorati che indicano lo stato di avanzamento. La vista dettaglio canzone integra un player audio personalizzato, la timeline degli asset con sistema di voto, e una chat flottante per la comunicazione contestuale. Infine, la vista Gig mostra la bacheca degli annunci con funzionalita di ricerca e filtri per strumento, genere e tipologia.
+
+**mettere screen delle schermate**
+
+## Tecnologie
+
+Lo stack tecnologico adottato e il MEVN, acronimo che identifica la combinazione di MongoDB, Express, Vue.js e Node.js, arricchito da Socket.io per le funzionalita real-time.
+### Backend
+
+Il backend e costruito su Node.js versione 18 o successiva, scelto per il suo modello asincrono non bloccante particolarmente adatto ad applicazioni con elevata concorrenza di connessioni. Express versione 4 fornisce il framework web per la definizione delle route e la gestione del middleware, offrendo la flessibilita necessaria per strutturare un'API RESTful ben organizzata.
+
+La persistenza dei dati e affidata a MongoDB versione 7, un database documentale NoSQL che si adatta naturalmente alla struttura flessibile dei dati musicali e collaborative. Mongoose versione 8 funge da ODM (Object Document Mapper), fornendo uno strato di astrazione che include validazione degli schema, middleware e query builder.
+
+La comunicazione in tempo reale e implementata attraverso Socket.io versione 4, che gestisce le connessioni WebSocket con fallback automatico su polling per garantire compatibilita con ambienti di rete restrittivi. Questa libreria permette l'organizzazione delle connessioni in "room" logiche, ciascuna corrispondente a una canzone specifica, ottimizzando la distribuzione dei messaggi.
