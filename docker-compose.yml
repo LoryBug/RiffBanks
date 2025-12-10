@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:latest
+    container_name: riffbanks-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=riffbanks
+    networks:
+      - riffbanks-network
+
+  # Express API Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: riffbanks-server
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+    volumes:
+      - uploads_data:/app/uploads
+    environment:
+      - NODE_ENV=production
+      - PORT=3333
+      - MONGODB_URI=mongodb://mongodb:27017/riffbanks
+      - JWT_SECRET=${JWT_SECRET:-riffbanks}
+      - JWT_EXPIRES_IN=7d
+      - CLIENT_URL=http://localhost
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - riffbank-network
+
+  # Vue 3 Frontend (nginx)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: riffbanks-client
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - riffbanks-network
+
+networks:
+  riffbanks-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    name: riffbanks-mongodb-data
+  uploads_data:
+    name: riffbanks-uploads-data
