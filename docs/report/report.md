@@ -105,3 +105,26 @@ Le comunicazioni HTTP con il backend sono gestite da Axios, configurato con inte
 ## Codice
 
 ### Struttura del Progetto
+Il progetto adotta una struttura monorepo gestita attraverso npm workspace, con due package principali: 
+- client, con la parte contenente il frontend in VUE
+- server, backend express
+Questa organizzazione permette di condividere configurazioni e script a livello di root mantenendo al contempo una chiara separazione di responsabilità.
+
+#### Client
+La cartella client contiene l'applicazione Vue organizzata secondo le convezioni del framework. 
+- **components** ospita i vari componenti riutilizzabili come ad asempio AudioPlayer, ChatPanel, GigGard e i vari modal.
+- **views** contiene i componenti che rappresentano le varie pagine dell'applicazione, mappati alle route definite nel router.
+- **stores** contiene Pinia store per auth e socket.
+- **services** contiene il modulo api che centralizza tutte le chiamate HTTP.
+- **routes** definisce tutte le route e i navigation guard
+
+#### Server
+Server contiene tutto il backend del progetto ed è organizzato nel seguente modo:
+- **models** contiene gli schemi di Mongoose per le diverse collezioni del DB.
+- **controllers** implementa la logica applicativa per ciascuna risorsa
+- **routes** definisce tutti gli endpoint e li collega al controller
+- **middleware** ospita i moduli per autenticazione e upload
+- **services** contiene la logica di business riutilizzabile
+- **socket** gestisce gli handler per gli eventi websocket
+
+**INSERIRE DIAGRAMMA DEI COMPONENTI QUI**
