@@ -5,22 +5,34 @@
         v-for="item in navItems"
         :key="item.id"
         @click="handleNavClick(item.id)"
-        class="flex flex-col items-center justify-center flex-1 h-full gap-2 group btn-press"
+        class="flex flex-col items-center justify-center flex-1 h-full gap-1.5 group btn-press"
         :aria-label="item.label"
         :aria-current="currentView === item.id ? 'page' : undefined"
       >
-        <!-- Line indicator -->
-        <div
-          class="w-8 h-[1px] mb-1 transition-colors duration-300"
-          :class="currentView === item.id ? 'bg-accent' : 'bg-transparent group-hover:bg-border-zero'"
-        ></div>
+        <!-- Icon -->
+        <i
+          :class="[
+            item.icon,
+            'text-xl transition-all duration-300',
+            currentView === item.id
+              ? 'text-accent scale-110'
+              : 'text-text-dim group-hover:text-text-main'
+          ]"
+        ></i>
 
+        <!-- Label -->
         <span
-          class="font-tech text-[0.6rem] uppercase tracking-widest transition-colors duration-300"
+          class="font-tech text-[0.55rem] uppercase tracking-widest transition-colors duration-300"
           :class="currentView === item.id ? 'text-text-main' : 'text-text-dim group-hover:text-text-main'"
         >
           {{ item.mobileLabel }}
         </span>
+
+        <!-- Active indicator dot -->
+        <div
+          class="w-1 h-1 rounded-full transition-all duration-300"
+          :class="currentView === item.id ? 'bg-accent' : 'bg-transparent'"
+        ></div>
       </button>
     </div>
   </nav>
@@ -34,9 +46,9 @@ const router = useRouter()
 const route = useRoute()
 
 const navItems = [
-  { id: 'dashboard', label: 'Console', mobileLabel: 'Console', route: 'dashboard' },
-  { id: 'gigs', label: 'Gig_Net', mobileLabel: 'Network', route: 'gigs' },
-  { id: 'profile', label: 'Profile', mobileLabel: 'Profile', route: 'profile' },
+  { id: 'dashboard', label: 'Console', mobileLabel: 'Console', route: 'dashboard', icon: 'ph ph-terminal' },
+  { id: 'gigs', label: 'Gig_Net', mobileLabel: 'Network', route: 'gigs', icon: 'ph ph-broadcast' },
+  { id: 'profile', label: 'Profile', mobileLabel: 'Profile', route: 'profile', icon: 'ph ph-user' },
 ]
 
 const currentView = computed(() => {

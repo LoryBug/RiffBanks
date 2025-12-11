@@ -126,7 +126,7 @@
             </div>
 
             <!-- Assets List -->
-            <div v-for="(asset, idx) in assets" :key="asset._id" :id="`asset-${asset._id}`" class="border border-border-zero p-4 hover:border-text-dim transition-colors group btn-press card-lift stagger-item" :style="{ animationDelay: `${idx * 0.05}s` }">
+            <div v-for="(asset, idx) in assets" :key="asset._id" :id="`asset-${asset._id}`" class="border border-border-zero p-4 hover:border-text-dim transition-colors group btn-press card-lift card-scan stagger-item" :style="{ animationDelay: `${idx * 0.05}s` }">
               <div class="flex justify-between items-start mb-4">
                 <span class="font-tech text-[0.6rem] text-text-dim">TRK_{{ String(idx + 1).padStart(2, '0') }}</span>
                 <div class="flex gap-2">

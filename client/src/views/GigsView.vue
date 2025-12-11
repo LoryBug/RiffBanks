@@ -206,29 +206,54 @@
             <div
               v-for="app in myApplications"
               :key="app._id"
-              class="flex items-center justify-between p-3 bg-surface-zero border border-border-zero"
+              class="p-3 bg-surface-zero border border-border-zero"
             >
-              <div>
-                <p class="font-bold text-text-main text-sm">{{ app.role }}</p>
-                <p class="font-tech text-[0.6rem] text-text-dim uppercase">{{ app.bandId?.name }}</p>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-bold text-text-main text-sm">{{ app.role }}</p>
+                  <p class="font-tech text-[0.6rem] text-text-dim uppercase">{{ app.bandId?.name }}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span
+                    :class="[
+                      'font-tech text-[0.6rem] uppercase px-2 py-1 border',
+                      getApplicationStatusClass(app.myApplicationStatus)
+                    ]"
+                  >
+                    {{ getApplicationStatusLabel(app.myApplicationStatus) }}
+                  </span>
+                  <button
+                    v-if="app.myApplicationStatus === 'pending'"
+                    @click="handleWithdrawApplication(app._id)"
+                    class="p-1 text-text-dim hover:text-accent transition-colors"
+                    title="Ritira"
+                  >
+                    <i class="ph ph-x"></i>
+                  </button>
+                </div>
               </div>
-              <div class="flex items-center gap-3">
-                <span
-                  :class="[
-                    'font-tech text-[0.6rem] uppercase px-2 py-1 border',
-                    getApplicationStatusClass(app.myApplicationStatus)
-                  ]"
-                >
-                  {{ getApplicationStatusLabel(app.myApplicationStatus) }}
-                </span>
-                <button
-                  v-if="app.myApplicationStatus === 'pending'"
-                  @click="handleWithdrawApplication(app._id)"
-                  class="p-1 text-text-dim hover:text-accent transition-colors"
-                  title="Ritira"
-                >
-                  <i class="ph ph-x"></i>
-                </button>
+
+              <!-- Invite Code shown when accepted to a member gig -->
+              <div
+                v-if="app.myApplicationStatus === 'accepted' && app.type === 'member' && app.bandInviteCode"
+                class="mt-3 p-3 bg-accent/10 border border-accent/30"
+              >
+                <p class="font-tech text-[0.6rem] text-accent uppercase mb-2">
+                  <i class="ph ph-key mr-1"></i> Codice Invito Band
+                </p>
+                <div class="flex items-center gap-3">
+                  <code class="font-mono text-accent text-lg tracking-wider">{{ app.bandInviteCode }}</code>
+                  <button
+                    @click="copyInviteCode(app.bandInviteCode)"
+                    class="p-1.5 border border-accent/30 text-accent hover:bg-accent hover:text-bg-zero transition-colors"
+                    title="Copia codice"
+                  >
+                    <i class="ph ph-copy text-sm"></i>
+                  </button>
+                </div>
+                <p class="font-tech text-[0.55rem] text-text-dim uppercase mt-2">
+                  Usa questo codice per entrare nella band dalla Dashboard
+                </p>
               </div>
             </div>
           </div>
@@ -351,10 +376,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { gigsAPI, bandsAPI } from '@/services/api'
 import { useConfirm } from '@/composables/useConfirm'
+import { useSocketStore } from '@/stores/socket'
 import ScanlineOverlay from '@/components/ScanlineOverlay.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import BottomNavigation from '@/components/BottomNavigation.vue'
@@ -364,6 +390,7 @@ import GigDetailModal from '@/components/GigDetailModal.vue'
 
 const router = useRouter()
 const { confirm } = useConfirm()
+const socketStore = useSocketStore()
 
 // Browse state
 const gigs = ref([])
@@ -406,7 +433,24 @@ watch(() => filters.type, () => loadGigs())
 
 onMounted(async () => {
   await Promise.all([loadGigs(), loadUserBands(), loadMyApplications(), loadMyGigs()])
+
+  // Listen for application status changes via notifications
+  if (socketStore.socket) {
+    socketStore.socket.on('new_notification', handleNotification)
+  }
 })
+
+onUnmounted(() => {
+  if (socketStore.socket) {
+    socketStore.socket.off('new_notification', handleNotification)
+  }
+})
+
+function handleNotification(notification) {
+  if (notification.type === 'application_accepted' || notification.type === 'application_rejected') {
+    loadMyApplications()
+  }
+}
 
 async function loadUserBands() {
   try {
@@ -585,6 +629,15 @@ function getApplicationStatusLabel(status) {
     case 'accepted': return 'Accettata'
     case 'rejected': return 'Rifiutata'
     default: return status
+  }
+}
+
+async function copyInviteCode(code) {
+  try {
+    await navigator.clipboard.writeText(code)
+    // Could add a toast notification here
+  } catch (err) {
+    console.error('Failed to copy:', err)
   }
 }
 </script>

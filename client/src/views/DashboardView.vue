@@ -154,7 +154,7 @@
               v-for="(band, index) in bands"
               :key="band._id"
               @click="router.push({ name: 'songs', params: { bandId: band._id } })"
-              class="bg-bg-zero p-5 flex justify-between items-center group cursor-pointer hover:bg-surface-zero transition-colors btn-press card-lift stagger-item"
+              class="bg-bg-zero p-5 flex justify-between items-center group cursor-pointer hover:bg-surface-zero transition-colors btn-press card-lift card-scan stagger-item"
               :style="{ animationDelay: `${index * 0.05}s` }"
             >
               <div>
