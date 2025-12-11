@@ -59,19 +59,22 @@ exports.myApplications = async (req, res) => {
       'applicants.userId': req.userId
     })
       .sort({ createdAt: -1 })
-      .populate('bandId', 'name genre coverImage')
+      .populate('bandId', 'name genre coverImage inviteCode')
       .populate('createdBy', 'username')
       .lean();
 
     // Add user's application status to each gig
     const gigsWithStatus = gigs.map(gig => {
       const myApplication = gig.applicants.find(a => a.userId.toString() === req.userId);
+      const isAcceptedMember = myApplication?.status === 'accepted' && gig.type === 'member';
       return {
         ...gig,
         myApplicationStatus: myApplication?.status || 'pending',
         myApplicationMessage: myApplication?.message || '',
         myApplicationDate: myApplication?.appliedAt,
         applicantCount: gig.applicants?.length || 0,
+        // Show invite code only if accepted to a member gig
+        bandInviteCode: isAcceptedMember ? gig.bandId?.inviteCode : undefined,
         // Remove other applicants for privacy
         applicants: undefined
       };
