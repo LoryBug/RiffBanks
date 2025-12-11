@@ -234,12 +234,41 @@
   }
 
   /* Card Lift */
-  .card-lift {
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+.card-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+    
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      /* Combina un'ombra glow con un bordo netto color accent */
+      box-shadow: 0 4px 20px var(--shadow-glow), 0 0 0 1px var(--accent);
     }
+  }
+
+  /* Card Scan Effect */
+  .card-scan {
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      transition: left 0.4s ease-out;
+      pointer-events: none; /* Buona pratica per evitare che interferisca col mouse */
+    }
+
+    &:hover::before {
+      left: 100%;
+    }
+  }
+
+  /* Card Glitch Border */
+  .card-glitch:hover {
+    animation: borderGlitch 0.3s ease-out;
   }
 
   /* Underline Slide */
@@ -422,6 +451,13 @@
   60% { transform: translate(-1px, -1px); }
   80% { transform: translate(1px, 1px); }
   100% { transform: translate(0); }
+}
+
+@keyframes borderGlitch {
+  0%, 100% { border-color: var(--border-zero); }
+  25% { border-color: var(--accent); }
+  50% { border-color: var(--border-zero); }
+  75% { border-color: var(--text-dim); }
 }
 
 @keyframes borderFlash {
