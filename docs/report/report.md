@@ -128,3 +128,30 @@ Server contiene tutto il backend del progetto ed è organizzato nel seguente mod
 - **socket** gestisce gli handler per gli eventi websocket
 
 **INSERIRE DIAGRAMMA DEI COMPONENTI QUI**
+
+### Pattern e Implementazioni Rilevanti
+L'architettura complessiva segue un pattern a strati che garantisce separazione delle responsabilità e testabilità. Le richieste HTTP provenienti dal frontend attraversano il layer delle route, che si occupa della validazione preliminare e dell'applicazione dei middleware appropriati. Il controller riceve la richiesta validata e orchestra la logica applicativa, eventualmente delegando operazioni complesse ai servizi. L'accesso ai dati avviene esclusivamente attraverso i modelli Mongoose, che incapsulano la struttura dei documenti e le operazioni di persistenza.
+
+Un esempio significativo di implementazione e il controller per le operazioni sulle band. La funzione createBand riceve dal body della richiesta i dati della nuova band, genera automaticamente un codice invito univoco attraverso una utility dedicata, e inserisce l'utente corrente come primo membro con ruolo di amministratore. La funzione joinBand verifica l'esistenza di una band con il codice fornito, controlla che l'utente non sia gia membro, e lo aggiunge all'array dei membri con ruolo standard.
+
+La gestione dello stato frontend attraverso Pinia segue il pattern della Composition API. Lo store di autenticazione espone lo stato reattivo dell'utente corrente e del flag di caricamento, computed properties per verificare l'autenticazione e la necessita di onboarding, e actions per le operazioni di login, logout e verifica del token. All'avvio dell'applicazione, la funzione checkAuth verifica la presenza di un token valido in localStorage e, se presente, recupera i dati dell'utente dal backend.
+
+La gestione dello stato frontend attraverso Pinia segue il pattern della Composition API. Lo store di autenticazione espone lo stato reattivo dell'utente corrente e del flag di caricamento, computed properties per verificare l'autenticazione e la necessita di onboarding, e actions per le operazioni di login, logout e verifica del token. All'avvio dell'applicazione, la funzione checkAuth verifica la presenza di un token valido in localStorage e, se presente, recupera i dati dell'utente dal backend.
+
+**Diagramma di sequenza per auth**
+
+L'implementazione Socket.io lato server gestisce il ciclo di vita delle connessioni e la comunicazione in tempo reale. All'evento di connessione, il client puo unirsi a una room specifica emettendo l'evento join_room con l'identificativo della canzone. I messaggi di chat vengono ricevuti attraverso l'evento send_message, salvati nel database, e ritrasmessi a tutti i client nella room attraverso l'evento new_message. Una funzione utility permette ai controller di emettere notifiche di sistema, ad esempio quando viene caricato un nuovo asset.
+
+Il sistema di voto implementa un meccanismo toggle efficiente. Quando un utente vota un asset, il controller cerca l'identificativo dell'utente nell'array dei voti. Se presente, il voto viene rimosso (unlike); altrimenti viene aggiunto (like). Dopo il salvataggio, un evento Socket.io notifica tutti i client nella room dell'aggiornamento del conteggio, garantendo sincronizzazione immediata dell'interfaccia.
+
+**Diagramma comunicazione real-time**
+
+## Test
+
+### Test Tecnici
+
+La verifica del corretto funzionamento dell'applicazione e stata condotta attraverso diverse tipologie di test. Il testing cross-browser ha verificato la compatibilita con i principali browser desktop (Chrome, Firefox, Edge) e i browser mobile su sistemi iOS e Android. L'approccio mobile-first adottato durante lo sviluppo ha garantito che l'esperienza su dispositivi touch fosse ottimale fin dalle prime fasi.
+
+Il testing delle API e stato eseguito sistematicamente utilizzando Postman, costruendo una collection che copre tutti gli endpoint con casi di test per i flussi nominali e per le condizioni di errore. Particolare attenzione e stata dedicata alla verifica dei meccanismi di autenticazione, testando il comportamento con token validi, scaduti e malformati.
+
+Il funzionamento real-time e stato verificato simulando scenari con connessioni multiple simultanee, confermando la corretta propagazione degli eventi di chat e delle notifiche di sistema a tutti i client iscritti alla room interessata.
