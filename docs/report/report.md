@@ -348,13 +348,45 @@ La gestione dello stato frontend attraverso Pinia segue il pattern della Composi
 
 La gestione dello stato frontend attraverso Pinia segue il pattern della Composition API. Lo store di autenticazione espone lo stato reattivo dell'utente corrente e del flag di caricamento, computed properties per verificare l'autenticazione e la necessita di onboarding, e actions per le operazioni di login, logout e verifica del token. All'avvio dell'applicazione, la funzione checkAuth verifica la presenza di un token valido in localStorage e, se presente, recupera i dati dell'utente dal backend.
 
-**Diagramma di sequenza per auth**
 
 L'implementazione Socket.io lato server gestisce il ciclo di vita delle connessioni e la comunicazione in tempo reale. All'evento di connessione, il client puo unirsi a una room specifica emettendo l'evento join_room con l'identificativo della canzone. I messaggi di chat vengono ricevuti attraverso l'evento send_message, salvati nel database, e ritrasmessi a tutti i client nella room attraverso l'evento new_message. Una funzione utility permette ai controller di emettere notifiche di sistema, ad esempio quando viene caricato un nuovo asset.
 
 Il sistema di voto implementa un meccanismo toggle efficiente. Quando un utente vota un asset, il controller cerca l'identificativo dell'utente nell'array dei voti. Se presente, il voto viene rimosso (unlike); altrimenti viene aggiunto (like). Dopo il salvataggio, un evento Socket.io notifica tutti i client nella room dell'aggiornamento del conteggio, garantendo sincronizzazione immediata dell'interfaccia.
 
-**Diagramma comunicazione real-time**
+##### Diagramma comunicazione real-time
+```mermaid
+sequenceDiagram
+    participant C1 as Client 1
+    participant C2 as Client 2
+    participant Server as Backend
+    participant DB as Database
+
+    Note over C1,DB: Connessione alla Room
+
+    C1->>Server: Join room (songId)
+    C2->>Server: Join room (songId)
+
+    Note over C1,DB: Invio Messaggio
+
+    C1->>Server: Invia messaggio
+    Server->>DB: Salva messaggio
+    Server-->>C1: Broadcast messaggio
+    Server-->>C2: Broadcast messaggio
+
+    Note over C1,DB: Upload Asset
+
+    C1->>Server: Upload file
+    Server->>DB: Salva asset
+    Server-->>C1: Notifica nuovo asset
+    Server-->>C2: Notifica nuovo asset
+
+    Note over C1,DB: Voto Asset
+
+    C2->>Server: Vota asset
+    Server->>DB: Aggiorna voti
+    Server-->>C1: Aggiorna contatore
+    Server-->>C2: Aggiorna contatore
+```
 
 ## Test
 
