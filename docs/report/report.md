@@ -29,76 +29,249 @@ La gestione dei contenuti musicali rappresenta il cuore dell'applicazione: gli u
 
 ### Requisiti Funzionali
 
-Dal punto di vista funzionale, il sistema deve implementare un completo flusso di autenticazione che comprende la registrazione di nuovi utenti, il login sicuro con generazione di token JWT, e la gestione del profilo personale attraverso un wizard di onboarding che guida l'utente nella configurazione iniziale.
+#### Autenticazione e Gestione Utente
+- Registrazione di nuovi utenti
+- Login sicuro con generazione di token JWT
+- Gestione del profilo personale tramite wizard di onboarding per la configurazione iniziale
 
-La gestione delle band costituisce un modulo centrale dell'applicazione. Alla creazione di una nuova band, il sistema genera automaticamente un codice invito univoco nel formato XX-XXX-000 che puo essere condiviso con i potenziali membri. Chi riceve il codice puo unirsi alla band inserendolo nell'apposita sezione, e il sistema gestisce automaticamente i ruoli distinguendo tra amministratori e membri semplici.
+#### Gestione delle Band
+- Creazione di nuove band con generazione automatica di codice invito univoco (formato: XX-XXX-000)
+- Condivisione del codice invito con potenziali membri
+- Possibilita di unirsi a una band inserendo il codice nell'apposita sezione
+- Gestione automatica dei ruoli:
+  - Amministratori
+  - Membri semplici
 
-Per quanto riguarda i progetti musicali, il sistema implementa operazioni CRUD complete sulle canzoni, ciascuna caratterizzata da un workflow di stato che riflette le fasi tipiche della produzione musicale: Idea, In Progress, Mix e Master. Gli asset associati a ogni canzone possono essere di tre tipologie: file audio caricati dall'utente, immagini di riferimento, e testi generati tramite l'assistente AI o inseriti manualmente. Ogni asset e soggetto a un sistema di voto che permette ai membri della band di esprimere preferenze, con conteggio aggiornato in tempo reale.
+#### Progetti Musicali
+- Operazioni CRUD complete sulle canzoni
+- Workflow di stato per ogni canzone:
+  1. Idea
+  2. In Progress
+  3. Mix
+  4. Master
+- Tipologie di asset associabili:
+  - File audio caricati dall'utente
+  - Immagini di riferimento
+- Sistema di voto sugli asset:
+  - Possibilita per i membri della band di esprimere preferenze
+  - Conteggio aggiornato in tempo reale
 
-La comunicazione avviene attraverso una chat integrata per ogni canzone, che combina messaggi degli utenti e notifiche di sistema relative agli upload e ad altre attivita significative. Il modulo Gig Economy consente la pubblicazione di annunci di due tipologie: "member" per posizioni permanenti nella band, e "session" per collaborazioni temporanee su specifici progetti. Gli utenti possono candidarsi agli annunci e gli amministratori delle band possono gestire le candidature ricevute.
+#### Comunicazione
+- Chat integrata per ogni canzone con:
+  - Messaggi degli utenti
+  - Notifiche di sistema (upload e altre attività significative)
+
+#### Modulo Gig Economy
+- Pubblicazione di annunci di due tipologie:
+  - **Member**: posizioni permanenti nella band
+  - **Session**: collaborazioni temporanee su specifici progetti
+- Candidatura degli utenti agli annunci
 
 ### Requisiti Non Funzionali
 
-L'usabilita rappresenta un requisito fondamentale: l'interfaccia deve risultare intuitiva anche per utenti non esperti di tecnologia, con un design ottimizzato per dispositivi mobili secondo l'approccio mobile-first. L'accessibilita e stata curata seguendo le linee guida WCAG 2.1 livello AA, implementando supporto per screen reader attraverso attributi ARIA appropriati e garantendo touch target di dimensioni minime di 44x44 pixel per facilitare l'interazione su dispositivi touch.
+#### Usabilità
+- Interfaccia intuitiva e user-friendly
+- Design ottimizzato per dispositivi mobili (approccio mobile-first)
 
-Sul fronte della sicurezza, l'autenticazione avviene tramite token JWT stateless con scadenza configurabile, le password vengono memorizzate dopo hashing con algoritmo bcrypt utilizzando 10 salt rounds, e tutti gli input utente sono sottoposti a validazione per prevenire injection e altri attacchi comuni.
+#### Accessibilita (WCAG 2.1 livello AA)
+- Supporto per screen reader tramite attributi ARIA appropriati
+- Touch target di dimensioni minime 44x44 pixel per dispositivi touch
 
-Le performance target prevedono tempi di risposta delle API inferiori ai 200 millisecondi, mentre l'architettura stateless del backend consente la scalabilita orizzontale per gestire carichi crescenti. Gli aggiornamenti in tempo reale per chat, notifiche e conteggio voti sono garantiti dall'utilizzo del protocollo WebSocket attraverso la libreria Socket.io.
+#### Sicurezza
+- Autenticazione tramite token JWT stateless con scadenza configurabile
+- Password memorizzate con hashing bcrypt (10 salt rounds)
+- Validazione di tutti gli input utente per prevenire injection e altri attacchi comuni
+
+#### Performance e Scalabilità
+- Tempi di risposta delle API inferiori a 200 millisecondi
+- Architettura stateless del backend per scalabilita orizzontale
+- Aggiornamenti in tempo reale (chat, notifiche, conteggio voti) tramite WebSocket con Socket.io
 
 ## Design
 
 ### Metodologia
 
-Il sistema si basa su un database MongoDB organizzato in sei collezioni principali che modellano il dominio applicativo. La collezione "users" memorizza i profili dei musicisti con le relative credenziali di autenticazione e le preferenze musicali espresse in termini di strumenti suonati e generi di riferimento. La collezione "bands" rappresenta i gruppi di lavoro, contenendo il nome, il genere musicale, la localita geografica, il codice invito univoco e l'elenco dei membri con i rispettivi ruoli. La collezione "songs" archivia i progetti musicali associati a ciascuna band, con metadati quali titolo, BPM, genere e stato di avanzamento nel workflow produttivo. La collezione "assets" contiene i file e i contenuti testuali associati alle canzoni, includendo il riferimento all'uploader, la tipologia (audio, immagine o testo), l'eventuale URL del file e l'array dei voti ricevuti. La collezione "messages" gestisce la chat ibrida che combina messaggi degli utenti e log di sistema. Infine, la collezione "gigs" memorizza gli annunci pubblicati per il recruiting di musicisti, con le relative candidature.
+Il sistema si basa su un database MongoDB organizzato in sei collezioni principali che modellano il dominio applicativo. 
+- *"users"* memorizza i profili dei musicisti con le relative credenziali di autenticazione e le preferenze musicali espresse in termini di strumenti suonati e generi di riferimento. 
+- *"bands"* rappresenta i gruppi di lavoro, contenendo il nome, il genere musicale, la localita geografica, il codice invito univoco e l'elenco dei membri con i rispettivi ruoli. 
+- *"songs"* archivia i progetti musicali associati a ciascuna band, con metadati quali titolo, BPM, genere e stato di avanzamento nel workflow produttivo.
+- *"assets"* contiene i file e i contenuti testuali associati alle canzoni, includendo il riferimento all'uploader, la tipologia (audio, immagine o testo), l'eventuale URL del file e l'array dei voti ricevuti. 
+- *"messages"* gestisce la chat ibrida che combina messaggi degli utenti e log di sistema
 
 Le relazioni tra le entita seguono un modello orientato ai documenti tipico di MongoDB. Un utente puo appartenere a molteplici band attraverso l'array di membri embedded in ciascuna band. Ogni band contiene multiple canzoni, referenziate tramite il campo bandId. A sua volta, ogni canzone puo avere associati numerosi asset e messaggi, collegati tramite il campo songId. Gli annunci gig sono pubblicati da una band specifica e raccolgono candidature da parte degli utenti interessati.
 
 La struttura del database e le relazioni tra le entita sono rappresentate nel seguente diagramma:
 
-**Inserire diagramma ER del db**
+```mermaid
+erDiagram
+    USERS {
+        ObjectId _id PK
+        string username
+        string email UK
+        string passwordHash
+        string avatar
+        boolean isProfileComplete
+        array instruments
+        array genres
+        date createdAt
+    }
 
-L'architettura generale segue il pattern REST per le operazioni CRUD, affiancato dal protocollo WebSocket per le funzionalita che richiedono aggiornamenti in tempo reale. Il frontend comunica con il backend attraverso chiamate HTTP per le operazioni transazionali e mantiene una connessione WebSocket persistente per ricevere notifiche push relative a nuovi messaggi, aggiornamenti dei voti e altre attivita collaborative.
+    BANDS {
+        ObjectId _id PK
+        string name
+        string genre
+        string bio
+        string location
+        string cover
+        string inviteCode UK
+        boolean active
+        array members
+        date createdAt
+    }
+
+    SONGS {
+        ObjectId _id PK
+        ObjectId bandId FK
+        string title
+        number bpm
+        string genre
+        string description
+        string status
+        date createdAt
+    }
+
+    ASSETS {
+        ObjectId _id PK
+        ObjectId songId FK
+        ObjectId uploaderId FK
+        string type
+        string title
+        string url
+        string content
+        string duration
+        array votes
+        string authorName
+        date createdAt
+    }
+
+    MESSAGES {
+        ObjectId _id PK
+        ObjectId songId FK
+        ObjectId userId FK
+        string type
+        string text
+        date createdAt
+    }
+
+    GIGS {
+        ObjectId _id PK
+        ObjectId bandId FK
+        string role
+        string type
+        ObjectId relatedSongId FK
+        string description
+        string status
+        array applicants
+        date createdAt
+    }
+
+    USERS ||--o{ BANDS : "members[]"
+    BANDS ||--o{ SONGS : "contains"
+    SONGS ||--o{ ASSETS : "has"
+    SONGS ||--o{ MESSAGES : "has"
+    USERS ||--o{ ASSETS : "uploads"
+    USERS ||--o{ MESSAGES : "writes"
+    BANDS ||--o{ GIGS : "publishes"
+    USERS ||--o{ GIGS : "applies"
+```
+
+---
+L'architettura generale segue il pattern REST per le operazioni CRUD, affiancato dal protocollo WebSocket per le funzionalità che richiedono aggiornamenti in tempo reale. Il frontend comunica con il backend attraverso chiamate HTTP per le operazioni transazionali e mantiene una connessione WebSocket persistente per ricevere notifiche push relative a nuovi messaggi, aggiornamenti dei voti e altre attivita collaborative.
 
 ### Architettura delle Interfacce Utente
 
-Il design dell'interfaccia utente e stato sviluppato seguendo un approccio iterativo direttamente in codice, utilizzando Tailwind CSS come framework di styling. Questa scelta ha permesso di mantenere elevata flessibilita durante le fasi di raffinamento, evitando la rigidita che talvolta caratterizza i passaggi da mockup statici a implementazione.
+#### Design System e Fonti di Ispirazione
 
-Le scelte estetiche si orientano verso un tema scuro **da fare e aggiornare con nuovo stile**
+Prima dello sviluppo delle interfacce, è stato definito uno stile visivo distintivo per il progetto. Le principali fonti di ispirazione sono state:
 
-L'applicazione si articola in sette viste principali. La schermata di autenticazione presenta un form animato per login e registrazione, accompagnato da elementi decorativi che introducono l'identita visiva del prodotto. Il wizard di onboarding guida i nuovi utenti attraverso due step per la selezione degli strumenti suonati e dei generi musicali preferiti. La dashboard mostra l'elenco delle band dell'utente attraverso card interattive e fornisce l'accesso alla bacheca dei gig. La vista dettaglio band organizza le informazioni in tre tab: panoramica, elenco membri e impostazioni con gestione del codice invito. La lista canzoni presenta i brani della band in formato griglia, con badge colorati che indicano lo stato di avanzamento. La vista dettaglio canzone integra un player audio personalizzato, la timeline degli asset con sistema di voto, e una chat flottante per la comunicazione contestuale. Infine, la vista Gig mostra la bacheca degli annunci con funzionalita di ricerca e filtri per strumento, genere e tipologia.
+- **Teenage Engineering**: brand noto per il design minimalista e funzionale dei propri dispositivi audio, caratterizzato da un'estetica industriale con accenti di colore vibranti e tipografia bold
+- **Nothing**: azienda di consumer electronics riconoscibile per l'approccio visivo basato su trasparenze, elementi geometrici e un linguaggio grafico pulito con forte identita
 
-**mettere screen delle schermate**
+Da queste influenze è stata creata una mood board contenente palette colori, font di riferimento e screenshot dei prodotti di ispirazione, insieme alla definizione delle funzionalità che ogni schermata principale doveva offrire.
+
+#### Processo di Creazione dei Mockup
+
+Per la realizzazione dei mockup e stato adottato un approccio non convenzionale: invece di utilizzare strumenti tradizionali come Figma, si è scelto di sperimentare con **Gemini 3.0 Flash** utilizzando la funzionalità Canvas. Partendo dalla mood board e dalle specifiche funzionali delle schermate, sono state condotte diverse iterazioni di prompt e raffinamenti successivi che hanno portato alla generazione dei mockup finali.
+
+Questo approccio ha permesso di:
+- Esplorare rapidamente molteplici varianti stilistiche
+- Iterare velocemente sul feedback visivo
+- Mantenere coerenza con il design system definito
+
+#### Mockup
+
+Di seguito i mockup delle schermate principali dell'applicazione:
+
+![Mockup Home](../mockups/home.png)
+*Dashboard principale con elenco delle band*
+
+![Mockup Canzone](../mockups/canzone.png)
+*Vista dettaglio canzone con player e asset*
+
+![Mockup Chat](../mockups/chat.png)
+*Chat integrata per la comunicazione contestuale*
+
+#### Viste dell'Applicazione
+
+L'applicazione si articola nelle seguenti viste principali:
+
+- **Autenticazione**: form per login e registrazione
+- **Onboarding**: wizard di configurazione iniziale del profilo
+- **Dashboard**: panoramica delle band e accesso alla bacheca gig
+- **Dettaglio Band**: informazioni, membri e impostazioni della band
+- **Lista Canzoni**: elenco dei brani con indicatori di stato
+- **Dettaglio Canzone**: player audio, asset e chat contestuale
+- **Gig**: bacheca annunci con filtri di ricerca
 
 ## Tecnologie
 
-Lo stack tecnologico adottato e il MEVN, acronimo che identifica la combinazione di MongoDB, Express, Vue.js e Node.js, arricchito da Socket.io per le funzionalita real-time.
+Lo stack tecnologico adottato e il **MEVN** (MongoDB, Express, Vue.js, Node.js), arricchito da Socket.io per le funzionalita real-time.
+
 ### Backend
 
-Il backend e costruito su Node.js versione 18 o successiva, scelto per il suo modello asincrono non bloccante particolarmente adatto ad applicazioni con elevata concorrenza di connessioni. Express versione 4 fornisce il framework web per la definizione delle route e la gestione del middleware, offrendo la flessibilita necessaria per strutturare un'API RESTful ben organizzata.
+**Runtime e Framework**
+- **Node.js 18+**: modello asincrono non bloccante, adatto ad applicazioni con elevata concorrenza
+- **Express 4**: framework web per API RESTful con gestione middleware
 
-La persistenza dei dati e affidata a MongoDB, un database documentale NoSQL che si adatta naturalmente alla struttura flessibile dei dati musicali e collaborative. Mongoose funge da ODM (Object Document Mapper), fornendo uno strato di astrazione che include validazione degli schema, middleware e query builder.
+**Persistenza Dati**
+- **MongoDB**: database documentale NoSQL, flessibile per dati musicali e collaborativi
+- **Mongoose**: ODM con validazione schema, middleware e query builder
 
-La comunicazione in tempo reale e implementata attraverso Socket.io, che gestisce le connessioni WebSocket con fallback automatico su polling per garantire compatibilita con ambienti di rete restrittivi. Questa libreria permette l'organizzazione delle connessioni in "room" logiche, ciascuna corrispondente a una canzone specifica, ottimizzando la distribuzione dei messaggi.
+**Real-time**
+- **Socket.io**: WebSocket con fallback automatico su polling, organizzazione in "room" per canzone
 
-L'autenticazione si basa su JSON Web Token attraverso la libreria jsonwebtoken, implementando un meccanismo stateless che non richiede storage lato server per le sessioni. Le password vengono processate con bcryptjs, che applica l'algoritmo bcrypt con un fattore di costo di 10 round per generare hash sicuri.
+**Autenticazione e Sicurezza**
+- **jsonwebtoken**: autenticazione stateless tramite JWT
+- **bcryptjs**: hashing password con algoritmo bcrypt (10 salt rounds)
 
-La gestione dell'upload dei file e affidata a Multer, un middleware per Express specializzato nel parsing di richieste multipart/form-data. La configurazione prevede un limite di 50 megabyte per singolo file e un filtro che accetta esclusivamente formati audio (mp3, wav, ogg, webm) e immagini (jpg, png, gif).
-
-**sicuramente da migliorare e controllare meglio**
+**Upload File**
+- **Multer**: parsing multipart/form-data con limite 50MB per file
+- Formati accettati: audio (mp3, wav, ogg, webm) e immagini (jpg, png, gif)
 
 ### Frontend
 
-Il frontend e sviluppato con Vue.js, sfruttando appieno la Composition API attraverso la sintassi script setup che permette di scrivere logica reattiva in modo conciso ed espressivo. Questa scelta architetturale facilita la composizione di funzionalità complesse e migliora la manutenibilita del codice rispetto all'Options API delle versioni precedenti.
+**Framework e Architettura**
+- **Vue.js 3** con Composition API e sintassi `<script setup>` per logica reattiva concisa
+- **Pinia**: state management centralizzato per autenticazione e connessione Socket.io
+- **Vue Router**: routing client-side con navigation guard e lazy loading delle viste
 
-La gestione dello stato applicativo e centralizzata attraverso Pinia, lo state manager ufficiale per Vue 3. Due store principali gestiscono rispettivamente lo stato di autenticazione (utente corrente, token, flag di onboarding) e la connessione Socket.io (istanza socket, stato di connessione, room attiva).
+**Build e Sviluppo**
+- **Vite**: Hot Module Replacement istantaneo, proxy API integrato per lo sviluppo
 
-Il routing client-side e implementato con Vue Router, configurato con navigation guard per proteggere le route che richiedono autenticazione e per gestire il reindirizzamento verso l'onboarding per gli utenti che non hanno completato la configurazione del profilo. Il caricamento delle viste avviene in modalita lazy attraverso import dinamici, riducendo il bundle iniziale e migliorando i tempi di caricamento.
-
-Vite costituisce il build tool del progetto, offrendo un server di sviluppo con Hot Module Replacement quasi istantaneo e producendo bundle ottimizzati per la produzione. La configurazione include un proxy che inoltra le richieste API al backend durante lo sviluppo, semplificando la gestione del CORS.
-
-Lo styling e realizzato interamente con Tailwind CSS, adottando l'approccio utility-first che permette di comporre stili direttamente nel markup senza dover gestire fogli di stile separati. Le icone provengono dalla libreria Lucide Vue Next, scelta per la coerenza stilistica e la leggerezza del bundle.
-
-Le comunicazioni HTTP con il backend sono gestite da Axios, configurato con interceptor che aggiungono automaticamente il token JWT alle richieste e gestiscono gli errori di autenticazione reindirizzando al login quando necessario.
+**UI e Styling**
+- **Tailwind CSS**: approccio utility-first per styling inline
+- **Lucide Vue Next**: libreria icone
+- **Axios**: client HTTP con interceptor per JWT e gestione errori autenticazione
 
 ## Codice
 
