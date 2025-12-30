@@ -340,18 +340,195 @@ graph TB
 ```
 
 ### Pattern e Implementazioni Rilevanti
-L'architettura complessiva segue un pattern a strati che garantisce separazione delle responsabilità e testabilità. Le richieste HTTP provenienti dal frontend attraversano il layer delle route, che si occupa della validazione preliminare e dell'applicazione dei middleware appropriati. Il controller riceve la richiesta validata e orchestra la logica applicativa, eventualmente delegando operazioni complesse ai servizi. L'accesso ai dati avviene esclusivamente attraverso i modelli Mongoose, che incapsulano la struttura dei documenti e le operazioni di persistenza.
 
-Un esempio significativo di implementazione e il controller per le operazioni sulle band. La funzione createBand riceve dal body della richiesta i dati della nuova band, genera automaticamente un codice invito univoco attraverso una utility dedicata, e inserisce l'utente corrente come primo membro con ruolo di amministratore. La funzione joinBand verifica l'esistenza di una band con il codice fornito, controlla che l'utente non sia gia membro, e lo aggiunge all'array dei membri con ruolo standard.
+L'architettura complessiva segue un **pattern a strati** che garantisce separazione delle responsabilita:
+1. **Route**: validazione preliminare e applicazione middleware
+2. **Controller**: orchestrazione della logica applicativa
+3. **Model**: accesso ai dati tramite Mongoose
 
-La gestione dello stato frontend attraverso Pinia segue il pattern della Composition API. Lo store di autenticazione espone lo stato reattivo dell'utente corrente e del flag di caricamento, computed properties per verificare l'autenticazione e la necessita di onboarding, e actions per le operazioni di login, logout e verifica del token. All'avvio dell'applicazione, la funzione checkAuth verifica la presenza di un token valido in localStorage e, se presente, recupera i dati dell'utente dal backend.
+#### Controller Backend: Gestione Band
 
-La gestione dello stato frontend attraverso Pinia segue il pattern della Composition API. Lo store di autenticazione espone lo stato reattivo dell'utente corrente e del flag di caricamento, computed properties per verificare l'autenticazione e la necessita di onboarding, e actions per le operazioni di login, logout e verifica del token. All'avvio dell'applicazione, la funzione checkAuth verifica la presenza di un token valido in localStorage e, se presente, recupera i dati dell'utente dal backend.
+Il controller `bandController.js` implementa le operazioni CRUD sulle band. Di seguito un estratto della funzione di creazione:
 
+```javascript
+// server/controllers/bandController.js
+exports.create = async (req, res) => {
+  try {
+    const { name, genre, bio, location, instrument } = req.body;
 
-L'implementazione Socket.io lato server gestisce il ciclo di vita delle connessioni e la comunicazione in tempo reale. All'evento di connessione, il client puo unirsi a una room specifica emettendo l'evento join_room con l'identificativo della canzone. I messaggi di chat vengono ricevuti attraverso l'evento send_message, salvati nel database, e ritrasmessi a tutti i client nella room attraverso l'evento new_message. Una funzione utility permette ai controller di emettere notifiche di sistema, ad esempio quando viene caricato un nuovo asset.
+    // Generate unique invite code
+    let inviteCode;
+    let isUnique = false;
+    while (!isUnique) {
+      inviteCode = Band.generateInviteCode(name);
+      const existing = await Band.findOne({ inviteCode });
+      if (!existing) isUnique = true;
+    }
 
-Il sistema di voto implementa un meccanismo toggle efficiente. Quando un utente vota un asset, il controller cerca l'identificativo dell'utente nell'array dei voti. Se presente, il voto viene rimosso (unlike); altrimenti viene aggiunto (like). Dopo il salvataggio, un evento Socket.io notifica tutti i client nella room dell'aggiornamento del conteggio, garantendo sincronizzazione immediata dell'interfaccia.
+    const band = new Band({
+      name, genre, bio, location, inviteCode,
+      members: [{
+        userId: req.userId,
+        role: 'Admin',
+        instrument: instrument || req.user.instruments?.[0] || '',
+        joinedAt: new Date()
+      }]
+    });
+
+    await band.save();
+    await band.populate('members.userId', 'username avatar');
+    res.status(201).json(band);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create band' });
+  }
+};
+```
+
+La funzione `join` verifica l'esistenza della band e l'appartenenza dell'utente prima di aggiungerlo:
+
+```javascript
+// server/controllers/bandController.js
+exports.join = async (req, res) => {
+  const { inviteCode, instrument } = req.body;
+
+  const band = await Band.findOne({
+    inviteCode: inviteCode.toUpperCase(),
+    active: true
+  });
+
+  if (!band) {
+    return res.status(404).json({ error: 'Invalid invite code' });
+  }
+
+  if (band.isMember(req.userId)) {
+    return res.status(400).json({ error: 'You are already a member of this band' });
+  }
+
+  band.members.push({
+    userId: req.userId,
+    role: 'Member',
+    instrument: instrument || req.user.instruments?.[0] || '',
+    joinedAt: new Date()
+  });
+
+  await band.save();
+  res.json(band);
+};
+```
+
+#### State Management Frontend: Auth Store
+
+Lo store Pinia per l'autenticazione utilizza la Composition API:
+
+```typescript
+// client/src/stores/auth.ts
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<any>(null)
+  const loading = ref(true)
+
+  const isAuthenticated = computed(() => !!user.value)
+  const needsOnboarding = computed(() => user.value && !user.value.isProfileComplete)
+
+  async function checkAuth() {
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        const res = await authAPI.me()
+        user.value = res.data
+      } catch (err) {
+        localStorage.removeItem('token')
+      }
+    }
+    loading.value = false
+  }
+
+  async function login(email: any, password: any) {
+    const res = await authAPI.login({ email, password })
+    localStorage.setItem('token', res.data.token)
+    user.value = res.data.user
+    return res.data.user
+  }
+
+  function logout() {
+    localStorage.removeItem('token')
+    user.value = null
+  }
+
+  return { user, loading, isAuthenticated, needsOnboarding, checkAuth, login, logout }
+})
+```
+
+#### Real-time: Socket.io
+
+La gestione Socket.io lato server (`server/socket/index.js`) implementa:
+- **Autenticazione** via middleware JWT
+- **Room per canzone**: ogni client si unisce a `song:{songId}`
+- **Broadcast messaggi**: eventi `send_message` → `new_message`
+
+```javascript
+// server/socket/index.js
+socket.on('join_room', async (songId) => {
+  const song = await Song.findById(songId);
+  const band = await Band.findById(song.bandId);
+
+  const isMember = band.members.some(m => m.userId.toString() === socket.userId);
+  if (!isMember) {
+    socket.emit('error', { message: 'Not a band member' });
+    return;
+  }
+
+  socket.join(`song:${songId}`);
+  socket.currentSongId = songId;
+});
+
+socket.on('send_message', async (data) => {
+  const { songId, text } = data;
+
+  const message = new Message({
+    songId,
+    userId: socket.userId,
+    type: 'user',
+    text: text.trim(),
+    readBy: [socket.userId]
+  });
+
+  await message.save();
+  await message.populate('userId', 'username profilePic');
+
+  io.to(`song:${songId}`).emit('new_message', messageData);
+});
+```
+
+#### Sistema di Voto
+
+Il meccanismo di voto implementa un toggle like/unlike con notifica real-time:
+
+```javascript
+// server/controllers/assetController.js
+exports.vote = async (req, res) => {
+  const asset = await Asset.findById(req.params.id);
+
+  const voteIndex = asset.votes.findIndex(v => v.equals(req.userId));
+  const votedByMe = voteIndex === -1;
+
+  if (votedByMe) {
+    asset.votes.push(req.userId);      // Add vote
+  } else {
+    asset.votes.splice(voteIndex, 1);  // Remove vote
+  }
+
+  await asset.save();
+
+  // Notify all clients in the room
+  req.io.to(`song:${asset.songId}`).emit('vote_update', {
+    assetId: asset._id,
+    votes: asset.votes.length,
+    action: votedByMe ? 'liked' : 'unliked'
+  });
+
+  res.json({ votes: asset.votes.length, votedByMe });
+};
+```
 
 ##### Diagramma comunicazione real-time
 ```mermaid
