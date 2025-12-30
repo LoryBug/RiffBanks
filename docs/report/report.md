@@ -298,7 +298,46 @@ Server contiene tutto il backend del progetto ed è organizzato nel seguente mod
 - **services** contiene la logica di business riutilizzabile
 - **socket** gestisce gli handler per gli eventi websocket
 
-**INSERIRE DIAGRAMMA DEI COMPONENTI QUI**
+##### Diagramma dei componenti
+```mermaid
+graph TB
+    subgraph Frontend["Frontend - Vue 3 + Pinia"]
+        Views[Views]
+        Components[Components]
+        Store[State Management]
+        ApiClient[API Client]
+    end
+
+    subgraph Backend["Backend - Express.js"]
+        REST[REST API]
+        WebSocket[Socket.io]
+        Middleware[Middleware]
+        Controllers[Controllers]
+        Models[Models]
+        Services[Services]
+    end
+
+    Database[(MongoDB)]
+
+    %% Frontend interno
+    Views --> Components
+    Views --> Store
+    Store --> ApiClient
+
+    %% Comunicazione Frontend-Backend
+    ApiClient -->|HTTP| REST
+    Store -.->|WebSocket| WebSocket
+
+    %% Backend interno
+    REST --> Middleware
+    Middleware --> Controllers
+    Controllers --> Models
+    Controllers --> Services
+    WebSocket --> Models
+
+    %% Persistenza
+    Models --> Database
+```
 
 ### Pattern e Implementazioni Rilevanti
 L'architettura complessiva segue un pattern a strati che garantisce separazione delle responsabilità e testabilità. Le richieste HTTP provenienti dal frontend attraversano il layer delle route, che si occupa della validazione preliminare e dell'applicazione dei middleware appropriati. Il controller riceve la richiesta validata e orchestra la logica applicativa, eventualmente delegando operazioni complesse ai servizi. L'accesso ai dati avviene esclusivamente attraverso i modelli Mongoose, che incapsulano la struttura dei documenti e le operazioni di persistenza.
