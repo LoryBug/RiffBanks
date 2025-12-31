@@ -1,0 +1,195 @@
+\documentclass{report}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+% Configurazione listings per codice
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{
+    RiffBanks - Piattaforma collaborativa per musicisti \\
+    \large Applicazioni e Servizi Web
+}
+
+\author{Lorenzo Leoni - 0001192033 \\ \texttt{lorenzo.leoni5@studio.unibo.it}}
+\date{Anno Accademico 2025/2026}
+
+\begin{document}
+
+\maketitle
+
+\chapter{Introduzione}
+
+Nel panorama musicale contemporaneo, i musicisti e le band si trovano quotidianamente ad affrontare una sfida organizzativa significativa: la gestione della collaborazione attraverso strumenti frammentati e disconnessi tra loro. Le conversazioni avvengono su WhatsApp o Telegram, i file audio vengono condivisi tramite Google Drive o WeTransfer, il coordinamento delle sessioni passa attraverso email, e la ricerca di nuovi collaboratori richiede la consultazione di molteplici piattaforme e gruppi social. Questa frammentazione genera inefficienze considerevoli, dalla difficoltà nel reperire versioni specifiche di un brano alla perdita di contesto nelle discussioni creative.
+
+RiffBanks nasce con l'obiettivo di risolvere queste problematiche offrendo uno spazio digitale unificato pensato specificamente per le esigenze dei musicisti. La piattaforma integra quattro funzionalità fondamentali: la gestione strutturata dei progetti musicali con versionamento degli asset, un sistema di comunicazione in tempo reale contestualizzato per ogni brano e una bacheca per il recruiting di musicisti (denominata ``Gig Economy'').
+
+Il target principale dell'applicazione comprende musicisti amatoriali e semi-professionali, band in fase di formazione o consolidamento, e session musician alla ricerca di opportunità di collaborazione. L'interfaccia è stata progettata con un approccio mobile-first, riconoscendo che gran parte delle interazioni tra musicisti avviene in mobilità, durante le prove o negli spostamenti.
+
+\chapter{Requisiti}
+
+\section{Analisi dell'utenza}
+
+Per comprendere a fondo le esigenze degli utenti finali, sono state definite tre personas rappresentative che incarnano i principali profili di utilizzo della piattaforma.
+
+La prima persona è \textbf{Marco}, un chitarrista che suona stabilmente in una band rock composta da quattro elementi. Marco necessita di uno strumento efficace per condividere demo e ricevere feedback dai compagni di band, oltre a voler mantenere traccia delle diverse iterazioni di ogni brano durante il processo creativo. La sua frustrazione principale riguarda la dispersione delle informazioni: ``Abbiamo tre gruppi WhatsApp diversi e non riesco mai a trovare i file quando mi servono''.
+
+La seconda persona è \textbf{Giulia}, una cantautrice che lavora principalmente in autonomia sulla scrittura di testi e melodie. Giulia cerca regolarmente musicisti a chiamata per le fasi di registrazione dei suoi brani e ha bisogno di strumenti che la aiutino a superare i momenti di blocco creativo. Si chiede spesso dove poter trovare un batterista disponibile per una sessione di registrazione senza dover contattare decine di conoscenti.
+
+La terza persona è \textbf{Alessandro}, un bassista freelance che lavora come musicista a chiamata per diverse band e progetti. Alessandro è costantemente alla ricerca di nuove opportunità di collaborazione e necessita di un modo efficiente per presentare il proprio profilo artistico. Attualmente deve monitorare numerose piattaforme e gruppi social per trovare offerte di lavoro, con un notevole dispendio di tempo.
+
+\section{Requisiti Utente}
+
+Dall'analisi dell'utenza emergono i requisiti che l'applicazione deve soddisfare dal punto di vista dell'esperienza utente. Gli utenti devono poter gestire un'area riservata personale contenente il proprio profilo con le preferenze musicali, inclusi gli strumenti suonati e i generi di riferimento. Devono poter creare nuove band e gestirne i membri attraverso un sistema di inviti basato su codici univoci, eliminando la necessità di condividere indirizzi email o altri dati personali.
+
+La gestione dei contenuti musicali rappresenta il cuore dell'applicazione: gli utenti devono poter caricare e organizzare file audio e immagini associandoli a specifici brani, comunicare in tempo reale con gli altri membri della band nel contesto di ciascuna canzone, e ricevere notifiche tempestive per nuovi messaggi e attività rilevanti. Per quanto riguarda l'aspetto sociale, gli utenti devono poter cercare opportunità di collaborazione nella bacheca pubblica e candidarsi a quelle di interesse. Infine, devono poter accedere a strumenti di generazione testuale assistita per supportare il processo creativo.
+
+\section{Requisiti Funzionali}
+
+\subsection{Autenticazione e Gestione Utente}
+\begin{itemize}
+    \item Registrazione di nuovi utenti
+    \item Login sicuro con generazione di token JWT
+    \item Gestione del profilo personale tramite wizard di onboarding per la configurazione iniziale
+\end{itemize}
+
+\subsection{Gestione delle Band}
+\begin{itemize}
+    \item Creazione di nuove band con generazione automatica di codice invito univoco (formato: XX-XXX-000)
+    \item Condivisione del codice invito con potenziali membri
+    \item Possibilità di unirsi a una band inserendo il codice nell'apposita sezione
+    \item Gestione automatica dei ruoli:
+    \begin{itemize}
+        \item Amministratori
+        \item Membri semplici
+    \end{itemize}
+\end{itemize}
+
+\subsection{Progetti Musicali}
+\begin{itemize}
+    \item Operazioni CRUD complete sulle canzoni
+    \item Workflow di stato per ogni canzone:
+    \begin{enumerate}
+        \item Idea
+        \item In Progress
+        \item Mix
+        \item Master
+    \end{enumerate}
+    \item Tipologie di asset associabili:
+    \begin{itemize}
+        \item File audio caricati dall'utente
+        \item Immagini di riferimento
+    \end{itemize}
+    \item Sistema di voto sugli asset:
+    \begin{itemize}
+        \item Possibilità per i membri della band di esprimere preferenze
+        \item Conteggio aggiornato in tempo reale
+    \end{itemize}
+\end{itemize}
+
+\subsection{Comunicazione}
+\begin{itemize}
+    \item Chat integrata per ogni canzone con:
+    \begin{itemize}
+        \item Messaggi degli utenti
+        \item Notifiche di sistema (upload e altre attività significative)
+    \end{itemize}
+\end{itemize}
+
+\subsection{Modulo Gig Economy}
+\begin{itemize}
+    \item Pubblicazione di annunci di due tipologie:
+    \begin{itemize}
+        \item \textbf{Member}: posizioni permanenti nella band
+        \item \textbf{Session}: collaborazioni temporanee su specifici progetti
+    \end{itemize}
+    \item Candidatura degli utenti agli annunci
+\end{itemize}
+
+\section{Requisiti Non Funzionali}
+
+\subsection{Usabilità}
+\begin{itemize}
+    \item Interfaccia intuitiva e user-friendly
+    \item Design ottimizzato per dispositivi mobili (approccio mobile-first)
+\end{itemize}
+
+\subsection{Accessibilità (WCAG 2.1 livello AA)}
+\begin{itemize}
+    \item Supporto per screen reader tramite attributi ARIA appropriati
+    \item Touch target di dimensioni minime 44x44 pixel per dispositivi touch
+\end{itemize}
+
+\subsection{Sicurezza}
+\begin{itemize}
+    \item Autenticazione tramite token JWT stateless con scadenza configurabile
+    \item Password memorizzate con hashing bcrypt (10 salt rounds)
+    \item Validazione di tutti gli input utente per prevenire injection e altri attacchi comuni
+\end{itemize}
+
+\subsection{Performance e Scalabilità}
+\begin{itemize}
+    \item Tempi di risposta delle API inferiori a 200 millisecondi
+    \item Architettura stateless del backend per scalabilità orizzontale
+    \item Aggiornamenti in tempo reale (chat, notifiche, conteggio voti) tramite WebSocket con Socket.io
+\end{itemize} 
+
+\section{Design}
+Design dell'architettura del sistema e delle interfacce utente.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.44]{deathStar2.jpg}
+\caption{Death Star}
+\label{fig:deathstar}
+\end{figure}
+
+\section{Tecnologie}
+Tecnologie adottate e motivazioni.
+
+\section{Codice}
+Solo aspetti rilevanti.
+
+\section{Test}
+Test effettuati sul codice e test con utenti.
+
+\section{Deployment}
+Rilascio, installazione e messa in funzione.
+
+
+\section{Conclusioni}
+Conclusioni
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
