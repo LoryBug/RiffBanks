@@ -257,7 +257,60 @@ L'applicazione si articola nelle seguenti viste principali:
 \end{itemize}
 
 \chapter{Tecnologie}
-Tecnologie adottate e motivazioni.
+
+Lo stack tecnologico adottato è il \textbf{MEVN} (MongoDB, Express, Vue.js, Node.js), arricchito da Socket.io per le funzionalità real-time.
+
+\section{Backend}
+
+\subsection{Runtime e Framework}
+\begin{itemize}
+    \item \textbf{Node.js 18+}: modello asincrono non bloccante, adatto ad applicazioni con elevata concorrenza
+    \item \textbf{Express 4}: framework web per API RESTful con gestione middleware
+\end{itemize}
+
+\subsection{Persistenza Dati}
+\begin{itemize}
+    \item \textbf{MongoDB}: database documentale NoSQL, flessibile per dati musicali e collaborativi
+    \item \textbf{Mongoose}: ODM con validazione schema, middleware e query builder
+\end{itemize}
+
+\subsection{Real-time}
+\begin{itemize}
+    \item \textbf{Socket.io}: WebSocket con fallback automatico su polling, organizzazione in ``room'' per canzone
+\end{itemize}
+
+\subsection{Autenticazione e Sicurezza}
+\begin{itemize}
+    \item \textbf{jsonwebtoken}: autenticazione stateless tramite JWT
+    \item \textbf{bcryptjs}: hashing password con algoritmo bcrypt (10 salt rounds)
+\end{itemize}
+
+\subsection{Upload File}
+\begin{itemize}
+    \item \textbf{Multer}: parsing multipart/form-data con limite 50MB per file
+    \item Formati accettati: audio (mp3, wav, ogg, webm) e immagini (jpg, png, gif)
+\end{itemize}
+
+\section{Frontend}
+
+\subsection{Framework e Architettura}
+\begin{itemize}
+    \item \textbf{Vue.js 3} con Composition API e sintassi \texttt{<script setup>} per logica reattiva concisa
+    \item \textbf{Pinia}: state management centralizzato per autenticazione e connessione Socket.io
+    \item \textbf{Vue Router}: routing client-side con navigation guard e lazy loading delle viste
+\end{itemize}
+
+\subsection{Build e Sviluppo}
+\begin{itemize}
+    \item \textbf{Vite}: Hot Module Replacement istantaneo, proxy API integrato per lo sviluppo
+\end{itemize}
+
+\subsection{UI e Styling}
+\begin{itemize}
+    \item \textbf{Tailwind CSS}: approccio utility-first per styling inline
+    \item \textbf{Lucide Vue Next}: libreria icone
+    \item \textbf{Axios}: client HTTP con interceptor per JWT e gestione errori autenticazione
+\end{itemize}
 
 \section{Codice}
 Solo aspetti rilevanti.
