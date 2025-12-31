@@ -574,3 +574,192 @@ La verifica del corretto funzionamento dell'applicazione e stata condotta attrav
 Il testing delle API e stato eseguito sistematicamente utilizzando Postman, costruendo una collection che copre tutti gli endpoint con casi di test per i flussi nominali e per le condizioni di errore. Particolare attenzione e stata dedicata alla verifica dei meccanismi di autenticazione, testando il comportamento con token validi, scaduti e malformati.
 
 Il funzionamento real-time e stato verificato simulando scenari con connessioni multiple simultanee, confermando la corretta propagazione degli eventi di chat e delle notifiche di sistema a tutti i client iscritti alla room interessata.
+
+## Deployment
+
+Il deployment dell'applicazione e stato progettato utilizzando **Docker** per garantire portabilita, riproducibilita e semplicita di installazione.
+
+### Architettura dei Container
+
+L'applicazione e composta da tre container orchestrati tramite Docker Compose:
+
+| Container | Immagine | Porta | Ruolo |
+|-----------|----------|-------|-------|
+| `riffbanks-mongodb` | `mongo:latest` | 27017 | Database documentale |
+| `riffbanks-server` | Node 20 Alpine | 3333 | API Express + Socket.io |
+| `riffbanks-client` | nginx Alpine | 80 | Frontend Vue + Reverse Proxy |
+
+### Build Multi-Stage del Frontend
+
+Il Dockerfile del client utilizza un approccio multi-stage per ottimizzare l'immagine finale:
+
+```dockerfile
+# client/Dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+Lo stage di build compila l'applicazione Vue, mentre lo stage di produzione serve solo i file statici risultanti tramite nginx.
+
+### Configurazione Nginx
+
+Il reverse proxy nginx gestisce il routing tra frontend e backend:
+
+```nginx
+# client/nginx.conf
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+
+    # SPA fallback per Vue Router
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy API verso backend
+    location /api {
+        proxy_pass http://server:3333;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+    }
+
+    # Proxy WebSocket per Socket.io
+    location /socket.io {
+        proxy_pass http://server:3333;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+
+    # Proxy file uploads
+    location /uploads {
+        proxy_pass http://server:3333;
+    }
+}
+```
+
+La configurazione include inoltre:
+- **Gzip compression** per ridurre il traffico di rete
+- **Security headers**: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection
+- **Cache 1 anno** per asset statici (js, css, immagini, font)
+
+### Persistenza dei Dati
+
+Docker Compose definisce due volumi nominati per la persistenza:
+
+```yaml
+# docker-compose.yml
+volumes:
+  mongodb_data:
+    name: riffbanks-mongodb-data    # Dati MongoDB
+  uploads_data:
+    name: riffbanks-uploads-data    # File caricati dagli utenti
+```
+
+### Variabili d'Ambiente
+
+La configurazione e esternalizzata tramite variabili d'ambiente:
+
+| Variabile | Valore Default | Descrizione |
+|-----------|----------------|-------------|
+| `NODE_ENV` | `production` | Ambiente di esecuzione |
+| `PORT` | `3333` | Porta del server Express |
+| `MONGODB_URI` | `mongodb://mongodb:27017/riffbanks` | Connection string database |
+| `JWT_SECRET` | `riffbanks` | Chiave per firma token JWT |
+| `JWT_EXPIRES_IN` | `7d` | Scadenza token |
+| `CLIENT_URL` | `http://localhost` | URL frontend per CORS |
+
+### Health Checks
+
+Ogni container implementa un health check per il monitoraggio automatico:
+
+**MongoDB**:
+```yaml
+healthcheck:
+  test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+```
+
+**Server Express** (endpoint `/api/health`):
+```javascript
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'RiffBank API is running' });
+});
+```
+
+**Client nginx**:
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+```
+
+### Avvio dell'Applicazione
+
+Per avviare l'intero stack:
+
+```bash
+# Clonare il repository
+git clone https://github.com/LoryBug/RiffBanks.git
+cd RiffBanks
+
+# Configurare JWT_SECRET (opzionale)
+export JWT_SECRET=your-secret-key
+
+# Avviare i container
+docker-compose up -d
+
+# Verificare lo stato
+docker-compose ps
+```
+
+L'applicazione sara disponibile su `http://localhost` (porta 80).
+
+### Dipendenze tra Servizi
+
+Docker Compose gestisce l'ordine di avvio:
+1. **MongoDB** si avvia per primo
+2. **Server** attende che MongoDB sia healthy (`condition: service_healthy`)
+3. **Client** attende che il server sia disponibile
+## Conclusioni
+
+Il progetto RiffBanks ha raggiunto la maggior parte degli obiettivi prefissati, portando a termine lo sviluppo di una piattaforma funzionante che risponde alle esigenze identificate in fase di analisi.
+
+Il prodotto finale offre un'esperienza d'uso coerente e intuitiva, permettendo ai musicisti di gestire le proprie band, organizzare i progetti musicali, comunicare in tempo reale e cercare opportunita di collaborazione attraverso un'unica interfaccia. L'approccio mobile-first ha garantito un'esperienza ottimale sui dispositivi che i musicisti utilizzano maggiormente nella loro quotidianita.
+
+### Sviluppi Futuri
+
+Per quanto riguarda le funzionalita che interessano gli utenti, un'evoluzione futura del sistema potra concentrarsi su possibili estensioni quali:
+
+- **Notifiche push**: implementazione di un sistema di notifiche push per dispositivi mobili, in modo da avvisare gli utenti di nuovi messaggi o attivita anche quando l'applicazione non e in primo piano
+- **Player audio avanzato**: integrazione di funzionalita di editing audio base (trim, fade) e visualizzazione della forma d'onda per una migliore gestione degli asset musicali
+- **Storage cloud**: migrazione dello storage dei file su servizi cloud (AWS S3, Cloudinary) per migliorare scalabilita e affidabilita
+- **Sistema di recensioni**: possibilita per i membri delle band di lasciare feedback sui collaboratori incontrati tramite la sezione Gig Economy
+
+Dal punto di vista tecnico, sarebbe interessante esplorare:
+
+- **PWA (Progressive Web App)**: trasformazione dell'applicazione in PWA per consentire l'installazione su dispositivi mobili e l'utilizzo offline
+- **CI/CD Pipeline**: automazione dei processi di testing e deployment tramite GitHub Actions
+
+### Commenti Finali
+
+Lo sviluppo di questo progetto ha permesso di mettere in pratica le conoscenze acquisite durante il corso, affrontando le sfide tipiche dello sviluppo web moderno: dalla progettazione di API RESTful alla gestione della comunicazione real-time tramite WebSocket, dall'autenticazione JWT alla containerizzazione con Docker.
+
+Particolarmente formativa e stata l'esperienza con lo stack MEVN, che ha richiesto di padroneggiare tecnologie diverse ma coerenti tra loro, dalla reattivita di Vue.js con la Composition API alla flessibilita di MongoDB come database documentale.
+
+Un aspetto interessante del processo di sviluppo e stato l'utilizzo di strumenti di intelligenza artificiale generativa per la creazione dei mockup, un approccio non convenzionale che ha permesso di esplorare nuove modalita di prototipazione rapida.
+
+L'idea di RiffBanks nasce da un'esigenza concreta riscontrata nel mondo della musica amatoriale: la frammentazione degli strumenti di collaborazione. Questo ha permesso di sviluppare con maggiore consapevolezza le funzionalita necessarie, potendo valutare in prima persona l'utilita delle scelte implementative.
