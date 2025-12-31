@@ -9,6 +9,8 @@
 \usepackage{enumitem}
 \usepackage{geometry}
 \geometry{a4paper, margin=2.5cm}
+\usepackage{svg}
+\usepackage{float}
 
 % Configurazione listings per codice
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -164,17 +166,97 @@ La gestione dei contenuti musicali rappresenta il cuore dell'applicazione: gli u
     \item Aggiornamenti in tempo reale (chat, notifiche, conteggio voti) tramite WebSocket con Socket.io
 \end{itemize} 
 
-\section{Design}
-Design dell'architettura del sistema e delle interfacce utente.
+\chapter{Design}
 
-\begin{figure}[h!]
-\centering
-\includegraphics[scale=0.44]{deathStar2.jpg}
-\caption{Death Star}
-\label{fig:deathstar}
+\section{Metodologia}
+
+Il sistema si basa su un database MongoDB organizzato in sei collezioni principali che modellano il dominio applicativo:
+\begin{itemize}
+    \item \textbf{users}: memorizza i profili dei musicisti con le relative credenziali di autenticazione e le preferenze musicali espresse in termini di strumenti suonati e generi di riferimento.
+    \item \textbf{bands}: rappresenta i gruppi di lavoro, contenendo il nome, il genere musicale, la località geografica, il codice invito univoco e l'elenco dei membri con i rispettivi ruoli.
+    \item \textbf{songs}: archivia i progetti musicali associati a ciascuna band, con metadati quali titolo, BPM, genere e stato di avanzamento nel workflow produttivo.
+    \item \textbf{assets}: contiene i file e i contenuti testuali associati alle canzoni, includendo il riferimento all'uploader, la tipologia (audio, immagine o testo), l'eventuale URL del file e l'array dei voti ricevuti.
+    \item \textbf{messages}: gestisce la chat ibrida che combina messaggi degli utenti e log di sistema.
+    \item \textbf{gigs}: gestisce gli annunci della bacheca Gig Economy con le relative candidature.
+\end{itemize}
+
+Le relazioni tra le entità seguono un modello orientato ai documenti tipico di MongoDB. Un utente può appartenere a molteplici band attraverso l'array di membri embedded in ciascuna band. Ogni band contiene multiple canzoni, referenziate tramite il campo \texttt{bandId}. A sua volta, ogni canzone può avere associati numerosi asset e messaggi, collegati tramite il campo \texttt{songId}. Gli annunci gig sono pubblicati da una band specifica e raccolgono candidature da parte degli utenti interessati.
+
+La struttura del database e le relazioni tra le entità sono rappresentate nel diagramma ER in Figura \ref{fig:er-diagram}.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=0.9\textwidth]{../diagrams/er-diagram}
+    \caption{Diagramma ER del database}
+    \label{fig:er-diagram}
 \end{figure}
 
-\section{Tecnologie}
+L'architettura generale segue il pattern REST per le operazioni CRUD, affiancato dal protocollo WebSocket per le funzionalità che richiedono aggiornamenti in tempo reale. Il frontend comunica con il backend attraverso chiamate HTTP per le operazioni transazionali e mantiene una connessione WebSocket persistente per ricevere notifiche push relative a nuovi messaggi, aggiornamenti dei voti e altre attività collaborative.
+
+\section{Architettura delle Interfacce Utente}
+
+\subsection{Design System e Fonti di Ispirazione}
+
+Prima dello sviluppo delle interfacce, è stato definito uno stile visivo distintivo per il progetto. Le principali fonti di ispirazione sono state:
+
+\begin{itemize}
+    \item \textbf{Teenage Engineering}: brand noto per il design minimalista e funzionale dei propri dispositivi audio, caratterizzato da un'estetica industriale con accenti di colore vibranti e tipografia bold.
+    \item \textbf{Nothing}: azienda di consumer electronics riconoscibile per l'approccio visivo basato su trasparenze, elementi geometrici e un linguaggio grafico pulito con forte identità.
+\end{itemize}
+
+Da queste influenze è stata creata una mood board contenente palette colori, font di riferimento e screenshot dei prodotti di ispirazione, insieme alla definizione delle funzionalità che ogni schermata principale doveva offrire.
+
+\subsection{Processo di Creazione dei Mockup}
+
+Per la realizzazione dei mockup è stato adottato un approccio non convenzionale: invece di utilizzare strumenti tradizionali come Figma, si è scelto di sperimentare con \textbf{Gemini 3.0 Flash} utilizzando la funzionalità Canvas. Partendo dalla mood board e dalle specifiche funzionali delle schermate, sono state condotte diverse iterazioni di prompt e raffinamenti successivi che hanno portato alla generazione dei mockup finali.
+
+Questo approccio ha permesso di:
+\begin{itemize}
+    \item Esplorare rapidamente molteplici varianti stilistiche
+    \item Iterare velocemente sul feedback visivo
+    \item Mantenere coerenza con il design system definito
+\end{itemize}
+
+\subsection{Mockup}
+
+Di seguito i mockup delle schermate principali dell'applicazione:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../mockups/home.png}
+    \caption{Dashboard principale con elenco delle band}
+    \label{fig:mockup-home}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../mockups/canzone.png}
+    \caption{Vista dettaglio canzone con player e asset}
+    \label{fig:mockup-canzone}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../mockups/chat.png}
+    \caption{Chat integrata per la comunicazione contestuale}
+    \label{fig:mockup-chat}
+\end{figure}
+
+\subsection{Viste dell'Applicazione}
+
+L'applicazione si articola nelle seguenti viste principali:
+
+\begin{itemize}
+    \item \textbf{Autenticazione}: form per login e registrazione
+    \item \textbf{Onboarding}: wizard di configurazione iniziale del profilo
+    \item \textbf{Dashboard}: panoramica delle band e accesso alla bacheca gig
+    \item \textbf{Dettaglio Band}: informazioni, membri e impostazioni della band
+    \item \textbf{Lista Canzoni}: elenco dei brani con indicatori di stato
+    \item \textbf{Dettaglio Canzone}: player audio, asset e chat contestuale
+    \item \textbf{Gig}: bacheca annunci con filtri di ricerca
+\end{itemize}
+
+\chapter{Tecnologie}
 Tecnologie adottate e motivazioni.
 
 \section{Codice}
