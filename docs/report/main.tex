@@ -53,7 +53,7 @@
 
 Nel panorama musicale contemporaneo, i musicisti e le band si trovano quotidianamente ad affrontare una sfida organizzativa significativa: la gestione della collaborazione attraverso strumenti frammentati e disconnessi tra loro. Le conversazioni avvengono su WhatsApp o Telegram, i file audio vengono condivisi tramite Google Drive o WeTransfer, il coordinamento delle sessioni passa attraverso email, e la ricerca di nuovi collaboratori richiede la consultazione di molteplici piattaforme e gruppi social. Questa frammentazione genera inefficienze considerevoli, dalla difficoltà nel reperire versioni specifiche di un brano alla perdita di contesto nelle discussioni creative.
 
-RiffBanks nasce con l'obiettivo di risolvere queste problematiche offrendo uno spazio digitale unificato pensato specificamente per le esigenze dei musicisti. La piattaforma integra quattro funzionalità fondamentali: la gestione strutturata dei progetti musicali con versionamento degli asset, un sistema di comunicazione in tempo reale contestualizzato per ogni brano e una bacheca per il recruiting di musicisti (denominata ``Gig Economy'').
+RiffBanks nasce con l'obiettivo di risolvere queste problematiche offrendo uno spazio digitale unificato pensato specificamente per le esigenze dei musicisti. La piattaforma integra tre funzionalità fondamentali: la gestione strutturata dei progetti musicali con versionamento degli asset, un sistema di comunicazione in tempo reale contestualizzato per ogni brano e una bacheca per il recruiting di musicisti (denominata ``Gig Economy'').
 
 Il target principale dell'applicazione comprende musicisti amatoriali e semi-professionali, band in fase di formazione o consolidamento, e session musician alla ricerca di opportunità di collaborazione. L'interfaccia è stata progettata con un approccio mobile-first, riconoscendo che gran parte delle interazioni tra musicisti avviene in mobilità, durante le prove o negli spostamenti.
 
@@ -73,7 +73,7 @@ La terza persona è \textbf{Alessandro}, un bassista freelance che lavora come m
 
 Dall'analisi dell'utenza emergono i requisiti che l'applicazione deve soddisfare dal punto di vista dell'esperienza utente. Gli utenti devono poter gestire un'area riservata personale contenente il proprio profilo con le preferenze musicali, inclusi gli strumenti suonati e i generi di riferimento. Devono poter creare nuove band e gestirne i membri attraverso un sistema di inviti basato su codici univoci, eliminando la necessità di condividere indirizzi email o altri dati personali.
 
-La gestione dei contenuti musicali rappresenta il cuore dell'applicazione: gli utenti devono poter caricare e organizzare file audio e immagini associandoli a specifici brani, comunicare in tempo reale con gli altri membri della band nel contesto di ciascuna canzone, e ricevere notifiche tempestive per nuovi messaggi e attività rilevanti. Per quanto riguarda l'aspetto sociale, gli utenti devono poter cercare opportunità di collaborazione nella bacheca pubblica e candidarsi a quelle di interesse. Infine, devono poter accedere a strumenti di generazione testuale assistita per supportare il processo creativo.
+La gestione dei contenuti musicali rappresenta il cuore dell'applicazione: gli utenti devono poter caricare e organizzare file audio e immagini associandoli a specifici brani, comunicare in tempo reale con gli altri membri della band nel contesto di ciascuna canzone, e ricevere notifiche tempestive per nuovi messaggi e attività rilevanti. Per quanto riguarda l'aspetto sociale, gli utenti devono poter cercare opportunità di collaborazione nella bacheca pubblica e candidarsi a quelle di interesse.
 
 \section{Requisiti Funzionali}
 
@@ -275,7 +275,7 @@ Lo stack tecnologico adottato è il \textbf{MEVN} (MongoDB, Express, Vue.js, Nod
 
 \subsection{Real-time}
 \begin{itemize}
-    \item \textbf{Socket.io}: WebSocket con fallback automatico su polling, organizzazione in ``room'' per canzone
+    \item \textbf{Socket.io}: WebSocket con fallback automatico su polling, organizzazione in room per canzone
 \end{itemize}
 
 \subsection{Autenticazione e Sicurezza}
