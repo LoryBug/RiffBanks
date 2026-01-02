@@ -9,7 +9,6 @@
 \usepackage{enumitem}
 \usepackage{geometry}
 \geometry{a4paper, margin=2.5cm}
-\usepackage{svg}
 \usepackage{float}
 
 % Configurazione listings per codice
@@ -186,7 +185,7 @@ La struttura del database e le relazioni tra le entità sono rappresentate nel d
 
 \begin{figure}[H]
     \centering
-    \includesvg[width=0.9\textwidth]{../diagrams/er-diagram}
+    \includegraphics[width=0.9\textwidth]{../diagrams/er-diagram.png}
     \caption{Diagramma ER del database}
     \label{fig:er-diagram}
 \end{figure}
@@ -312,19 +311,481 @@ Lo stack tecnologico adottato è il \textbf{MEVN} (MongoDB, Express, Vue.js, Nod
     \item \textbf{Axios}: client HTTP con interceptor per JWT e gestione errori autenticazione
 \end{itemize}
 
-\section{Codice}
-Solo aspetti rilevanti.
+\chapter{Codice}
 
-\section{Test}
-Test effettuati sul codice e test con utenti.
+\section{Struttura del Progetto}
 
-\section{Deployment}
-Rilascio, installazione e messa in funzione.
+Il progetto adotta una struttura monorepo gestita attraverso npm workspace, con due package principali:
+\begin{itemize}
+    \item \textbf{client}: contenente il frontend in Vue
+    \item \textbf{server}: backend Express
+\end{itemize}
 
+Questa organizzazione permette di condividere configurazioni e script a livello di root mantenendo al contempo una chiara separazione di responsabilità.
 
-\section{Conclusioni}
-Conclusioni
+\subsection{Client}
 
-\bibliographystyle{plain}
-\bibliography{references}
+La cartella client contiene l'applicazione Vue organizzata secondo le convenzioni del framework:
+\begin{itemize}
+    \item \textbf{components}: ospita i componenti riutilizzabili come AudioPlayer, ChatPanel, GigCard e i vari modal
+    \item \textbf{views}: contiene i componenti che rappresentano le pagine dell'applicazione, mappati alle route definite nel router
+    \item \textbf{stores}: contiene i Pinia store per auth e socket
+    \item \textbf{services}: contiene il modulo api che centralizza tutte le chiamate HTTP
+    \item \textbf{routes}: definisce tutte le route e i navigation guard
+\end{itemize}
+
+\subsection{Server}
+
+La cartella server contiene tutto il backend del progetto ed è organizzata nel seguente modo:
+\begin{itemize}
+    \item \textbf{models}: contiene gli schemi di Mongoose per le diverse collezioni del DB
+    \item \textbf{controllers}: implementa la logica applicativa per ciascuna risorsa
+    \item \textbf{routes}: definisce tutti gli endpoint e li collega al controller
+    \item \textbf{middleware}: ospita i moduli per autenticazione e upload
+    \item \textbf{services}: contiene la logica di business riutilizzabile
+    \item \textbf{socket}: gestisce gli handler per gli eventi WebSocket
+\end{itemize}
+
+\subsection{Diagramma dei Componenti}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{../diagrams/component-diagram.png}
+    \caption{Diagramma dei componenti dell'architettura}
+    \label{fig:component-diagram}
+\end{figure}
+
+\section{Pattern e Implementazioni Rilevanti}
+
+L'architettura complessiva segue un \textbf{pattern a strati} che garantisce separazione delle responsabilità:
+\begin{enumerate}
+    \item \textbf{Route}: validazione preliminare e applicazione middleware
+    \item \textbf{Controller}: orchestrazione della logica applicativa
+    \item \textbf{Model}: accesso ai dati tramite Mongoose
+\end{enumerate}
+
+\subsection{Controller Backend: Gestione Band}
+
+Il controller \texttt{bandController.js} implementa le operazioni CRUD sulle band. Di seguito un estratto della funzione di creazione:
+
+\begin{lstlisting}[language=JavaScript, caption={Creazione di una band}]
+// server/controllers/bandController.js
+exports.create = async (req, res) => {
+  try {
+    const { name, genre, bio, location, instrument } = req.body;
+
+    // Generate unique invite code
+    let inviteCode;
+    let isUnique = false;
+    while (!isUnique) {
+      inviteCode = Band.generateInviteCode(name);
+      const existing = await Band.findOne({ inviteCode });
+      if (!existing) isUnique = true;
+    }
+
+    const band = new Band({
+      name, genre, bio, location, inviteCode,
+      members: [{
+        userId: req.userId,
+        role: 'Admin',
+        instrument: instrument || req.user.instruments?.[0] || '',
+        joinedAt: new Date()
+      }]
+    });
+
+    await band.save();
+    await band.populate('members.userId', 'username avatar');
+    res.status(201).json(band);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create band' });
+  }
+};
+\end{lstlisting}
+
+La funzione \texttt{join} verifica l'esistenza della band e l'appartenenza dell'utente prima di aggiungerlo:
+
+\begin{lstlisting}[language=JavaScript, caption={Join a una band tramite codice invito}]
+// server/controllers/bandController.js
+exports.join = async (req, res) => {
+  const { inviteCode, instrument } = req.body;
+
+  const band = await Band.findOne({
+    inviteCode: inviteCode.toUpperCase(),
+    active: true
+  });
+
+  if (!band) {
+    return res.status(404).json({ error: 'Invalid invite code' });
+  }
+
+  if (band.isMember(req.userId)) {
+    return res.status(400).json({ error: 'You are already a member' });
+  }
+
+  band.members.push({
+    userId: req.userId,
+    role: 'Member',
+    instrument: instrument || req.user.instruments?.[0] || '',
+    joinedAt: new Date()
+  });
+
+  await band.save();
+  res.json(band);
+};
+\end{lstlisting}
+
+\subsection{State Management Frontend: Auth Store}
+
+Lo store Pinia per l'autenticazione utilizza la Composition API:
+
+\begin{lstlisting}[language=JavaScript, caption={Auth Store con Pinia}]
+// client/src/stores/auth.ts
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<any>(null)
+  const loading = ref(true)
+
+  const isAuthenticated = computed(() => !!user.value)
+  const needsOnboarding = computed(() =>
+    user.value && !user.value.isProfileComplete
+  )
+
+  async function checkAuth() {
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        const res = await authAPI.me()
+        user.value = res.data
+      } catch (err) {
+        localStorage.removeItem('token')
+      }
+    }
+    loading.value = false
+  }
+
+  async function login(email: any, password: any) {
+    const res = await authAPI.login({ email, password })
+    localStorage.setItem('token', res.data.token)
+    user.value = res.data.user
+    return res.data.user
+  }
+
+  function logout() {
+    localStorage.removeItem('token')
+    user.value = null
+  }
+
+  return { user, loading, isAuthenticated, needsOnboarding,
+           checkAuth, login, logout }
+})
+\end{lstlisting}
+
+\subsection{Real-time: Socket.io}
+
+La gestione Socket.io lato server (\texttt{server/socket/index.js}) implementa:
+\begin{itemize}
+    \item \textbf{Autenticazione} via middleware JWT
+    \item \textbf{Room per canzone}: ogni client si unisce a \texttt{song:\{songId\}}
+    \item \textbf{Broadcast messaggi}: eventi \texttt{send\_message} $\rightarrow$ \texttt{new\_message}
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption={Gestione eventi Socket.io}]
+// server/socket/index.js
+socket.on('join_room', async (songId) => {
+  const song = await Song.findById(songId);
+  const band = await Band.findById(song.bandId);
+
+  const isMember = band.members.some(
+    m => m.userId.toString() === socket.userId
+  );
+  if (!isMember) {
+    socket.emit('error', { message: 'Not a band member' });
+    return;
+  }
+
+  socket.join(`song:${songId}`);
+  socket.currentSongId = songId;
+});
+
+socket.on('send_message', async (data) => {
+  const { songId, text } = data;
+
+  const message = new Message({
+    songId,
+    userId: socket.userId,
+    type: 'user',
+    text: text.trim(),
+    readBy: [socket.userId]
+  });
+
+  await message.save();
+  await message.populate('userId', 'username profilePic');
+
+  io.to(`song:${songId}`).emit('new_message', messageData);
+});
+\end{lstlisting}
+
+\subsection{Sistema di Voto}
+
+Il meccanismo di voto implementa un toggle like/unlike con notifica real-time:
+
+\begin{lstlisting}[language=JavaScript, caption={Sistema di voto sugli asset}]
+// server/controllers/assetController.js
+exports.vote = async (req, res) => {
+  const asset = await Asset.findById(req.params.id);
+
+  const voteIndex = asset.votes.findIndex(v => v.equals(req.userId));
+  const votedByMe = voteIndex === -1;
+
+  if (votedByMe) {
+    asset.votes.push(req.userId);      // Add vote
+  } else {
+    asset.votes.splice(voteIndex, 1);  // Remove vote
+  }
+
+  await asset.save();
+
+  // Notify all clients in the room
+  req.io.to(`song:${asset.songId}`).emit('vote_update', {
+    assetId: asset._id,
+    votes: asset.votes.length,
+    action: votedByMe ? 'liked' : 'unliked'
+  });
+
+  res.json({ votes: asset.votes.length, votedByMe });
+};
+\end{lstlisting}
+
+\subsection{Diagramma Comunicazione Real-time}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../diagrams/sequence-realtime.png}
+    \caption{Sequence diagram della comunicazione real-time}
+    \label{fig:sequence-realtime}
+\end{figure}
+
+\chapter{Test}
+
+\section{Test Tecnici}
+
+La verifica del corretto funzionamento dell'applicazione è stata condotta attraverso diverse tipologie di test. Il testing cross-browser ha verificato la compatibilità con i principali browser desktop (Chrome, Firefox, Edge) e i browser mobile su sistemi iOS e Android. L'approccio mobile-first adottato durante lo sviluppo ha garantito che l'esperienza su dispositivi touch fosse ottimale fin dalle prime fasi.
+
+Il testing delle API è stato eseguito sistematicamente utilizzando Postman, costruendo una collection che copre tutti gli endpoint con casi di test per i flussi nominali e per le condizioni di errore. Particolare attenzione è stata dedicata alla verifica dei meccanismi di autenticazione, testando il comportamento con token validi, scaduti e malformati.
+
+Il funzionamento real-time è stato verificato simulando scenari con connessioni multiple simultanee, confermando la corretta propagazione degli eventi di chat e delle notifiche di sistema a tutti i client iscritti alla room interessata.
+
+\chapter{Deployment}
+
+Il deployment dell'applicazione è stato progettato utilizzando \textbf{Docker} per garantire portabilità, riproducibilità e semplicità di installazione.
+
+\section{Architettura dei Container}
+
+L'applicazione è composta da tre container orchestrati tramite Docker Compose:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{Container} & \textbf{Immagine} & \textbf{Porta} & \textbf{Ruolo} \\
+\midrule
+riffbanks-mongodb & mongo:latest & 27017 & Database documentale \\
+riffbanks-server & Node 20 Alpine & 3333 & API Express + Socket.io \\
+riffbanks-client & nginx Alpine & 80 & Frontend Vue + Reverse Proxy \\
+\bottomrule
+\end{tabular}
+\caption{Architettura dei container Docker}
+\end{table}
+
+\section{Build Multi-Stage del Frontend}
+
+Il Dockerfile del client utilizza un approccio multi-stage per ottimizzare l'immagine finale:
+
+\begin{lstlisting}[language=bash, caption={Dockerfile multi-stage del client}]
+# client/Dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+\end{lstlisting}
+
+Lo stage di build compila l'applicazione Vue, mentre lo stage di produzione serve solo i file statici risultanti tramite nginx.
+
+\section{Configurazione Nginx}
+
+Il reverse proxy nginx gestisce il routing tra frontend e backend:
+
+\begin{lstlisting}[language=bash, caption={Configurazione nginx}]
+# client/nginx.conf
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+
+    # SPA fallback per Vue Router
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy API verso backend
+    location /api {
+        proxy_pass http://server:3333;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+    }
+
+    # Proxy WebSocket per Socket.io
+    location /socket.io {
+        proxy_pass http://server:3333;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+
+    # Proxy file uploads
+    location /uploads {
+        proxy_pass http://server:3333;
+    }
+}
+\end{lstlisting}
+
+La configurazione include inoltre:
+\begin{itemize}
+    \item \textbf{Gzip compression} per ridurre il traffico di rete
+    \item \textbf{Security headers}: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection
+    \item \textbf{Cache 1 anno} per asset statici (js, css, immagini, font)
+\end{itemize}
+
+\section{Persistenza dei Dati}
+
+Docker Compose definisce due volumi nominati per la persistenza:
+
+\begin{lstlisting}[language=bash, caption={Volumi Docker Compose}]
+# docker-compose.yml
+volumes:
+  mongodb_data:
+    name: riffbanks-mongodb-data    # Dati MongoDB
+  uploads_data:
+    name: riffbanks-uploads-data    # File caricati dagli utenti
+\end{lstlisting}
+
+\section{Variabili d'Ambiente}
+
+La configurazione è esternalizzata tramite variabili d'ambiente:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Variabile} & \textbf{Default} & \textbf{Descrizione} \\
+\midrule
+NODE\_ENV & production & Ambiente di esecuzione \\
+PORT & 3333 & Porta del server Express \\
+MONGODB\_URI & mongodb://mongodb:27017/riffbanks & Connection string \\
+JWT\_SECRET & riffbanks & Chiave per firma token JWT \\
+JWT\_EXPIRES\_IN & 7d & Scadenza token \\
+CLIENT\_URL & http://localhost & URL frontend per CORS \\
+\bottomrule
+\end{tabular}
+\caption{Variabili d'ambiente}
+\end{table}
+
+\section{Health Checks}
+
+Ogni container implementa un health check per il monitoraggio automatico:
+
+\textbf{MongoDB}:
+\begin{lstlisting}[language=bash, caption={Health check MongoDB}]
+healthcheck:
+  test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+\end{lstlisting}
+
+\textbf{Server Express} (endpoint \texttt{/api/health}):
+\begin{lstlisting}[language=JavaScript, caption={Endpoint health check}]
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'RiffBank API is running' });
+});
+\end{lstlisting}
+
+\textbf{Client nginx}:
+\begin{lstlisting}[language=bash, caption={Health check nginx}]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+\end{lstlisting}
+
+\section{Avvio dell'Applicazione}
+
+Per avviare l'intero stack:
+
+\begin{lstlisting}[language=bash, caption={Comandi per l'avvio}]
+# Clonare il repository
+git clone https://github.com/LoryBug/RiffBanks.git
+cd RiffBanks
+
+# Configurare JWT_SECRET (opzionale)
+export JWT_SECRET=your-secret-key
+
+# Avviare i container
+docker-compose up -d
+
+# Verificare lo stato
+docker-compose ps
+\end{lstlisting}
+
+L'applicazione sarà disponibile su \texttt{http://localhost} (porta 80).
+
+\section{Dipendenze tra Servizi}
+
+Docker Compose gestisce l'ordine di avvio:
+\begin{enumerate}
+    \item \textbf{MongoDB} si avvia per primo
+    \item \textbf{Server} attende che MongoDB sia healthy (\texttt{condition: service\_healthy})
+    \item \textbf{Client} attende che il server sia disponibile
+\end{enumerate}
+
+\chapter{Conclusioni}
+
+Il progetto RiffBanks ha raggiunto la maggior parte degli obiettivi prefissati, portando a termine lo sviluppo di una piattaforma funzionante che risponde alle esigenze identificate in fase di analisi.
+
+Il prodotto finale offre un'esperienza d'uso coerente e intuitiva, permettendo ai musicisti di gestire le proprie band, organizzare i progetti musicali, comunicare in tempo reale e cercare opportunità di collaborazione attraverso un'unica interfaccia. L'approccio mobile-first ha garantito un'esperienza ottimale sui dispositivi che i musicisti utilizzano maggiormente nella loro quotidianità.
+
+\section{Sviluppi Futuri}
+
+Per quanto riguarda le funzionalità che interessano gli utenti, un'evoluzione futura del sistema potrà concentrarsi su possibili estensioni quali:
+
+\begin{itemize}
+    \item \textbf{Notifiche push}: implementazione di un sistema di notifiche push per dispositivi mobili, in modo da avvisare gli utenti di nuovi messaggi o attività anche quando l'applicazione non è in primo piano
+    \item \textbf{Player audio avanzato}: integrazione di funzionalità di editing audio base (trim, fade) e visualizzazione della forma d'onda per una migliore gestione degli asset musicali
+    \item \textbf{Storage cloud}: migrazione dello storage dei file su servizi cloud (AWS S3, Cloudinary) per migliorare scalabilità e affidabilità
+    \item \textbf{Sistema di recensioni}: possibilità per i membri delle band di lasciare feedback sui collaboratori incontrati tramite la sezione Gig Economy
+\end{itemize}
+
+Dal punto di vista tecnico, sarebbe interessante esplorare:
+
+\begin{itemize}
+    \item \textbf{PWA (Progressive Web App)}: trasformazione dell'applicazione in PWA per consentire l'installazione su dispositivi mobili e l'utilizzo offline
+    \item \textbf{CI/CD Pipeline}: automazione dei processi di testing e deployment tramite GitHub Actions
+\end{itemize}
+
+\section{Commenti Finali}
+
+Lo sviluppo di questo progetto ha permesso di mettere in pratica le conoscenze acquisite durante il corso, affrontando le sfide tipiche dello sviluppo web moderno: dalla progettazione di API RESTful alla gestione della comunicazione real-time tramite WebSocket, dall'autenticazione JWT alla containerizzazione con Docker.
+
+Particolarmente formativa è stata l'esperienza con lo stack MEVN, che ha richiesto di padroneggiare tecnologie diverse ma coerenti tra loro, dalla reattività di Vue.js con la Composition API alla flessibilità di MongoDB come database documentale.
+
+Un aspetto interessante del processo di sviluppo è stato l'utilizzo di strumenti di intelligenza artificiale generativa per la creazione dei mockup, un approccio non convenzionale che ha permesso di esplorare nuove modalità di prototipazione rapida.
+
+L'idea di RiffBanks nasce da un'esigenza concreta riscontrata nel mondo della musica amatoriale: la frammentazione degli strumenti di collaborazione. Questo ha permesso di sviluppare con maggiore consapevolezza le funzionalità necessarie, potendo valutare in prima persona l'utilità delle scelte implementative.
+
 \end{document}
