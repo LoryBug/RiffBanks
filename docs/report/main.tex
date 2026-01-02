@@ -37,8 +37,19 @@
 }
 \lstset{style=mystyle}
 
+% Definizione linguaggio JavaScript per listings
+\lstdefinelanguage{JavaScript}{
+  keywords={break, case, catch, continue, debugger, default, delete, do, else, finally, for, function, if, in, instanceof, new, return, switch, this, throw, try, typeof, var, void, while, with, let, const, class, export, extends, import, super, async, await},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  morestring=[b]`,
+  sensitive=true
+}
+
 \title{
-    RiffBanks - Piattaforma collaborativa per musicisti \\
+    RiffBanks\\
     \large Applicazioni e Servizi Web
 }
 
@@ -48,6 +59,9 @@
 \begin{document}
 
 \maketitle
+
+\tableofcontents
+\newpage
 
 \chapter{Introduzione}
 
@@ -185,7 +199,7 @@ La struttura del database e le relazioni tra le entità sono rappresentate nel d
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../diagrams/er-diagram.png}
+    \includegraphics[width=0.9\textwidth]{diagrams/er-diagram.png}
     \caption{Diagramma ER del database}
     \label{fig:er-diagram}
 \end{figure}
@@ -222,21 +236,21 @@ Di seguito i mockup delle schermate principali dell'applicazione:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{../mockups/home.png}
+    \includegraphics[width=0.5\textwidth]{mockups/home.png}
     \caption{Dashboard principale con elenco delle band}
     \label{fig:mockup-home}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{../mockups/canzone.png}
+    \includegraphics[width=0.5\textwidth]{mockups/canzone.png}
     \caption{Vista dettaglio canzone con player e asset}
     \label{fig:mockup-canzone}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{../mockups/chat.png}
+    \includegraphics[width=0.5\textwidth]{mockups/chat.png}
     \caption{Chat integrata per la comunicazione contestuale}
     \label{fig:mockup-chat}
 \end{figure}
@@ -275,7 +289,7 @@ Lo stack tecnologico adottato è il \textbf{MEVN} (MongoDB, Express, Vue.js, Nod
 
 \subsection{Real-time}
 \begin{itemize}
-    \item \textbf{Socket.io}: WebSocket con fallback automatico su polling, organizzazione in room per canzone
+    \item \textbf{Socket.io}: WebSocket con fallback automatico su polling, organizzazione in ``room'' per canzone
 \end{itemize}
 
 \subsection{Autenticazione e Sicurezza}
@@ -350,7 +364,7 @@ La cartella server contiene tutto il backend del progetto ed è organizzata nel 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{../diagrams/component-diagram.png}
+    \includegraphics[width=0.85\textwidth]{diagrams/component-diagram.png}
     \caption{Diagramma dei componenti dell'architettura}
     \label{fig:component-diagram}
 \end{figure}
@@ -559,7 +573,7 @@ exports.vote = async (req, res) => {
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{../diagrams/sequence-realtime.png}
+    \includegraphics[width=0.9\textwidth]{diagrams/sequence-realtime.png}
     \caption{Sequence diagram della comunicazione real-time}
     \label{fig:sequence-realtime}
 \end{figure}
@@ -573,6 +587,61 @@ La verifica del corretto funzionamento dell'applicazione è stata condotta attra
 Il testing delle API è stato eseguito sistematicamente utilizzando Postman, costruendo una collection che copre tutti gli endpoint con casi di test per i flussi nominali e per le condizioni di errore. Particolare attenzione è stata dedicata alla verifica dei meccanismi di autenticazione, testando il comportamento con token validi, scaduti e malformati.
 
 Il funzionamento real-time è stato verificato simulando scenari con connessioni multiple simultanee, confermando la corretta propagazione degli eventi di chat e delle notifiche di sistema a tutti i client iscritti alla room interessata.
+
+
+\section{Euristiche di Nielsen}
+
+Per garantire un'esperienza utente di qualità, l'interfaccia è stata progettata seguendo le dieci euristiche di usabilità di Nielsen:
+
+\begin{enumerate}
+    \item \textbf{Visibilità dello stato del sistema}: l'applicazione fornisce feedback costante sulle operazioni in corso attraverso spinner di caricamento animati durante le chiamate API, indicatori di "typing" nella chat che mostrano quando altri utenti stanno scrivendo, badge numerici per le notifiche non lette, e lo stato di avanzamento di ogni canzone (Idea, In Progress, Mix, Master) sempre visibile nella lista brani.
+
+    \item \textbf{Corrispondenza tra sistema e mondo reale}: la terminologia adottata rispecchia il linguaggio comune nel mondo musicale (band, canzone, gig, session musician). Il workflow di produzione delle canzoni segue le fasi reali del processo creativo, dalla nascita dell'idea fino al master finale. Le icone utilizzate (Lucide) sono intuitive e convenzionali.
+
+    \item \textbf{Controllo e libertà per l'utente}: la navigazione è completamente libera grazie alla bottom navigation sempre accessibile. Gli utenti possono annullare i propri voti sugli asset con un semplice tap (toggle like/unlike), e le azioni distruttive richiedono conferma attraverso modal dedicati, prevenendo operazioni accidentali.
+
+    \item \textbf{Consistenza e standard}: l'applicazione mantiene coerenza visiva attraverso il design system ispirato a Teenage Engineering e Nothing. Tutti i form di creazione (band, canzone, gig) seguono lo stesso pattern di interazione. Il formato del codice invito (XX-XXX-000) è uniforme in tutta la piattaforma.
+
+    \item \textbf{Prevenzione dall'errore}: i form implementano validazione lato client per prevenire l'invio di dati incompleti o malformati. Prima di eliminare elementi viene sempre richiesta conferma. Il codice invito accetta input case-insensitive, riducendo gli errori di digitazione.
+
+    \item \textbf{Riconoscimento più che ricordo}: la dashboard presenta tutte le band dell'utente in modo immediato, senza necessità di navigazione. La lista canzoni mostra lo stato di ciascun brano con indicatori visivi. I filtri nella sezione Gig Economy permettono di restringere la ricerca senza dover ricordare criteri precedenti.
+
+    \item \textbf{Flessibilità ed efficienza}: il wizard di onboarding guida i nuovi utenti nella configurazione iniziale del profilo, mentre gli utenti esperti possono saltare direttamente alle funzionalità. Il sistema di codice invito permette di unirsi a una band con una singola azione. La chat contestualizzata per canzone evita la dispersione delle conversazioni.
+
+    \item \textbf{Estetica e progettazione minimalista}: il design minimale, ispirato all'estetica industriale di Teenage Engineering, elimina elementi superflui. L'approccio mobile-first ha imposto rigore nella selezione delle informazioni da mostrare, privilegiando la chiarezza alla completezza.
+
+    \item \textbf{Facilità di riconoscimento, diagnosi e risoluzione delle situazioni di errore}: i messaggi di errore sono descrittivi e suggeriscono possibili soluzioni (es. "Codice invito non valido - verifica di averlo digitato correttamente"). Le notifiche toast forniscono feedback immediato sulle operazioni completate o fallite.
+
+    \item \textbf{Documentazione}: il wizard di onboarding funge da tutorial integrato per i nuovi utenti. L'interfaccia è stata progettata per essere autoesplicativa, riducendo al minimo la necessità di documentazione esterna.
+\end{enumerate}
+
+\section{Test di Usabilità}
+
+Un gruppo ristretto di utenti ha partecipato a sessioni di test di usabilità, fornendo feedback iterativo durante lo sviluppo. I partecipanti sono stati selezionati in modo da rappresentare le tre personas identificate in fase di analisi. A ciascun tester è stato assegnato un insieme di task da completare senza alcuna guida preliminare, osservando come interagivano con l'applicazione al primo utilizzo.
+
+\begin{itemize}
+    \item \textbf{Profilo "Marco" (chitarrista in band stabile)}: ai tester di questo profilo è stato chiesto di creare una nuova band, generare e condividere il codice invito, aggiungere una canzone caricando un file audio demo, esprimere preferenze sugli asset tramite il sistema di voto, e comunicare con i compagni di band attraverso la chat contestuale. I partecipanti hanno completato tutti i task senza difficoltà significative, apprezzando in particolare l'immediatezza del sistema di invito tramite codice.
+
+    \item \textbf{Profilo "Giulia" (cantautrice solista)}: a questo gruppo è stato richiesto di pubblicare un annuncio nella sezione Gig Economy per cercare un batterista per una sessione di registrazione, consultare eventuali candidature ricevute, e aggiornare il proprio profilo con strumenti suonati e generi musicali. I tester hanno trovato intuitivo il flusso di creazione degli annunci, suggerendo come miglioramento l'aggiunta di filtri più granulari per la ricerca.
+
+    \item \textbf{Profilo "Alessandro" (musicista freelance)}: i partecipanti hanno dovuto esplorare la bacheca Gig Economy alla ricerca di opportunità, filtrare gli annunci per strumento e genere, e candidarsi a quelli di interesse. È emersa l'utilità della distinzione tra annunci "Member" (posizioni permanenti) e "Session" (collaborazioni temporanee), che permette di identificare rapidamente le opportunità più rilevanti.
+\end{itemize}
+
+In generale, i feedback raccolti hanno confermato l'efficacia delle scelte di design adottate. Le osservazioni degli utenti hanno riguardato principalmente aspetti stilistici minori e suggerimenti per funzionalità aggiuntive, mentre la struttura e i flussi di navigazione sono stati giudicati chiari e coerenti.
+
+\section{Validazione e Accessibilità}
+
+L'applicazione è stata sottoposta a verifica di conformità agli standard web. La validazione del markup HTML tramite il W3C Validation Service non ha evidenziato errori critici. Per quanto riguarda l'accessibilità, sono state implementate le linee guida WCAG 2.1 livello AA:
+
+\begin{itemize}
+    \item Attributi ARIA appropriati per supportare gli screen reader
+    \item Touch target di dimensioni minime 44x44 pixel per tutti gli elementi interattivi
+    \item Contrasto cromatico sufficiente tra testo e sfondo
+    \item Navigazione completamente accessibile da tastiera
+\end{itemize}
+
+I test con Lighthouse hanno restituito punteggi soddisfacenti nelle categorie Performance (75), Accessibility (88), Best Practices (96) e SEO (83), confermando la qualità complessiva dell'implementazione frontend.
+
 
 \chapter{Deployment}
 
@@ -765,17 +834,9 @@ Il prodotto finale offre un'esperienza d'uso coerente e intuitiva, permettendo a
 Per quanto riguarda le funzionalità che interessano gli utenti, un'evoluzione futura del sistema potrà concentrarsi su possibili estensioni quali:
 
 \begin{itemize}
-    \item \textbf{Notifiche push}: implementazione di un sistema di notifiche push per dispositivi mobili, in modo da avvisare gli utenti di nuovi messaggi o attività anche quando l'applicazione non è in primo piano
     \item \textbf{Player audio avanzato}: integrazione di funzionalità di editing audio base (trim, fade) e visualizzazione della forma d'onda per una migliore gestione degli asset musicali
     \item \textbf{Storage cloud}: migrazione dello storage dei file su servizi cloud (AWS S3, Cloudinary) per migliorare scalabilità e affidabilità
     \item \textbf{Sistema di recensioni}: possibilità per i membri delle band di lasciare feedback sui collaboratori incontrati tramite la sezione Gig Economy
-\end{itemize}
-
-Dal punto di vista tecnico, sarebbe interessante esplorare:
-
-\begin{itemize}
-    \item \textbf{PWA (Progressive Web App)}: trasformazione dell'applicazione in PWA per consentire l'installazione su dispositivi mobili e l'utilizzo offline
-    \item \textbf{CI/CD Pipeline}: automazione dei processi di testing e deployment tramite GitHub Actions
 \end{itemize}
 
 \section{Commenti Finali}
