@@ -19,45 +19,47 @@
 \contentsline {section}{\numberline {3.1}Metodologia}{7}{section.3.1}%
 \contentsline {section}{\numberline {3.2}Architettura delle Interfacce Utente}{8}{section.3.2}%
 \contentsline {subsection}{\numberline {3.2.1}Design System e Fonti di Ispirazione}{8}{subsection.3.2.1}%
-\contentsline {subsection}{\numberline {3.2.2}Processo di Creazione dei Mockup}{9}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.2}Processo di Creazione dei Mockup}{8}{subsection.3.2.2}%
 \contentsline {subsection}{\numberline {3.2.3}Mockup}{9}{subsection.3.2.3}%
-\contentsline {subsection}{\numberline {3.2.4}Viste dell'Applicazione}{10}{subsection.3.2.4}%
-\contentsline {chapter}{\numberline {4}Tecnologie}{11}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Backend}{11}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Runtime e Framework}{11}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Persistenza Dati}{11}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}Real-time}{11}{subsection.4.1.3}%
-\contentsline {subsection}{\numberline {4.1.4}Autenticazione e Sicurezza}{11}{subsection.4.1.4}%
-\contentsline {subsection}{\numberline {4.1.5}Upload File}{11}{subsection.4.1.5}%
-\contentsline {section}{\numberline {4.2}Frontend}{11}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Framework e Architettura}{11}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Build e Sviluppo}{11}{subsection.4.2.2}%
-\contentsline {subsection}{\numberline {4.2.3}UI e Styling}{12}{subsection.4.2.3}%
-\contentsline {chapter}{\numberline {5}Codice}{13}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Struttura del Progetto}{13}{section.5.1}%
-\contentsline {subsection}{\numberline {5.1.1}Client}{13}{subsection.5.1.1}%
-\contentsline {subsection}{\numberline {5.1.2}Server}{13}{subsection.5.1.2}%
-\contentsline {subsection}{\numberline {5.1.3}Diagramma dei Componenti}{14}{subsection.5.1.3}%
-\contentsline {section}{\numberline {5.2}Pattern e Implementazioni Rilevanti}{14}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Controller Backend: Gestione Band}{14}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}State Management Frontend: Auth Store}{15}{subsection.5.2.2}%
-\contentsline {subsection}{\numberline {5.2.3}Real-time: Socket.io}{16}{subsection.5.2.3}%
-\contentsline {subsection}{\numberline {5.2.4}Sistema di Voto}{17}{subsection.5.2.4}%
-\contentsline {subsection}{\numberline {5.2.5}Diagramma Comunicazione Real-time}{18}{subsection.5.2.5}%
-\contentsline {chapter}{\numberline {6}Test}{19}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Test Tecnici}{19}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Euristiche di Nielsen}{19}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Test di Usabilità}{20}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Validazione e Accessibilità}{20}{section.6.4}%
-\contentsline {chapter}{\numberline {7}Deployment}{22}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Architettura dei Container}{22}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Build Multi-Stage del Frontend}{22}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Configurazione Nginx}{22}{section.7.3}%
-\contentsline {section}{\numberline {7.4}Persistenza dei Dati}{23}{section.7.4}%
-\contentsline {section}{\numberline {7.5}Variabili d'Ambiente}{23}{section.7.5}%
-\contentsline {section}{\numberline {7.6}Health Checks}{24}{section.7.6}%
-\contentsline {section}{\numberline {7.7}Avvio dell'Applicazione}{24}{section.7.7}%
-\contentsline {section}{\numberline {7.8}Dipendenze tra Servizi}{24}{section.7.8}%
-\contentsline {chapter}{\numberline {8}Conclusioni}{25}{chapter.8}%
-\contentsline {section}{\numberline {8.1}Sviluppi Futuri}{25}{section.8.1}%
-\contentsline {section}{\numberline {8.2}Commenti Finali}{25}{section.8.2}%
+\contentsline {subsection}{\numberline {3.2.4}Behavior-Driven Development}{11}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}Viste dell'Applicazione}{12}{subsection.3.2.5}%
+\contentsline {chapter}{\numberline {4}Tecnologie}{13}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Containerizzazione}{13}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Backend}{13}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Runtime e Framework}{13}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Persistenza Dati}{13}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Real-time}{13}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Autenticazione e Sicurezza}{14}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.5}Upload File}{14}{subsection.4.2.5}%
+\contentsline {section}{\numberline {4.3}Frontend}{14}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Framework e Architettura}{14}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Build e Sviluppo}{14}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}UI e Styling}{14}{subsection.4.3.3}%
+\contentsline {chapter}{\numberline {5}Codice}{15}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Struttura del Progetto}{15}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Client}{15}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Server}{15}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Diagramma dei Componenti}{16}{subsection.5.1.3}%
+\contentsline {section}{\numberline {5.2}Pattern e Implementazioni Rilevanti}{16}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Controller Backend: Gestione Band}{16}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}State Management Frontend: Auth Store}{17}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Real-time: Socket.io}{18}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}Sistema di Voto}{18}{subsection.5.2.4}%
+\contentsline {subsection}{\numberline {5.2.5}Diagramma Comunicazione Real-time}{19}{subsection.5.2.5}%
+\contentsline {chapter}{\numberline {6}Test}{20}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Test Tecnici}{20}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Euristiche di Nielsen}{20}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Test di Usabilità}{21}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Validazione e Accessibilità}{21}{section.6.4}%
+\contentsline {chapter}{\numberline {7}Deployment}{23}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Architettura dei Container}{23}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Build Multi-Stage del Frontend}{23}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Configurazione Nginx}{23}{section.7.3}%
+\contentsline {section}{\numberline {7.4}Persistenza dei Dati}{24}{section.7.4}%
+\contentsline {section}{\numberline {7.5}Variabili d'Ambiente}{24}{section.7.5}%
+\contentsline {section}{\numberline {7.6}Health Checks}{25}{section.7.6}%
+\contentsline {section}{\numberline {7.7}Avvio dell'Applicazione}{25}{section.7.7}%
+\contentsline {section}{\numberline {7.8}Dipendenze tra Servizi}{25}{section.7.8}%
+\contentsline {chapter}{\numberline {8}Conclusioni}{26}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Sviluppi Futuri}{26}{section.8.1}%
+\contentsline {section}{\numberline {8.2}Commenti Finali}{26}{section.8.2}%

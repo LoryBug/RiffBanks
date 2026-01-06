@@ -185,6 +185,17 @@
     }
   }
 
+  /* Select dropdown options - fix per dark mode */
+  select.input-zero {
+    background-color: var(--surface-zero);
+
+    & option {
+      background-color: var(--surface-zero);
+      color: var(--text-main);
+      padding: 8px;
+    }
+  }
+
   /* Button Glitch Effect */
   .btn-glitch:hover {
     animation: glitch 0.3s ease-in-out;

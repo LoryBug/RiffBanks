@@ -199,7 +199,7 @@ La struttura del database e le relazioni tra le entità sono rappresentate nel d
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{diagrams/er-diagram.png}
+    \includegraphics[width=0.9\textwidth]{../diagrams/er-diagram.png}
     \caption{Diagramma ER del database}
     \label{fig:er-diagram}
 \end{figure}
@@ -236,24 +236,73 @@ Di seguito i mockup delle schermate principali dell'applicazione:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{mockups/home.png}
+    \includegraphics[width=0.5\textwidth]{../mockups/home.png}
     \caption{Dashboard principale con elenco delle band}
     \label{fig:mockup-home}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{mockups/canzone.png}
+    \includegraphics[width=0.5\textwidth]{../mockups/canzone.png}
     \caption{Vista dettaglio canzone con player e asset}
     \label{fig:mockup-canzone}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{mockups/chat.png}
+    \includegraphics[width=0.5\textwidth]{../mockups/chat.png}
     \caption{Chat integrata per la comunicazione contestuale}
     \label{fig:mockup-chat}
 \end{figure}
+
+\subsection{Behavior-Driven Development}
+
+Per definire i casi d'uso e guidare la progettazione dei mockup è stato adottato un approccio \textbf{Behavior-Driven Development (BDD)}. I requisiti funzionali sono stati formalizzati in scenari Gherkin, che descrivono il comportamento atteso dell'applicazione dal punto di vista dell'utente.
+
+Questa metodologia ha permesso di:
+\begin{itemize}
+    \item Chiarire i flussi utente prima della progettazione visiva
+    \item Creare un linguaggio condiviso tra requisiti e implementazione
+    \item Definire criteri di accettazione verificabili per ogni funzionalità
+\end{itemize}
+
+Di seguito alcuni esempi delle feature definite:
+
+\begin{lstlisting}[caption={Feature: Registrazione e onboarding}]
+Feature: User onboarding
+
+  Scenario: Account creation and onboarding completion
+    Given I am a new user on the registration page
+    When I enter the name "Mario", email and password
+    Then I am redirected to the onboarding wizard
+    When I select an instrument
+    And I select a genre
+    Then my profile is saved
+    And I access the empty dashboard
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Feature: Creazione di una band}]
+Feature: Band management
+
+  Scenario: Creating a new band
+    Given I am a logged-in user without a band
+    When I click on "Create New Band"
+    And I enter the name and the genre
+    Then a new band is created
+    And I am assigned the role "Admin"
+    And a unique invite code is generated
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Feature: Join band tramite codice invito}]
+Feature: Join band by invite code
+
+  Scenario: Join an existing band using invite code
+    Given I am a logged-in user without a band
+    When I enter the invite code "RC-99X-DEV"
+    And I click on "Join band"
+    Then I am added to the band members list
+    And I see the band dashboard
+\end{lstlisting}
 
 \subsection{Viste dell'Applicazione}
 
@@ -271,7 +320,22 @@ L'applicazione si articola nelle seguenti viste principali:
 
 \chapter{Tecnologie}
 
-Lo stack tecnologico adottato è il \textbf{MEVN} (MongoDB, Express, Vue.js, Node.js), arricchito da Socket.io per le funzionalità real-time.
+Lo stack tecnologico adottato è il \textbf{MEVN} (MongoDB, Express, Vue.js, Node.js), arricchito da Socket.io per le funzionalità real-time e containerizzato con Docker per il deployment.
+
+Questa combinazione offre diversi vantaggi:
+\begin{itemize}
+    \item \textbf{JavaScript full-stack}: un unico linguaggio per frontend, backend e query database (MongoDB), riducendo il context-switching e facilitando la condivisione di logica tra i layer
+    \item \textbf{Architettura asincrona}: Node.js gestisce efficacemente connessioni WebSocket simultanee per la chat real-time
+    \item \textbf{Schema flessibile}: MongoDB si adatta naturalmente a dati eterogenei come asset musicali, metadati e messaggi
+    \item \textbf{Reattività}: Vue.js con Composition API permette interfacce responsive con stato condiviso tra componenti
+    \item \textbf{Portabilità}: Docker garantisce ambienti consistenti tra sviluppo e produzione
+\end{itemize}
+
+\section{Containerizzazione}
+\begin{itemize}
+    \item \textbf{Docker}: containerizzazione dell'intera applicazione per deployment riproducibile e isolato
+    \item \textbf{Docker Compose}: orchestrazione multi-container (MongoDB, Express, nginx) con gestione delle dipendenze
+\end{itemize}
 
 \section{Backend}
 
@@ -364,7 +428,7 @@ La cartella server contiene tutto il backend del progetto ed è organizzata nel 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{diagrams/component-diagram.png}
+    \includegraphics[width=0.85\textwidth]{../diagrams/component-diagram.png}
     \caption{Diagramma dei componenti dell'architettura}
     \label{fig:component-diagram}
 \end{figure}
@@ -573,7 +637,7 @@ exports.vote = async (req, res) => {
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{diagrams/sequence-realtime.png}
+    \includegraphics[width=0.9\textwidth]{../diagrams/sequence-realtime.png}
     \caption{Sequence diagram della comunicazione real-time}
     \label{fig:sequence-realtime}
 \end{figure}
