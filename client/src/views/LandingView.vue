@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-bg-zero text-text-main overflow-x-hidden">
+  <div class="h-screen bg-bg-zero text-text-main overflow-y-scroll snap-y snap-mandatory">
     <!-- Scanlines Overlay -->
     <ScanlineOverlay />
 
@@ -99,7 +99,7 @@
       <!-- Hero Section -->
       <section
         id="hero"
-        class="min-h-screen flex items-center justify-center pt-16 relative"
+        class="h-screen flex items-center justify-center pt-16 relative snap-start snap-always"
       >
         <div class="container-zero text-center">
           <div class="mb-8 animate-fade-in">
@@ -146,7 +146,7 @@
       <!-- Problema Section -->
       <section
         id="problema"
-        class="min-h-screen flex items-center py-20 border-t border-border-zero"
+        class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
           <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -192,7 +192,7 @@
       <!-- Soluzione Section -->
       <section
         id="soluzione"
-        class="min-h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero"
+        class="h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
           <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">02 // La Soluzione</span>
@@ -253,7 +253,7 @@
       <!-- Target Section -->
       <section
         id="target"
-        class="min-h-screen flex items-center py-20 border-t border-border-zero"
+        class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
           <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">03 // Target Utenti</span>
@@ -324,7 +324,7 @@
       <!-- Tecnologie Section -->
       <section
         id="tecnologie"
-        class="min-h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero"
+        class="h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
           <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">04 // Stack Tecnologico</span>
@@ -404,7 +404,7 @@
       <!-- Architettura Section -->
       <section
         id="architettura"
-        class="min-h-screen flex items-center py-20 border-t border-border-zero"
+        class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
           <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">05 // Architettura</span>
@@ -477,7 +477,7 @@
       <!-- Demo Section -->
       <section
         id="demo"
-        class="min-h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero"
+        class="h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
           <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">06 // Demo</span>
@@ -529,7 +529,7 @@
       <!-- Test & Validazione Section -->
       <section
         id="test"
-        class="min-h-screen flex items-center py-20 border-t border-border-zero"
+        class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
           <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">07 // Test e Validazione</span>
@@ -623,7 +623,7 @@
       <!-- Conclusioni Section -->
       <section
         id="conclusioni"
-        class="min-h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero"
+        class="h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
           <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">08 // Conclusioni</span>
@@ -679,14 +679,6 @@
       </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="py-8 border-t border-border-zero bg-bg-zero">
-      <div class="container-zero text-center">
-        <p class="font-tech text-xs text-text-dim">
-          RiffBanks // Lorenzo Leoni - 0001192033 // Applicazioni e Servizi Web A.A. 2025/2026
-        </p>
-      </div>
-    </footer>
   </div>
 </template>
 
@@ -698,6 +690,7 @@ import ThemeToggle from '@/components/ThemeToggle.vue'
 
 const router = useRouter()
 const activeSection = ref('hero')
+const scrollContainer = ref(null)
 
 const sections = [
   { id: 'hero', label: 'Home' },
@@ -730,7 +723,10 @@ function scrollToSection(sectionId) {
 }
 
 function handleScroll() {
-  const scrollPosition = window.scrollY + window.innerHeight / 3
+  const container = scrollContainer.value
+  if (!container) return
+
+  const scrollPosition = container.scrollTop + window.innerHeight / 2
 
   for (const section of sections) {
     const element = document.getElementById(section.id)
@@ -745,11 +741,16 @@ function handleScroll() {
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  scrollContainer.value = document.querySelector('.snap-y')
+  if (scrollContainer.value) {
+    scrollContainer.value.addEventListener('scroll', handleScroll)
+  }
   handleScroll()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  if (scrollContainer.value) {
+    scrollContainer.value.removeEventListener('scroll', handleScroll)
+  }
 })
 </script>
