@@ -318,6 +318,38 @@ L'applicazione si articola nelle seguenti viste principali:
     \item \textbf{Gig}: bacheca annunci con filtri di ricerca
 \end{itemize}
 
+\subsection{Screenshot dell'Applicazione}
+
+Di seguito alcune schermate dell'applicazione finale, che mostrano l'implementazione del design system definito in fase di progettazione.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../views/home.png}
+    \caption{Dashboard principale in tema chiaro. Mostra lo stato dell'utente, il numero di band (Units) a cui appartiene e l'elenco delle band con genere e numero di membri. La bottom navigation permette l'accesso rapido a Console, Network (Gig Economy) e Profilo.}
+    \label{fig:screen-home}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../views/songsList.png}
+    \caption{Lista canzoni di una band in tema scuro. Ogni brano mostra titolo, data di aggiornamento, BPM e stato nel workflow (Idea, In Progress, Mix, Master). La barra di progresso visualizza lo stato di avanzamento del brano.}
+    \label{fig:screen-songs}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../views/songDetail.png}
+    \caption{Dettaglio canzone con pannello chat. A sinistra gli asset caricati (immagini e registrazioni audio) con sistema di voto; a destra la chat contestuale che mostra messaggi utente e notifiche di sistema per upload di file. Il pannello COMMS permette la comunicazione real-time tra i membri della band.}
+    \label{fig:screen-detail}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../views/gigDetail.png}
+    \caption{Modal di creazione annuncio Gig. Permette di specificare la band, il titolo, la tipologia (Band Member per posizioni permanenti o Session per collaborazioni temporanee), il ruolo richiesto, genere, località, compenso e descrizione dell'opportunità.}
+    \label{fig:screen-gig}
+\end{figure}
+
 \chapter{Tecnologie}
 
 Lo stack tecnologico adottato è il \textbf{MEVN} (MongoDB, Express, Vue.js, Node.js), arricchito da Socket.io per le funzionalità real-time e containerizzato con Docker per il deployment.
