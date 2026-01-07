@@ -23,8 +23,5 @@
     "build": "npm run build -w client",
     "start": "npm start -w server",
     "install:all": "npm install"
-  },
-    "devDependencies": {
-    "concurrently": "^8.2.2"
   }
 }

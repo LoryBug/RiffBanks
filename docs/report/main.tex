@@ -1,0 +1,948 @@
+\documentclass{report}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{float}
+
+% Configurazione listings per codice
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+% Definizione linguaggio JavaScript per listings
+\lstdefinelanguage{JavaScript}{
+  keywords={break, case, catch, continue, debugger, default, delete, do, else, finally, for, function, if, in, instanceof, new, return, switch, this, throw, try, typeof, var, void, while, with, let, const, class, export, extends, import, super, async, await},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  morestring=[b]`,
+  sensitive=true
+}
+
+\title{
+    RiffBanks\\
+    \large Applicazioni e Servizi Web
+}
+
+\author{Lorenzo Leoni - 0001192033 \\ \texttt{lorenzo.leoni5@studio.unibo.it}}
+\date{Anno Accademico 2025/2026}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\chapter{Introduzione}
+
+Nel panorama musicale contemporaneo, i musicisti e le band si trovano quotidianamente ad affrontare una sfida organizzativa significativa: la gestione della collaborazione attraverso strumenti frammentati e disconnessi tra loro. Le conversazioni avvengono su WhatsApp o Telegram, i file audio vengono condivisi tramite Google Drive o WeTransfer, il coordinamento delle sessioni passa attraverso email, e la ricerca di nuovi collaboratori richiede la consultazione di molteplici piattaforme e gruppi social. Questa frammentazione genera inefficienze considerevoli, dalla difficoltà nel reperire versioni specifiche di un brano alla perdita di contesto nelle discussioni creative.
+
+RiffBanks nasce con l'obiettivo di risolvere queste problematiche offrendo uno spazio digitale unificato pensato specificamente per le esigenze dei musicisti. La piattaforma integra tre funzionalità fondamentali: la gestione strutturata dei progetti musicali con versionamento degli asset, un sistema di comunicazione in tempo reale contestualizzato per ogni brano e una bacheca per il recruiting di musicisti (denominata ``Gig Economy'').
+
+Il target principale dell'applicazione comprende musicisti amatoriali e semi-professionali, band in fase di formazione o consolidamento, e session musician alla ricerca di opportunità di collaborazione. L'interfaccia è stata progettata con un approccio mobile-first, riconoscendo che gran parte delle interazioni tra musicisti avviene in mobilità, durante le prove o negli spostamenti.
+
+\chapter{Requisiti}
+
+\section{Analisi dell'utenza}
+
+Per comprendere a fondo le esigenze degli utenti finali, sono state definite tre personas rappresentative che incarnano i principali profili di utilizzo della piattaforma.
+
+La prima persona è \textbf{Marco}, un chitarrista che suona stabilmente in una band rock composta da quattro elementi. Marco necessita di uno strumento efficace per condividere demo e ricevere feedback dai compagni di band, oltre a voler mantenere traccia delle diverse iterazioni di ogni brano durante il processo creativo. La sua frustrazione principale riguarda la dispersione delle informazioni: ``Abbiamo tre gruppi WhatsApp diversi e non riesco mai a trovare i file quando mi servono''.
+
+La seconda persona è \textbf{Giulia}, una cantautrice che lavora principalmente in autonomia sulla scrittura di testi e melodie. Giulia cerca regolarmente musicisti a chiamata per le fasi di registrazione dei suoi brani e ha bisogno di strumenti che la aiutino a superare i momenti di blocco creativo. Si chiede spesso dove poter trovare un batterista disponibile per una sessione di registrazione senza dover contattare decine di conoscenti.
+
+La terza persona è \textbf{Alessandro}, un bassista freelance che lavora come musicista a chiamata per diverse band e progetti. Alessandro è costantemente alla ricerca di nuove opportunità di collaborazione e necessita di un modo efficiente per presentare il proprio profilo artistico. Attualmente deve monitorare numerose piattaforme e gruppi social per trovare offerte di lavoro, con un notevole dispendio di tempo.
+
+\section{Requisiti Utente}
+
+Dall'analisi dell'utenza emergono i requisiti che l'applicazione deve soddisfare dal punto di vista dell'esperienza utente. Gli utenti devono poter gestire un'area riservata personale contenente il proprio profilo con le preferenze musicali, inclusi gli strumenti suonati e i generi di riferimento. Devono poter creare nuove band e gestirne i membri attraverso un sistema di inviti basato su codici univoci, eliminando la necessità di condividere indirizzi email o altri dati personali.
+
+La gestione dei contenuti musicali rappresenta il cuore dell'applicazione: gli utenti devono poter caricare e organizzare file audio e immagini associandoli a specifici brani, comunicare in tempo reale con gli altri membri della band nel contesto di ciascuna canzone, e ricevere notifiche tempestive per nuovi messaggi e attività rilevanti. Per quanto riguarda l'aspetto sociale, gli utenti devono poter cercare opportunità di collaborazione nella bacheca pubblica e candidarsi a quelle di interesse.
+
+\section{Requisiti Funzionali}
+
+\subsection{Autenticazione e Gestione Utente}
+\begin{itemize}
+    \item Registrazione di nuovi utenti
+    \item Login sicuro con generazione di token JWT
+    \item Gestione del profilo personale tramite wizard di onboarding per la configurazione iniziale
+\end{itemize}
+
+\subsection{Gestione delle Band}
+\begin{itemize}
+    \item Creazione di nuove band con generazione automatica di codice invito univoco (formato: XX-XXX-000)
+    \item Condivisione del codice invito con potenziali membri
+    \item Possibilità di unirsi a una band inserendo il codice nell'apposita sezione
+    \item Gestione automatica dei ruoli:
+    \begin{itemize}
+        \item Amministratori
+        \item Membri semplici
+    \end{itemize}
+\end{itemize}
+
+\subsection{Progetti Musicali}
+\begin{itemize}
+    \item Operazioni CRUD complete sulle canzoni
+    \item Workflow di stato per ogni canzone:
+    \begin{enumerate}
+        \item Idea
+        \item In Progress
+        \item Mix
+        \item Master
+    \end{enumerate}
+    \item Tipologie di asset associabili:
+    \begin{itemize}
+        \item File audio caricati dall'utente
+        \item Immagini di riferimento
+    \end{itemize}
+    \item Sistema di voto sugli asset:
+    \begin{itemize}
+        \item Possibilità per i membri della band di esprimere preferenze
+        \item Conteggio aggiornato in tempo reale
+    \end{itemize}
+\end{itemize}
+
+\subsection{Comunicazione}
+\begin{itemize}
+    \item Chat integrata per ogni canzone con:
+    \begin{itemize}
+        \item Messaggi degli utenti
+        \item Notifiche di sistema (upload e altre attività significative)
+    \end{itemize}
+\end{itemize}
+
+\subsection{Modulo Gig Economy}
+\begin{itemize}
+    \item Pubblicazione di annunci di due tipologie:
+    \begin{itemize}
+        \item \textbf{Member}: posizioni permanenti nella band
+        \item \textbf{Session}: collaborazioni temporanee su specifici progetti
+    \end{itemize}
+    \item Candidatura degli utenti agli annunci
+\end{itemize}
+
+\section{Requisiti Non Funzionali}
+
+\subsection{Usabilità}
+\begin{itemize}
+    \item Interfaccia intuitiva e user-friendly
+    \item Design ottimizzato per dispositivi mobili (approccio mobile-first)
+\end{itemize}
+
+\subsection{Accessibilità (WCAG 2.1 livello AA)}
+\begin{itemize}
+    \item Supporto per screen reader tramite attributi ARIA appropriati
+    \item Touch target di dimensioni minime 44x44 pixel per dispositivi touch
+\end{itemize}
+
+\subsection{Sicurezza}
+\begin{itemize}
+    \item Autenticazione tramite token JWT stateless con scadenza configurabile
+    \item Password memorizzate con hashing bcrypt (10 salt rounds)
+    \item Validazione di tutti gli input utente per prevenire injection e altri attacchi comuni
+\end{itemize}
+
+\subsection{Performance e Scalabilità}
+\begin{itemize}
+    \item Tempi di risposta delle API inferiori a 200 millisecondi
+    \item Architettura stateless del backend per scalabilità orizzontale
+    \item Aggiornamenti in tempo reale (chat, notifiche, conteggio voti) tramite WebSocket con Socket.io
+\end{itemize} 
+
+\chapter{Design}
+
+\section{Metodologia}
+
+Il sistema si basa su un database MongoDB organizzato in sei collezioni principali che modellano il dominio applicativo:
+\begin{itemize}
+    \item \textbf{users}: memorizza i profili dei musicisti con le relative credenziali di autenticazione e le preferenze musicali espresse in termini di strumenti suonati e generi di riferimento.
+    \item \textbf{bands}: rappresenta i gruppi di lavoro, contenendo il nome, il genere musicale, la località geografica, il codice invito univoco e l'elenco dei membri con i rispettivi ruoli.
+    \item \textbf{songs}: archivia i progetti musicali associati a ciascuna band, con metadati quali titolo, BPM, genere e stato di avanzamento nel workflow produttivo.
+    \item \textbf{assets}: contiene i file e i contenuti testuali associati alle canzoni, includendo il riferimento all'uploader, la tipologia (audio, immagine o testo), l'eventuale URL del file e l'array dei voti ricevuti.
+    \item \textbf{messages}: gestisce la chat ibrida che combina messaggi degli utenti e log di sistema.
+    \item \textbf{gigs}: gestisce gli annunci della bacheca Gig Economy con le relative candidature.
+\end{itemize}
+
+Le relazioni tra le entità seguono un modello orientato ai documenti tipico di MongoDB. Un utente può appartenere a molteplici band attraverso l'array di membri embedded in ciascuna band. Ogni band contiene multiple canzoni, referenziate tramite il campo \texttt{bandId}. A sua volta, ogni canzone può avere associati numerosi asset e messaggi, collegati tramite il campo \texttt{songId}. Gli annunci gig sono pubblicati da una band specifica e raccolgono candidature da parte degli utenti interessati.
+
+La struttura del database e le relazioni tra le entità sono rappresentate nel diagramma ER in Figura \ref{fig:er-diagram}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../diagrams/er-diagram.png}
+    \caption{Diagramma ER del database}
+    \label{fig:er-diagram}
+\end{figure}
+
+L'architettura generale segue il pattern REST per le operazioni CRUD, affiancato dal protocollo WebSocket per le funzionalità che richiedono aggiornamenti in tempo reale. Il frontend comunica con il backend attraverso chiamate HTTP per le operazioni transazionali e mantiene una connessione WebSocket persistente per ricevere notifiche push relative a nuovi messaggi, aggiornamenti dei voti e altre attività collaborative.
+
+\section{Architettura delle Interfacce Utente}
+
+\subsection{Design System e Fonti di Ispirazione}
+
+Prima dello sviluppo delle interfacce, è stato definito uno stile visivo distintivo per il progetto. Le principali fonti di ispirazione sono state:
+
+\begin{itemize}
+    \item \textbf{Teenage Engineering}: brand noto per il design minimalista e funzionale dei propri dispositivi audio, caratterizzato da un'estetica industriale con accenti di colore vibranti e tipografia bold.
+    \item \textbf{Nothing}: azienda di consumer electronics riconoscibile per l'approccio visivo basato su trasparenze, elementi geometrici e un linguaggio grafico pulito con forte identità.
+\end{itemize}
+
+Da queste influenze è stata creata una mood board contenente palette colori, font di riferimento e screenshot dei prodotti di ispirazione, insieme alla definizione delle funzionalità che ogni schermata principale doveva offrire.
+
+\subsection{Processo di Creazione dei Mockup}
+
+Per la realizzazione dei mockup è stato adottato un approccio non convenzionale: invece di utilizzare strumenti tradizionali come Figma, si è scelto di sperimentare con \textbf{Gemini 3.0 Flash} utilizzando la funzionalità Canvas. Partendo dalla mood board e dalle specifiche funzionali delle schermate, sono state condotte diverse iterazioni di prompt e raffinamenti successivi che hanno portato alla generazione dei mockup finali.
+
+Questo approccio ha permesso di:
+\begin{itemize}
+    \item Esplorare rapidamente molteplici varianti stilistiche
+    \item Iterare velocemente sul feedback visivo
+    \item Mantenere coerenza con il design system definito
+\end{itemize}
+
+\subsection{Mockup}
+
+Di seguito i mockup delle schermate principali dell'applicazione:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../mockups/home.png}
+    \caption{Dashboard principale con elenco delle band}
+    \label{fig:mockup-home}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../mockups/canzone.png}
+    \caption{Vista dettaglio canzone con player e asset}
+    \label{fig:mockup-canzone}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../mockups/chat.png}
+    \caption{Chat integrata per la comunicazione contestuale}
+    \label{fig:mockup-chat}
+\end{figure}
+
+\subsection{Behavior-Driven Development}
+
+Per definire i casi d'uso e guidare la progettazione dei mockup è stato adottato un approccio \textbf{Behavior-Driven Development (BDD)}. I requisiti funzionali sono stati formalizzati in scenari Gherkin, che descrivono il comportamento atteso dell'applicazione dal punto di vista dell'utente.
+
+Questa metodologia ha permesso di:
+\begin{itemize}
+    \item Chiarire i flussi utente prima della progettazione visiva
+    \item Creare un linguaggio condiviso tra requisiti e implementazione
+    \item Definire criteri di accettazione verificabili per ogni funzionalità
+\end{itemize}
+
+Di seguito alcuni esempi delle feature definite:
+
+\begin{lstlisting}[caption={Feature: Registrazione e onboarding}]
+Feature: User onboarding
+
+  Scenario: Account creation and onboarding completion
+    Given I am a new user on the registration page
+    When I enter the name "Mario", email and password
+    Then I am redirected to the onboarding wizard
+    When I select an instrument
+    And I select a genre
+    Then my profile is saved
+    And I access the empty dashboard
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Feature: Creazione di una band}]
+Feature: Band management
+
+  Scenario: Creating a new band
+    Given I am a logged-in user without a band
+    When I click on "Create New Band"
+    And I enter the name and the genre
+    Then a new band is created
+    And I am assigned the role "Admin"
+    And a unique invite code is generated
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Feature: Join band tramite codice invito}]
+Feature: Join band by invite code
+
+  Scenario: Join an existing band using invite code
+    Given I am a logged-in user without a band
+    When I enter the invite code "RC-99X-DEV"
+    And I click on "Join band"
+    Then I am added to the band members list
+    And I see the band dashboard
+\end{lstlisting}
+
+\subsection{Viste dell'Applicazione}
+
+L'applicazione si articola nelle seguenti viste principali:
+
+\begin{itemize}
+    \item \textbf{Autenticazione}: form per login e registrazione
+    \item \textbf{Onboarding}: wizard di configurazione iniziale del profilo
+    \item \textbf{Dashboard}: panoramica delle band e accesso alla bacheca gig
+    \item \textbf{Dettaglio Band}: informazioni, membri e impostazioni della band
+    \item \textbf{Lista Canzoni}: elenco dei brani con indicatori di stato
+    \item \textbf{Dettaglio Canzone}: player audio, asset e chat contestuale
+    \item \textbf{Gig}: bacheca annunci con filtri di ricerca
+\end{itemize}
+
+\subsection{Screenshot dell'Applicazione}
+
+Di seguito alcune schermate dell'applicazione finale, che mostrano l'implementazione del design system definito in fase di progettazione.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../views/home.png}
+    \caption{Dashboard principale in tema chiaro. Mostra lo stato dell'utente, il numero di band (Units) a cui appartiene e l'elenco delle band con genere e numero di membri. La bottom navigation permette l'accesso rapido a Console, Network (Gig Economy) e Profilo.}
+    \label{fig:screen-home}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../views/songsList.png}
+    \caption{Lista canzoni di una band in tema scuro. Ogni brano mostra titolo, data di aggiornamento, BPM e stato nel workflow (Idea, In Progress, Mix, Master). La barra di progresso visualizza lo stato di avanzamento del brano.}
+    \label{fig:screen-songs}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../views/songDetail.png}
+    \caption{Dettaglio canzone con pannello chat. A sinistra gli asset caricati (immagini e registrazioni audio) con sistema di voto; a destra la chat contestuale che mostra messaggi utente e notifiche di sistema per upload di file. Il pannello COMMS permette la comunicazione real-time tra i membri della band.}
+    \label{fig:screen-detail}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{../views/gigDetail.png}
+    \caption{Modal di creazione annuncio Gig. Permette di specificare la band, il titolo, la tipologia (Band Member per posizioni permanenti o Session per collaborazioni temporanee), il ruolo richiesto, genere, località, compenso e descrizione dell'opportunità.}
+    \label{fig:screen-gig}
+\end{figure}
+
+\chapter{Tecnologie}
+
+Lo stack tecnologico adottato è il \textbf{MEVN} (MongoDB, Express, Vue.js, Node.js), arricchito da Socket.io per le funzionalità real-time e containerizzato con Docker per il deployment.
+
+Questa combinazione offre diversi vantaggi:
+\begin{itemize}
+    \item \textbf{JavaScript full-stack}: un unico linguaggio per frontend, backend e query database (MongoDB), riducendo il context-switching e facilitando la condivisione di logica tra i layer
+    \item \textbf{Architettura asincrona}: Node.js gestisce efficacemente connessioni WebSocket simultanee per la chat real-time
+    \item \textbf{Schema flessibile}: MongoDB si adatta naturalmente a dati eterogenei come asset musicali, metadati e messaggi
+    \item \textbf{Reattività}: Vue.js con Composition API permette interfacce responsive con stato condiviso tra componenti
+    \item \textbf{Portabilità}: Docker garantisce ambienti consistenti tra sviluppo e produzione
+\end{itemize}
+
+\section{Containerizzazione}
+\begin{itemize}
+    \item \textbf{Docker}: containerizzazione dell'intera applicazione per deployment riproducibile e isolato
+    \item \textbf{Docker Compose}: orchestrazione multi-container (MongoDB, Express, nginx) con gestione delle dipendenze
+\end{itemize}
+
+\section{Backend}
+
+\subsection{Runtime e Framework}
+\begin{itemize}
+    \item \textbf{Node.js 18+}: modello asincrono non bloccante, adatto ad applicazioni con elevata concorrenza
+    \item \textbf{Express 4}: framework web per API RESTful con gestione middleware
+\end{itemize}
+
+\subsection{Persistenza Dati}
+\begin{itemize}
+    \item \textbf{MongoDB}: database documentale NoSQL, flessibile per dati musicali e collaborativi
+    \item \textbf{Mongoose}: ODM con validazione schema, middleware e query builder
+\end{itemize}
+
+\subsection{Real-time}
+\begin{itemize}
+    \item \textbf{Socket.io}: WebSocket con fallback automatico su polling, organizzazione in ``room'' per canzone
+\end{itemize}
+
+\subsection{Autenticazione e Sicurezza}
+\begin{itemize}
+    \item \textbf{jsonwebtoken}: autenticazione stateless tramite JWT
+    \item \textbf{bcryptjs}: hashing password con algoritmo bcrypt (10 salt rounds)
+\end{itemize}
+
+\subsection{Upload File}
+\begin{itemize}
+    \item \textbf{Multer}: parsing multipart/form-data con limite 50MB per file
+    \item Formati accettati: audio (mp3, wav, ogg, webm) e immagini (jpg, png, gif)
+\end{itemize}
+
+\section{Frontend}
+
+\subsection{Framework e Architettura}
+\begin{itemize}
+    \item \textbf{Vue.js 3} con Composition API e sintassi \texttt{<script setup>} per logica reattiva concisa
+    \item \textbf{Pinia}: state management centralizzato per autenticazione e connessione Socket.io
+    \item \textbf{Vue Router}: routing client-side con navigation guard e lazy loading delle viste
+\end{itemize}
+
+\subsection{Build e Sviluppo}
+\begin{itemize}
+    \item \textbf{Vite}: Hot Module Replacement istantaneo, proxy API integrato per lo sviluppo
+\end{itemize}
+
+\subsection{UI e Styling}
+\begin{itemize}
+    \item \textbf{Tailwind CSS}: approccio utility-first per styling inline
+    \item \textbf{Lucide Vue Next}: libreria icone
+    \item \textbf{Axios}: client HTTP con interceptor per JWT e gestione errori autenticazione
+\end{itemize}
+
+\chapter{Codice}
+
+\section{Struttura del Progetto}
+
+Il progetto adotta una struttura monorepo gestita attraverso npm workspace, con due package principali:
+\begin{itemize}
+    \item \textbf{client}: contenente il frontend in Vue
+    \item \textbf{server}: backend Express
+\end{itemize}
+
+Questa organizzazione permette di condividere configurazioni e script a livello di root mantenendo al contempo una chiara separazione di responsabilità.
+
+\subsection{Client}
+
+La cartella client contiene l'applicazione Vue organizzata secondo le convenzioni del framework:
+\begin{itemize}
+    \item \textbf{components}: ospita i componenti riutilizzabili come AudioPlayer, ChatPanel, GigCard e i vari modal
+    \item \textbf{views}: contiene i componenti che rappresentano le pagine dell'applicazione, mappati alle route definite nel router
+    \item \textbf{stores}: contiene i Pinia store per auth e socket
+    \item \textbf{services}: contiene il modulo api che centralizza tutte le chiamate HTTP
+    \item \textbf{routes}: definisce tutte le route e i navigation guard
+\end{itemize}
+
+\subsection{Server}
+
+La cartella server contiene tutto il backend del progetto ed è organizzata nel seguente modo:
+\begin{itemize}
+    \item \textbf{models}: contiene gli schemi di Mongoose per le diverse collezioni del DB
+    \item \textbf{controllers}: implementa la logica applicativa per ciascuna risorsa
+    \item \textbf{routes}: definisce tutti gli endpoint e li collega al controller
+    \item \textbf{middleware}: ospita i moduli per autenticazione e upload
+    \item \textbf{services}: contiene la logica di business riutilizzabile
+    \item \textbf{socket}: gestisce gli handler per gli eventi WebSocket
+\end{itemize}
+
+\subsection{Diagramma dei Componenti}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{../diagrams/component-diagram.png}
+    \caption{Diagramma dei componenti dell'architettura}
+    \label{fig:component-diagram}
+\end{figure}
+
+\section{Pattern e Implementazioni Rilevanti}
+
+L'architettura complessiva segue un \textbf{pattern a strati} che garantisce separazione delle responsabilità:
+\begin{enumerate}
+    \item \textbf{Route}: validazione preliminare e applicazione middleware
+    \item \textbf{Controller}: orchestrazione della logica applicativa
+    \item \textbf{Model}: accesso ai dati tramite Mongoose
+\end{enumerate}
+
+\subsection{Controller Backend: Gestione Band}
+
+Il controller \texttt{bandController.js} implementa le operazioni CRUD sulle band. Di seguito un estratto della funzione di creazione:
+
+\begin{lstlisting}[language=JavaScript, caption={Creazione di una band}]
+// server/controllers/bandController.js
+exports.create = async (req, res) => {
+  try {
+    const { name, genre, bio, location, instrument } = req.body;
+
+    // Generate unique invite code
+    let inviteCode;
+    let isUnique = false;
+    while (!isUnique) {
+      inviteCode = Band.generateInviteCode(name);
+      const existing = await Band.findOne({ inviteCode });
+      if (!existing) isUnique = true;
+    }
+
+    const band = new Band({
+      name, genre, bio, location, inviteCode,
+      members: [{
+        userId: req.userId,
+        role: 'Admin',
+        instrument: instrument || req.user.instruments?.[0] || '',
+        joinedAt: new Date()
+      }]
+    });
+
+    await band.save();
+    await band.populate('members.userId', 'username avatar');
+    res.status(201).json(band);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create band' });
+  }
+};
+\end{lstlisting}
+
+La funzione \texttt{join} verifica l'esistenza della band e l'appartenenza dell'utente prima di aggiungerlo:
+
+\begin{lstlisting}[language=JavaScript, caption={Join a una band tramite codice invito}]
+// server/controllers/bandController.js
+exports.join = async (req, res) => {
+  const { inviteCode, instrument } = req.body;
+
+  const band = await Band.findOne({
+    inviteCode: inviteCode.toUpperCase(),
+    active: true
+  });
+
+  if (!band) {
+    return res.status(404).json({ error: 'Invalid invite code' });
+  }
+
+  if (band.isMember(req.userId)) {
+    return res.status(400).json({ error: 'You are already a member' });
+  }
+
+  band.members.push({
+    userId: req.userId,
+    role: 'Member',
+    instrument: instrument || req.user.instruments?.[0] || '',
+    joinedAt: new Date()
+  });
+
+  await band.save();
+  res.json(band);
+};
+\end{lstlisting}
+
+\subsection{State Management Frontend: Auth Store}
+
+Lo store Pinia per l'autenticazione utilizza la Composition API:
+
+\begin{lstlisting}[language=JavaScript, caption={Auth Store con Pinia}]
+// client/src/stores/auth.ts
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<any>(null)
+  const loading = ref(true)
+
+  const isAuthenticated = computed(() => !!user.value)
+  const needsOnboarding = computed(() =>
+    user.value && !user.value.isProfileComplete
+  )
+
+  async function checkAuth() {
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        const res = await authAPI.me()
+        user.value = res.data
+      } catch (err) {
+        localStorage.removeItem('token')
+      }
+    }
+    loading.value = false
+  }
+
+  async function login(email: any, password: any) {
+    const res = await authAPI.login({ email, password })
+    localStorage.setItem('token', res.data.token)
+    user.value = res.data.user
+    return res.data.user
+  }
+
+  function logout() {
+    localStorage.removeItem('token')
+    user.value = null
+  }
+
+  return { user, loading, isAuthenticated, needsOnboarding,
+           checkAuth, login, logout }
+})
+\end{lstlisting}
+
+\subsection{Real-time: Socket.io}
+
+La gestione Socket.io lato server (\texttt{server/socket/index.js}) implementa:
+\begin{itemize}
+    \item \textbf{Autenticazione} via middleware JWT
+    \item \textbf{Room per canzone}: ogni client si unisce a \texttt{song:\{songId\}}
+    \item \textbf{Broadcast messaggi}: eventi \texttt{send\_message} $\rightarrow$ \texttt{new\_message}
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption={Gestione eventi Socket.io}]
+// server/socket/index.js
+socket.on('join_room', async (songId) => {
+  const song = await Song.findById(songId);
+  const band = await Band.findById(song.bandId);
+
+  const isMember = band.members.some(
+    m => m.userId.toString() === socket.userId
+  );
+  if (!isMember) {
+    socket.emit('error', { message: 'Not a band member' });
+    return;
+  }
+
+  socket.join(`song:${songId}`);
+  socket.currentSongId = songId;
+});
+
+socket.on('send_message', async (data) => {
+  const { songId, text } = data;
+
+  const message = new Message({
+    songId,
+    userId: socket.userId,
+    type: 'user',
+    text: text.trim(),
+    readBy: [socket.userId]
+  });
+
+  await message.save();
+  await message.populate('userId', 'username profilePic');
+
+  io.to(`song:${songId}`).emit('new_message', messageData);
+});
+\end{lstlisting}
+
+\subsection{Sistema di Voto}
+
+Il meccanismo di voto implementa un toggle like/unlike con notifica real-time:
+
+\begin{lstlisting}[language=JavaScript, caption={Sistema di voto sugli asset}]
+// server/controllers/assetController.js
+exports.vote = async (req, res) => {
+  const asset = await Asset.findById(req.params.id);
+
+  const voteIndex = asset.votes.findIndex(v => v.equals(req.userId));
+  const votedByMe = voteIndex === -1;
+
+  if (votedByMe) {
+    asset.votes.push(req.userId);      // Add vote
+  } else {
+    asset.votes.splice(voteIndex, 1);  // Remove vote
+  }
+
+  await asset.save();
+
+  // Notify all clients in the room
+  req.io.to(`song:${asset.songId}`).emit('vote_update', {
+    assetId: asset._id,
+    votes: asset.votes.length,
+    action: votedByMe ? 'liked' : 'unliked'
+  });
+
+  res.json({ votes: asset.votes.length, votedByMe });
+};
+\end{lstlisting}
+
+\subsection{Diagramma Comunicazione Real-time}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../diagrams/sequence-realtime.png}
+    \caption{Sequence diagram della comunicazione real-time}
+    \label{fig:sequence-realtime}
+\end{figure}
+
+\chapter{Test}
+
+\section{Test Tecnici}
+
+La verifica del corretto funzionamento dell'applicazione è stata condotta attraverso diverse tipologie di test. Il testing cross-browser ha verificato la compatibilità con i principali browser desktop (Chrome, Firefox, Edge) e i browser mobile su sistemi iOS e Android. L'approccio mobile-first adottato durante lo sviluppo ha garantito che l'esperienza su dispositivi touch fosse ottimale fin dalle prime fasi.
+
+Il testing delle API è stato eseguito sistematicamente utilizzando Postman, costruendo una collection che copre tutti gli endpoint con casi di test per i flussi nominali e per le condizioni di errore. Particolare attenzione è stata dedicata alla verifica dei meccanismi di autenticazione, testando il comportamento con token validi, scaduti e malformati.
+
+Il funzionamento real-time è stato verificato simulando scenari con connessioni multiple simultanee, confermando la corretta propagazione degli eventi di chat e delle notifiche di sistema a tutti i client iscritti alla room interessata.
+
+
+\section{Euristiche di Nielsen}
+
+Per garantire un'esperienza utente di qualità, l'interfaccia è stata progettata seguendo le dieci euristiche di usabilità di Nielsen:
+
+\begin{enumerate}
+    \item \textbf{Visibilità dello stato del sistema}: l'applicazione fornisce feedback costante sulle operazioni in corso attraverso spinner di caricamento animati durante le chiamate API, indicatori di "typing" nella chat che mostrano quando altri utenti stanno scrivendo, badge numerici per le notifiche non lette, e lo stato di avanzamento di ogni canzone (Idea, In Progress, Mix, Master) sempre visibile nella lista brani.
+
+    \item \textbf{Corrispondenza tra sistema e mondo reale}: la terminologia adottata rispecchia il linguaggio comune nel mondo musicale (band, canzone, gig, session musician). Il workflow di produzione delle canzoni segue le fasi reali del processo creativo, dalla nascita dell'idea fino al master finale. Le icone utilizzate (Lucide) sono intuitive e convenzionali.
+
+    \item \textbf{Controllo e libertà per l'utente}: la navigazione è completamente libera grazie alla bottom navigation sempre accessibile. Gli utenti possono annullare i propri voti sugli asset con un semplice tap (toggle like/unlike), e le azioni distruttive richiedono conferma attraverso modal dedicati, prevenendo operazioni accidentali.
+
+    \item \textbf{Consistenza e standard}: l'applicazione mantiene coerenza visiva attraverso il design system ispirato a Teenage Engineering e Nothing. Tutti i form di creazione (band, canzone, gig) seguono lo stesso pattern di interazione. Il formato del codice invito (XX-XXX-000) è uniforme in tutta la piattaforma.
+
+    \item \textbf{Prevenzione dall'errore}: i form implementano validazione lato client per prevenire l'invio di dati incompleti o malformati. Prima di eliminare elementi viene sempre richiesta conferma. Il codice invito accetta input case-insensitive, riducendo gli errori di digitazione.
+
+    \item \textbf{Riconoscimento più che ricordo}: la dashboard presenta tutte le band dell'utente in modo immediato, senza necessità di navigazione. La lista canzoni mostra lo stato di ciascun brano con indicatori visivi. I filtri nella sezione Gig Economy permettono di restringere la ricerca senza dover ricordare criteri precedenti.
+
+    \item \textbf{Flessibilità ed efficienza}: il wizard di onboarding guida i nuovi utenti nella configurazione iniziale del profilo, mentre gli utenti esperti possono saltare direttamente alle funzionalità. Il sistema di codice invito permette di unirsi a una band con una singola azione. La chat contestualizzata per canzone evita la dispersione delle conversazioni.
+
+    \item \textbf{Estetica e progettazione minimalista}: il design minimale, ispirato all'estetica industriale di Teenage Engineering, elimina elementi superflui. L'approccio mobile-first ha imposto rigore nella selezione delle informazioni da mostrare, privilegiando la chiarezza alla completezza.
+
+    \item \textbf{Facilità di riconoscimento, diagnosi e risoluzione delle situazioni di errore}: i messaggi di errore sono descrittivi e suggeriscono possibili soluzioni (es. "Codice invito non valido - verifica di averlo digitato correttamente"). Le notifiche toast forniscono feedback immediato sulle operazioni completate o fallite.
+
+    \item \textbf{Documentazione}: il wizard di onboarding funge da tutorial integrato per i nuovi utenti. L'interfaccia è stata progettata per essere autoesplicativa, riducendo al minimo la necessità di documentazione esterna.
+\end{enumerate}
+
+\section{Test di Usabilità}
+
+Un gruppo ristretto di utenti ha partecipato a sessioni di test di usabilità, fornendo feedback iterativo durante lo sviluppo. I partecipanti sono stati selezionati in modo da rappresentare le tre personas identificate in fase di analisi. A ciascun tester è stato assegnato un insieme di task da completare senza alcuna guida preliminare, osservando come interagivano con l'applicazione al primo utilizzo.
+
+\begin{itemize}
+    \item \textbf{Profilo "Marco" (chitarrista in band stabile)}: ai tester di questo profilo è stato chiesto di creare una nuova band, generare e condividere il codice invito, aggiungere una canzone caricando un file audio demo, esprimere preferenze sugli asset tramite il sistema di voto, e comunicare con i compagni di band attraverso la chat contestuale. I partecipanti hanno completato tutti i task senza difficoltà significative, apprezzando in particolare l'immediatezza del sistema di invito tramite codice.
+
+    \item \textbf{Profilo "Giulia" (cantautrice solista)}: a questo gruppo è stato richiesto di pubblicare un annuncio nella sezione Gig Economy per cercare un batterista per una sessione di registrazione, consultare eventuali candidature ricevute, e aggiornare il proprio profilo con strumenti suonati e generi musicali. I tester hanno trovato intuitivo il flusso di creazione degli annunci, suggerendo come miglioramento l'aggiunta di filtri più granulari per la ricerca.
+
+    \item \textbf{Profilo "Alessandro" (musicista freelance)}: i partecipanti hanno dovuto esplorare la bacheca Gig Economy alla ricerca di opportunità, filtrare gli annunci per strumento e genere, e candidarsi a quelli di interesse. È emersa l'utilità della distinzione tra annunci "Member" (posizioni permanenti) e "Session" (collaborazioni temporanee), che permette di identificare rapidamente le opportunità più rilevanti.
+\end{itemize}
+
+In generale, i feedback raccolti hanno confermato l'efficacia delle scelte di design adottate. Le osservazioni degli utenti hanno riguardato principalmente aspetti stilistici minori e suggerimenti per funzionalità aggiuntive, mentre la struttura e i flussi di navigazione sono stati giudicati chiari e coerenti.
+
+\section{Validazione e Accessibilità}
+
+L'applicazione è stata sottoposta a verifica di conformità agli standard web. La validazione del markup HTML tramite il W3C Validation Service non ha evidenziato errori critici. Per quanto riguarda l'accessibilità, sono state implementate le linee guida WCAG 2.1 livello AA:
+
+\begin{itemize}
+    \item Attributi ARIA appropriati per supportare gli screen reader
+    \item Touch target di dimensioni minime 44x44 pixel per tutti gli elementi interattivi
+    \item Contrasto cromatico sufficiente tra testo e sfondo
+    \item Navigazione completamente accessibile da tastiera
+\end{itemize}
+
+I test con Lighthouse hanno restituito punteggi soddisfacenti nelle categorie Performance (75), Accessibility (88), Best Practices (96) e SEO (83), confermando la qualità complessiva dell'implementazione frontend.
+
+
+\chapter{Deployment}
+
+Il deployment dell'applicazione è stato progettato utilizzando \textbf{Docker} per garantire portabilità, riproducibilità e semplicità di installazione.
+
+\section{Architettura dei Container}
+
+L'applicazione è composta da tre container orchestrati tramite Docker Compose:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{Container} & \textbf{Immagine} & \textbf{Porta} & \textbf{Ruolo} \\
+\midrule
+riffbanks-mongodb & mongo:latest & 27017 & Database documentale \\
+riffbanks-server & Node 20 Alpine & 3333 & API Express + Socket.io \\
+riffbanks-client & nginx Alpine & 80 & Frontend Vue + Reverse Proxy \\
+\bottomrule
+\end{tabular}
+\caption{Architettura dei container Docker}
+\end{table}
+
+\section{Build Multi-Stage del Frontend}
+
+Il Dockerfile del client utilizza un approccio multi-stage per ottimizzare l'immagine finale:
+
+\begin{lstlisting}[language=bash, caption={Dockerfile multi-stage del client}]
+# client/Dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+\end{lstlisting}
+
+Lo stage di build compila l'applicazione Vue, mentre lo stage di produzione serve solo i file statici risultanti tramite nginx.
+
+\section{Configurazione Nginx}
+
+Il reverse proxy nginx gestisce il routing tra frontend e backend:
+
+\begin{lstlisting}[language=bash, caption={Configurazione nginx}]
+# client/nginx.conf
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+
+    # SPA fallback per Vue Router
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy API verso backend
+    location /api {
+        proxy_pass http://server:3333;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+    }
+
+    # Proxy WebSocket per Socket.io
+    location /socket.io {
+        proxy_pass http://server:3333;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+
+    # Proxy file uploads
+    location /uploads {
+        proxy_pass http://server:3333;
+    }
+}
+\end{lstlisting}
+
+La configurazione include inoltre:
+\begin{itemize}
+    \item \textbf{Gzip compression} per ridurre il traffico di rete
+    \item \textbf{Security headers}: X-Frame-Options, X-Content-Type-Options, X-XSS-Protection
+    \item \textbf{Cache 1 anno} per asset statici (js, css, immagini, font)
+\end{itemize}
+
+\section{Persistenza dei Dati}
+
+Docker Compose definisce due volumi nominati per la persistenza:
+
+\begin{lstlisting}[language=bash, caption={Volumi Docker Compose}]
+# docker-compose.yml
+volumes:
+  mongodb_data:
+    name: riffbanks-mongodb-data    # Dati MongoDB
+  uploads_data:
+    name: riffbanks-uploads-data    # File caricati dagli utenti
+\end{lstlisting}
+
+\section{Variabili d'Ambiente}
+
+La configurazione è esternalizzata tramite variabili d'ambiente:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Variabile} & \textbf{Default} & \textbf{Descrizione} \\
+\midrule
+NODE\_ENV & production & Ambiente di esecuzione \\
+PORT & 3333 & Porta del server Express \\
+MONGODB\_URI & mongodb://mongodb:27017/riffbanks & Connection string \\
+JWT\_SECRET & riffbanks & Chiave per firma token JWT \\
+JWT\_EXPIRES\_IN & 7d & Scadenza token \\
+CLIENT\_URL & http://localhost & URL frontend per CORS \\
+\bottomrule
+\end{tabular}
+\caption{Variabili d'ambiente}
+\end{table}
+
+\section{Health Checks}
+
+Ogni container implementa un health check per il monitoraggio automatico:
+
+\textbf{MongoDB}:
+\begin{lstlisting}[language=bash, caption={Health check MongoDB}]
+healthcheck:
+  test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+\end{lstlisting}
+
+\textbf{Server Express} (endpoint \texttt{/api/health}):
+\begin{lstlisting}[language=JavaScript, caption={Endpoint health check}]
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'RiffBank API is running' });
+});
+\end{lstlisting}
+
+\textbf{Client nginx}:
+\begin{lstlisting}[language=bash, caption={Health check nginx}]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+\end{lstlisting}
+
+\section{Avvio dell'Applicazione}
+
+Per avviare l'intero stack:
+
+\begin{lstlisting}[language=bash, caption={Comandi per l'avvio}]
+# Clonare il repository
+git clone https://github.com/LoryBug/RiffBanks.git
+cd RiffBanks
+
+# Configurare JWT_SECRET (opzionale)
+export JWT_SECRET=your-secret-key
+
+# Avviare i container
+docker-compose up -d
+
+# Verificare lo stato
+docker-compose ps
+\end{lstlisting}
+
+L'applicazione sarà disponibile su \texttt{http://localhost} (porta 80).
+
+\section{Dipendenze tra Servizi}
+
+Docker Compose gestisce l'ordine di avvio:
+\begin{enumerate}
+    \item \textbf{MongoDB} si avvia per primo
+    \item \textbf{Server} attende che MongoDB sia healthy (\texttt{condition: service\_healthy})
+    \item \textbf{Client} attende che il server sia disponibile
+\end{enumerate}
+
+\chapter{Conclusioni}
+
+Il progetto RiffBanks ha raggiunto la maggior parte degli obiettivi prefissati, portando a termine lo sviluppo di una piattaforma funzionante che risponde alle esigenze identificate in fase di analisi.
+
+Il prodotto finale offre un'esperienza d'uso coerente e intuitiva, permettendo ai musicisti di gestire le proprie band, organizzare i progetti musicali, comunicare in tempo reale e cercare opportunità di collaborazione attraverso un'unica interfaccia. L'approccio mobile-first ha garantito un'esperienza ottimale sui dispositivi che i musicisti utilizzano maggiormente nella loro quotidianità.
+
+\section{Sviluppi Futuri}
+
+Per quanto riguarda le funzionalità che interessano gli utenti, un'evoluzione futura del sistema potrà concentrarsi su possibili estensioni quali:
+
+\begin{itemize}
+    \item \textbf{Player audio avanzato}: integrazione di funzionalità di editing audio base (trim, fade) e visualizzazione della forma d'onda per una migliore gestione degli asset musicali
+    \item \textbf{Storage cloud}: migrazione dello storage dei file su servizi cloud (AWS S3, Cloudinary) per migliorare scalabilità e affidabilità
+    \item \textbf{Sistema di recensioni}: possibilità per i membri delle band di lasciare feedback sui collaboratori incontrati tramite la sezione Gig Economy
+\end{itemize}
+
+\section{Commenti Finali}
+
+Lo sviluppo di questo progetto ha permesso di mettere in pratica le conoscenze acquisite durante il corso, affrontando le sfide tipiche dello sviluppo web moderno: dalla progettazione di API RESTful alla gestione della comunicazione real-time tramite WebSocket, dall'autenticazione JWT alla containerizzazione con Docker.
+
+Particolarmente formativa è stata l'esperienza con lo stack MEVN, che ha richiesto di padroneggiare tecnologie diverse ma coerenti tra loro, dalla reattività di Vue.js con la Composition API alla flessibilità di MongoDB come database documentale.
+
+Un aspetto interessante del processo di sviluppo è stato l'utilizzo di strumenti di intelligenza artificiale generativa per la creazione dei mockup, un approccio non convenzionale che ha permesso di esplorare nuove modalità di prototipazione rapida.
+
+L'idea di RiffBanks nasce da un'esigenza concreta riscontrata nel mondo della musica amatoriale: la frammentazione degli strumenti di collaborazione. Questo ha permesso di sviluppare con maggiore consapevolezza le funzionalità necessarie, potendo valutare in prima persona l'utilità delle scelte implementative.
+
+\end{document}
