@@ -2,6 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const routes = [
+  {
+    path: '/landing',
+    name: 'landing',
+    component: () => import('@/views/LandingView.vue'),
+    meta: { requiresGuest: true }
+  },
    {
     path: '/auth',
     name: 'auth',
@@ -86,7 +92,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    return next({ name: 'auth' })
+    return next({ name: 'landing' })
   }
 
   if (to.meta.requiresOnboarding && needsOnboarding) {
