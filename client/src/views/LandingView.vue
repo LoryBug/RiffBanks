@@ -250,71 +250,97 @@
         </div>
       </section>
 
-      <!-- Target Section -->
+      <!-- Requisiti Section -->
       <section
-        id="target"
+        id="requisiti"
         class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
-          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">03 // Target Utenti</span>
-          <h2 class="text-4xl font-bold mb-12">Pensato per i musicisti</h2>
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">03 // Requisiti</span>
+          <h2 class="text-4xl font-bold mb-8">Requisiti del Sistema</h2>
 
-          <div class="grid md:grid-cols-3 gap-8">
-            <!-- Persona 1 -->
-            <div class="border border-border-zero p-6 card-scan">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-accent flex items-center justify-center font-bold text-bg-zero">
-                  M
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- Requisiti Funzionali -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Requisiti Funzionali</h3>
+              <div class="space-y-2">
+                <div class="p-3 border border-border-zero flex items-start gap-3">
+                  <i class="ph ph-key text-accent mt-0.5"></i>
+                  <div>
+                    <span class="font-bold text-sm">Autenticazione</span>
+                    <p class="text-text-dim text-xs">JWT stateless, registrazione, login, onboarding wizard</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="font-bold">Marco</h3>
-                  <p class="font-tech text-xs text-text-dim">Chitarrista in band rock</p>
+                <div class="p-3 border border-border-zero flex items-start gap-3">
+                  <i class="ph ph-users text-accent mt-0.5"></i>
+                  <div>
+                    <span class="font-bold text-sm">Gestione Band</span>
+                    <p class="text-text-dim text-xs">Codice invito univoco (XX-XXX-000), ruoli Admin/Member</p>
+                  </div>
                 </div>
-              </div>
-              <p class="text-text-dim text-sm mb-4">
-                Necessita di condividere demo e ricevere feedback, mantenendo traccia delle diverse
-                iterazioni di ogni brano durante il processo creativo.
-              </p>
-              <div class="font-tech text-xs text-accent">
-                Esigenza: Organizzazione e versionamento
+                <div class="p-3 border border-border-zero flex items-start gap-3">
+                  <i class="ph ph-music-notes text-accent mt-0.5"></i>
+                  <div>
+                    <span class="font-bold text-sm">Progetti Musicali</span>
+                    <p class="text-text-dim text-xs">CRUD canzoni, workflow: Idea → In Progress → Mix → Master</p>
+                  </div>
+                </div>
+                <div class="p-3 border border-border-zero flex items-start gap-3">
+                  <i class="ph ph-upload text-accent mt-0.5"></i>
+                  <div>
+                    <span class="font-bold text-sm">Asset Management</span>
+                    <p class="text-text-dim text-xs">Upload audio/immagini, sistema di voto real-time</p>
+                  </div>
+                </div>
+                <div class="p-3 border border-border-zero flex items-start gap-3">
+                  <i class="ph ph-chats text-accent mt-0.5"></i>
+                  <div>
+                    <span class="font-bold text-sm">Chat Real-time</span>
+                    <p class="text-text-dim text-xs">Messaggi contestuali per brano + notifiche di sistema</p>
+                  </div>
+                </div>
+                <div class="p-3 border border-border-zero flex items-start gap-3">
+                  <i class="ph ph-broadcast text-accent mt-0.5"></i>
+                  <div>
+                    <span class="font-bold text-sm">Gig Economy</span>
+                    <p class="text-text-dim text-xs">Annunci Member/Session, sistema candidature</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Persona 2 -->
-            <div class="border border-border-zero p-6 card-scan">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-accent flex items-center justify-center font-bold text-bg-zero">
-                  G
+            <!-- Requisiti Non Funzionali -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Requisiti Non Funzionali</h3>
+              <div class="space-y-3">
+                <div class="p-4 border border-border-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-device-mobile text-accent"></i>
+                    <span class="font-bold text-sm">Mobile-first Design</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Interfaccia ottimizzata per dispositivi touch</p>
                 </div>
-                <div>
-                  <h3 class="font-bold">Giulia</h3>
-                  <p class="font-tech text-xs text-text-dim">Cantautrice solista</p>
+                <div class="p-4 border border-border-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-eye text-accent"></i>
+                    <span class="font-bold text-sm">Accessibilita WCAG 2.1 AA</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Touch target 44x44px, ARIA attributes, contrasto</p>
                 </div>
-              </div>
-              <p class="text-text-dim text-sm mb-4">
-                Cerca regolarmente musicisti a chiamata per le fasi di registrazione dei suoi brani.
-              </p>
-              <div class="font-tech text-xs text-accent">
-                Esigenza: Recruiting session musician
-              </div>
-            </div>
-
-            <!-- Persona 3 -->
-            <div class="border border-border-zero p-6 card-scan">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 bg-accent flex items-center justify-center font-bold text-bg-zero">
-                  A
+                <div class="p-4 border border-border-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-lightning text-accent"></i>
+                    <span class="font-bold text-sm">Performance</span>
+                  </div>
+                  <p class="text-text-dim text-xs">API response &lt; 200ms, architettura stateless</p>
                 </div>
-                <div>
-                  <h3 class="font-bold">Alessandro</h3>
-                  <p class="font-tech text-xs text-text-dim">Bassista freelance</p>
+                <div class="p-4 border border-border-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-shield-check text-accent"></i>
+                    <span class="font-bold text-sm">Sicurezza</span>
+                  </div>
+                  <p class="text-text-dim text-xs">bcrypt hashing, JWT expiry, input validation</p>
                 </div>
-              </div>
-              <p class="text-text-dim text-sm mb-4">
-                Costantemente alla ricerca di nuove opportunita di collaborazione con diverse band.
-              </p>
-              <div class="font-tech text-xs text-accent">
-                Esigenza: Visibilita e opportunita
               </div>
             </div>
           </div>
@@ -401,127 +427,345 @@
         </div>
       </section>
 
-      <!-- Architettura Section -->
+      <!-- Frontend Architecture Section -->
       <section
-        id="architettura"
+        id="frontend"
         class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
-          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">05 // Architettura</span>
-          <h2 class="text-4xl font-bold mb-12">Design e Database</h2>
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">05 // Frontend</span>
+          <h2 class="text-4xl font-bold mb-8">Pattern MVVM</h2>
 
-          <div class="grid md:grid-cols-2 gap-12">
-            <!-- Database Schema -->
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- MVVM Pattern -->
             <div>
-              <h3 class="font-tech text-sm text-text-dim uppercase mb-4">Collezioni MongoDB</h3>
-              <div class="space-y-2">
-                <div class="p-3 border border-border-zero flex justify-between items-center">
-                  <span class="font-bold">users</span>
-                  <span class="font-tech text-xs text-text-dim">Profili e credenziali</span>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Model-View-ViewModel</h3>
+              <div class="space-y-3">
+                <div class="p-4 border border-border-zero bg-surface-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-eye text-accent"></i>
+                    <span class="font-bold text-sm">View</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Componenti Vue in views/ e components/</p>
                 </div>
-                <div class="p-3 border border-border-zero flex justify-between items-center">
-                  <span class="font-bold">bands</span>
-                  <span class="font-tech text-xs text-text-dim">Gruppi di lavoro</span>
+                <div class="p-4 border border-border-zero bg-surface-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-git-branch text-accent"></i>
+                    <span class="font-bold text-sm">ViewModel</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Pinia stores (auth, socket) con stato reattivo</p>
                 </div>
-                <div class="p-3 border border-border-zero flex justify-between items-center">
-                  <span class="font-bold">songs</span>
-                  <span class="font-tech text-xs text-text-dim">Progetti musicali</span>
+                <div class="p-4 border border-border-zero bg-surface-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-database text-accent"></i>
+                    <span class="font-bold text-sm">Model</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Services API con Axios + Backend</p>
                 </div>
-                <div class="p-3 border border-border-zero flex justify-between items-center">
-                  <span class="font-bold">assets</span>
-                  <span class="font-tech text-xs text-text-dim">File e contenuti</span>
-                </div>
-                <div class="p-3 border border-border-zero flex justify-between items-center">
-                  <span class="font-bold">messages</span>
-                  <span class="font-tech text-xs text-text-dim">Chat ibrida</span>
-                </div>
-                <div class="p-3 border border-border-zero flex justify-between items-center">
-                  <span class="font-bold">gigs</span>
-                  <span class="font-tech text-xs text-text-dim">Annunci e candidature</span>
-                </div>
+              </div>
+              <!-- Data Binding -->
+              <div class="mt-4 p-3 border border-accent bg-accent-dim">
+                <p class="font-tech text-xs">
+                  <span class="text-accent">Two-way binding:</span> v-model + reattivita Vue
+                </p>
               </div>
             </div>
 
-            <!-- Design Inspiration -->
+            <!-- Structure -->
             <div>
-              <h3 class="font-tech text-sm text-text-dim uppercase mb-4">Design System</h3>
-              <div class="border border-border-zero p-6 bg-surface-zero mb-4">
-                <p class="text-text-dim text-sm mb-4">
-                  Lo stile visivo e ispirato a due brand iconici nel mondo dell'elettronica di consumo:
-                </p>
-                <div class="space-y-4">
-                  <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 bg-accent"></div>
-                    <div>
-                      <span class="font-bold">Teenage Engineering</span>
-                      <p class="text-text-dim text-xs">Estetica industriale, accenti vibranti</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 border-2 border-text-main"></div>
-                    <div>
-                      <span class="font-bold">Nothing</span>
-                      <p class="text-text-dim text-xs">Trasparenze, elementi geometrici</p>
-                    </div>
-                  </div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Struttura MVVM</h3>
+              <div class="border border-border-zero p-4 bg-surface-zero font-tech text-xs">
+                <div class="text-text-dim">
+                  <p>client/src/</p>
+                  <p class="ml-4">├── <span class="text-accent">views/</span> <span class="text-text-dim">// View Layer</span></p>
+                  <p class="ml-4">├── <span class="text-accent">components/</span> <span class="text-text-dim">// View Layer</span></p>
+                  <p class="ml-4">├── <span class="text-accent">stores/</span> <span class="text-text-dim">// ViewModel (Pinia)</span></p>
+                  <p class="ml-4">├── <span class="text-accent">composables/</span> <span class="text-text-dim">// Logica riusabile</span></p>
+                  <p class="ml-4">├── <span class="text-accent">services/</span> <span class="text-text-dim">// Model (API)</span></p>
+                  <p class="ml-4">└── <span class="text-accent">router/</span> <span class="text-text-dim">// Navigation</span></p>
                 </div>
               </div>
-              <p class="font-tech text-xs text-text-dim">
-                Mockup generati con Gemini 3.0 Flash + Canvas attraverso iterazioni di prompt
-              </p>
+              <div class="mt-4 grid grid-cols-2 gap-2">
+                <div class="p-3 border border-border-zero text-center">
+                  <span class="text-accent font-bold text-lg">Pinia</span>
+                  <p class="font-tech text-xs text-text-dim">ViewModel</p>
+                </div>
+                <div class="p-3 border border-border-zero text-center">
+                  <span class="text-accent font-bold text-lg">Axios</span>
+                  <p class="font-tech text-xs text-text-dim">Model Access</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Design System -->
+          <div class="mt-8 p-4 border border-accent bg-accent-dim">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-accent"></div>
+                <span class="font-tech text-xs">Teenage Engineering</span>
+              </div>
+              <span class="text-text-dim">+</span>
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 border-2 border-text-main"></div>
+                <span class="font-tech text-xs">Nothing</span>
+              </div>
+              <span class="text-text-dim">=</span>
+              <span class="font-bold">Design System</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Demo Section -->
+      <!-- Backend Architecture Section -->
       <section
-        id="demo"
+        id="backend"
         class="h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
-          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">06 // Demo</span>
-          <h2 class="text-4xl font-bold mb-12">L'applicazione in azione</h2>
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">06 // Backend</span>
+          <h2 class="text-4xl font-bold mb-8">Architettura Backend</h2>
 
-          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Screenshot placeholders -->
-            <div class="aspect-[9/16] border border-border-zero bg-bg-zero p-4 flex flex-col">
-              <span class="font-tech text-xs text-accent mb-2">Dashboard</span>
-              <div class="flex-1 border border-border-zero flex items-center justify-center">
-                <i class="ph ph-terminal text-4xl text-text-dim"></i>
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- API Structure -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">RESTful API Design</h3>
+              <div class="space-y-2">
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <span class="font-tech text-xs text-accent w-16">GET</span>
+                  <span class="text-sm">/api/bands</span>
+                  <span class="text-text-dim text-xs ml-auto">Lista band utente</span>
+                </div>
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <span class="font-tech text-xs text-accent w-16">POST</span>
+                  <span class="text-sm">/api/songs</span>
+                  <span class="text-text-dim text-xs ml-auto">Crea nuovo brano</span>
+                </div>
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <span class="font-tech text-xs text-accent w-16">PUT</span>
+                  <span class="text-sm">/api/songs/:id</span>
+                  <span class="text-text-dim text-xs ml-auto">Aggiorna workflow</span>
+                </div>
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <span class="font-tech text-xs text-accent w-16">DELETE</span>
+                  <span class="text-sm">/api/assets/:id</span>
+                  <span class="text-text-dim text-xs ml-auto">Rimuovi asset</span>
+                </div>
               </div>
-              <p class="text-text-dim text-xs mt-2">Panoramica band e stato utente</p>
             </div>
-            <div class="aspect-[9/16] border border-border-zero bg-bg-zero p-4 flex flex-col">
-              <span class="font-tech text-xs text-accent mb-2">Song List</span>
-              <div class="flex-1 border border-border-zero flex items-center justify-center">
-                <i class="ph ph-list text-4xl text-text-dim"></i>
+
+            <!-- Middleware & Auth -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Middleware Stack</h3>
+              <div class="space-y-3">
+                <div class="p-4 border border-border-zero bg-bg-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-shield-check text-accent"></i>
+                    <span class="font-bold text-sm">JWT Authentication</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Token stateless con expiry configurabile</p>
+                </div>
+                <div class="p-4 border border-border-zero bg-bg-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-user-check text-accent"></i>
+                    <span class="font-bold text-sm">Authorization</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Verifica membership band per ogni risorsa</p>
+                </div>
+                <div class="p-4 border border-border-zero bg-bg-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-upload text-accent"></i>
+                    <span class="font-bold text-sm">Multer</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Gestione upload file multipart/form-data</p>
+                </div>
               </div>
-              <p class="text-text-dim text-xs mt-2">Workflow di stato per brani</p>
-            </div>
-            <div class="aspect-[9/16] border border-border-zero bg-bg-zero p-4 flex flex-col">
-              <span class="font-tech text-xs text-accent mb-2">Song Detail</span>
-              <div class="flex-1 border border-border-zero flex items-center justify-center">
-                <i class="ph ph-waveform text-4xl text-text-dim"></i>
-              </div>
-              <p class="text-text-dim text-xs mt-2">Player audio e chat contestuale</p>
-            </div>
-            <div class="aspect-[9/16] border border-border-zero bg-bg-zero p-4 flex flex-col">
-              <span class="font-tech text-xs text-accent mb-2">Gig Economy</span>
-              <div class="flex-1 border border-border-zero flex items-center justify-center">
-                <i class="ph ph-broadcast text-4xl text-text-dim"></i>
-              </div>
-              <p class="text-text-dim text-xs mt-2">Bacheca annunci e candidature</p>
             </div>
           </div>
 
-          <div class="mt-12 text-center">
-            <button
-              @click="router.push({ name: 'auth' })"
-              class="px-8 py-4 bg-accent text-bg-zero font-tech text-sm uppercase tracking-wider hover:shadow-glow transition-all btn-press cursor-pointer"
-            >
-              Prova l'Applicazione
-            </button>
+          <!-- Server Structure -->
+          <div class="mt-8 border border-border-zero p-4 bg-bg-zero font-tech text-xs">
+            <div class="grid md:grid-cols-4 gap-4 text-center">
+              <div class="p-3 border border-border-zero">
+                <span class="text-accent">routes/</span>
+                <p class="text-text-dim mt-1">Definizione endpoint</p>
+              </div>
+              <div class="p-3 border border-border-zero">
+                <span class="text-accent">controllers/</span>
+                <p class="text-text-dim mt-1">Business logic</p>
+              </div>
+              <div class="p-3 border border-border-zero">
+                <span class="text-accent">models/</span>
+                <p class="text-text-dim mt-1">Mongoose schemas</p>
+              </div>
+              <div class="p-3 border border-border-zero">
+                <span class="text-accent">middleware/</span>
+                <p class="text-text-dim mt-1">Auth, validation</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Database Section -->
+      <section
+        id="database"
+        class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
+      >
+        <div class="container-zero">
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">07 // Database</span>
+          <h2 class="text-4xl font-bold mb-8">Schema MongoDB</h2>
+
+          <!-- Collections Description -->
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="p-4 border border-border-zero flex items-start gap-3">
+              <i class="ph ph-user text-accent text-xl mt-0.5"></i>
+              <div>
+                <h4 class="font-bold text-sm mb-1">Users</h4>
+                <p class="text-text-dim text-xs">Musicisti registrati con profilo, strumenti e preferenze</p>
+              </div>
+            </div>
+            <div class="p-4 border border-border-zero flex items-start gap-3">
+              <i class="ph ph-users-three text-accent text-xl mt-0.5"></i>
+              <div>
+                <h4 class="font-bold text-sm mb-1">Bands</h4>
+                <p class="text-text-dim text-xs">Gruppi musicali con membri, ruoli e codice invito</p>
+              </div>
+            </div>
+            <div class="p-4 border border-border-zero flex items-start gap-3">
+              <i class="ph ph-music-notes text-accent text-xl mt-0.5"></i>
+              <div>
+                <h4 class="font-bold text-sm mb-1">Songs</h4>
+                <p class="text-text-dim text-xs">Progetti musicali con workflow a stati</p>
+              </div>
+            </div>
+            <div class="p-4 border border-border-zero flex items-start gap-3">
+              <i class="ph ph-file-audio text-accent text-xl mt-0.5"></i>
+              <div>
+                <h4 class="font-bold text-sm mb-1">Assets</h4>
+                <p class="text-text-dim text-xs">File audio e immagini con sistema di voto</p>
+              </div>
+            </div>
+            <div class="p-4 border border-border-zero flex items-start gap-3">
+              <i class="ph ph-chat-circle text-accent text-xl mt-0.5"></i>
+              <div>
+                <h4 class="font-bold text-sm mb-1">Messages</h4>
+                <p class="text-text-dim text-xs">Chat contestuale per brano con notifiche</p>
+              </div>
+            </div>
+            <div class="p-4 border border-border-zero flex items-start gap-3">
+              <i class="ph ph-broadcast text-accent text-xl mt-0.5"></i>
+              <div>
+                <h4 class="font-bold text-sm mb-1">Gigs</h4>
+                <p class="text-text-dim text-xs">Annunci per recruiting musicisti</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Real-time Section -->
+      <section
+        id="realtime"
+        class="h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero snap-start snap-always overflow-y-auto"
+      >
+        <div class="container-zero">
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">08 // Real-time</span>
+          <h2 class="text-4xl font-bold mb-8">Comunicazione WebSocket</h2>
+
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- Socket Events -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Eventi Socket.io</h3>
+              <div class="space-y-2">
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <i class="ph ph-arrow-right text-accent"></i>
+                  <code class="font-tech text-xs">join_song</code>
+                  <span class="text-text-dim text-xs ml-auto">Entra nella room del brano</span>
+                </div>
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <i class="ph ph-arrow-right text-accent"></i>
+                  <code class="font-tech text-xs">send_message</code>
+                  <span class="text-text-dim text-xs ml-auto">Invia messaggio chat</span>
+                </div>
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <i class="ph ph-arrow-left text-accent"></i>
+                  <code class="font-tech text-xs">new_message</code>
+                  <span class="text-text-dim text-xs ml-auto">Ricevi messaggio</span>
+                </div>
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <i class="ph ph-arrow-left text-accent"></i>
+                  <code class="font-tech text-xs">vote_update</code>
+                  <span class="text-text-dim text-xs ml-auto">Aggiornamento voti asset</span>
+                </div>
+                <div class="p-3 border border-border-zero flex items-center gap-3">
+                  <i class="ph ph-arrow-left text-accent"></i>
+                  <code class="font-tech text-xs">asset_uploaded</code>
+                  <span class="text-text-dim text-xs ml-auto">Notifica nuovo asset</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Architecture -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Architettura Ibrida</h3>
+              <div class="border border-border-zero p-6 bg-bg-zero mb-4">
+                <div class="space-y-4">
+                  <div class="flex items-start gap-3">
+                    <i class="ph ph-database text-accent mt-1"></i>
+                    <div>
+                      <span class="font-bold text-sm">Persistenza MongoDB</span>
+                      <p class="text-text-dim text-xs">Messaggi salvati per storico e offline</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <i class="ph ph-lightning text-accent mt-1"></i>
+                    <div>
+                      <span class="font-bold text-sm">Delivery Socket.io</span>
+                      <p class="text-text-dim text-xs">Broadcast real-time agli utenti connessi</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <i class="ph ph-bell text-accent mt-1"></i>
+                    <div>
+                      <span class="font-bold text-sm">Sistema Notifiche</span>
+                      <p class="text-text-dim text-xs">Conteggio non letti per brano e band</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 border border-accent bg-accent-dim">
+                <p class="font-tech text-xs">
+                  <span class="text-accent">Room-based:</span> Ogni brano ha una room dedicata per isolare il traffico
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Flow Diagram -->
+          <div class="mt-8 p-6 border border-border-zero bg-bg-zero">
+            <h4 class="font-tech text-xs text-text-dim uppercase mb-4">Flusso Messaggio</h4>
+            <div class="flex items-center justify-between text-center font-tech text-xs">
+              <div class="p-3 border border-accent">
+                <i class="ph ph-user text-accent text-xl block mb-1"></i>
+                Client A
+              </div>
+              <i class="ph ph-arrow-right text-text-dim"></i>
+              <div class="p-3 border border-border-zero">
+                <i class="ph ph-cloud text-accent text-xl block mb-1"></i>
+                Socket Server
+              </div>
+              <i class="ph ph-arrow-right text-text-dim"></i>
+              <div class="p-3 border border-border-zero">
+                <i class="ph ph-database text-accent text-xl block mb-1"></i>
+                MongoDB
+              </div>
+              <i class="ph ph-arrow-right text-text-dim"></i>
+              <div class="p-3 border border-accent">
+                <i class="ph ph-users text-accent text-xl block mb-1"></i>
+                Room Broadcast
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -532,89 +776,226 @@
         class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
-          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">07 // Test e Validazione</span>
-          <h2 class="text-4xl font-bold mb-12">Qualita garantita</h2>
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">09 // Test</span>
+          <h2 class="text-4xl font-bold mb-8">Test e Validazione</h2>
 
-          <div class="grid md:grid-cols-2 gap-12">
-            <!-- Test Results -->
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- Lighthouse Scores -->
             <div>
-              <h3 class="font-tech text-sm text-text-dim uppercase mb-4">Lighthouse Scores</h3>
-              <div class="space-y-4">
-                <div class="flex items-center gap-4">
-                  <div class="w-16 h-16 border-2 border-accent flex items-center justify-center font-bold text-xl">
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Lighthouse Scores</h3>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="p-4 border border-border-zero text-center">
+                  <div class="w-14 h-14 border-2 border-accent flex items-center justify-center font-bold text-xl mx-auto mb-2">
                     75
                   </div>
-                  <div>
-                    <span class="font-bold">Performance</span>
-                    <div class="w-32 h-2 bg-border-zero mt-1">
-                      <div class="h-full bg-accent" style="width: 75%"></div>
-                    </div>
-                  </div>
+                  <span class="font-tech text-xs text-text-dim">Performance</span>
                 </div>
-                <div class="flex items-center gap-4">
-                  <div class="w-16 h-16 border-2 border-accent flex items-center justify-center font-bold text-xl">
+                <div class="p-4 border border-border-zero text-center">
+                  <div class="w-14 h-14 border-2 border-accent flex items-center justify-center font-bold text-xl mx-auto mb-2">
                     88
                   </div>
-                  <div>
-                    <span class="font-bold">Accessibility</span>
-                    <div class="w-32 h-2 bg-border-zero mt-1">
-                      <div class="h-full bg-accent" style="width: 88%"></div>
-                    </div>
-                  </div>
+                  <span class="font-tech text-xs text-text-dim">Accessibility</span>
                 </div>
-                <div class="flex items-center gap-4">
-                  <div class="w-16 h-16 border-2 border-accent flex items-center justify-center font-bold text-xl">
+                <div class="p-4 border border-border-zero text-center">
+                  <div class="w-14 h-14 border-2 border-accent flex items-center justify-center font-bold text-xl mx-auto mb-2">
                     96
                   </div>
-                  <div>
-                    <span class="font-bold">Best Practices</span>
-                    <div class="w-32 h-2 bg-border-zero mt-1">
-                      <div class="h-full bg-accent" style="width: 96%"></div>
-                    </div>
-                  </div>
+                  <span class="font-tech text-xs text-text-dim">Best Practices</span>
                 </div>
-                <div class="flex items-center gap-4">
-                  <div class="w-16 h-16 border-2 border-accent flex items-center justify-center font-bold text-xl">
+                <div class="p-4 border border-border-zero text-center">
+                  <div class="w-14 h-14 border-2 border-accent flex items-center justify-center font-bold text-xl mx-auto mb-2">
                     83
                   </div>
+                  <span class="font-tech text-xs text-text-dim">SEO</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nielsen Heuristics -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Euristiche di Nielsen</h3>
+              <div class="space-y-2 text-sm">
+                <div class="p-2 border border-border-zero flex items-center gap-2">
+                  <i class="ph ph-check-circle text-accent"></i>
+                  <span>Visibilita dello stato del sistema</span>
+                </div>
+                <div class="p-2 border border-border-zero flex items-center gap-2">
+                  <i class="ph ph-check-circle text-accent"></i>
+                  <span>Corrispondenza sistema-mondo reale</span>
+                </div>
+                <div class="p-2 border border-border-zero flex items-center gap-2">
+                  <i class="ph ph-check-circle text-accent"></i>
+                  <span>Controllo e libertà per l'utente</span>
+                </div>
+                <div class="p-2 border border-border-zero flex items-center gap-2">
+                  <i class="ph ph-check-circle text-accent"></i>
+                  <span>Consistenza e standard</span>
+                </div>
+                <div class="p-2 border border-border-zero flex items-center gap-2">
+                  <i class="ph ph-check-circle text-accent"></i>
+                  <span>Prevenzione dall'errore</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Accessibility Section -->
+      <section
+        id="accessibility"
+        class="h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero snap-start snap-always overflow-y-auto"
+      >
+        <div class="container-zero">
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">10 // Accessibilita</span>
+          <h2 class="text-4xl font-bold mb-8">WCAG 2.1 Level AA</h2>
+
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- Standards -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Standard Implementati</h3>
+              <div class="space-y-3">
+                <div class="p-4 border border-border-zero bg-bg-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-hand-tap text-accent"></i>
+                    <span class="font-bold text-sm">Touch Target 44x44px</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Tutti gli elementi interattivi rispettano le dimensioni minime</p>
+                </div>
+                <div class="p-4 border border-border-zero bg-bg-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-eye text-accent"></i>
+                    <span class="font-bold text-sm">Contrasto 4.5:1</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Rapporto di contrasto conforme per testo e elementi UI</p>
+                </div>
+                <div class="p-4 border border-border-zero bg-bg-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-cursor text-accent"></i>
+                    <span class="font-bold text-sm">Focus Visible</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Indicatori di focus evidenti per navigazione keyboard</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ARIA Implementation -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Implementazione ARIA</h3>
+              <div class="border border-border-zero p-4 bg-bg-zero font-tech text-xs space-y-2">
+                <p><span class="text-accent">aria-label</span> <span class="text-text-dim">// Etichette per screen reader</span></p>
+                <p><span class="text-accent">aria-current</span> <span class="text-text-dim">// Stato navigazione</span></p>
+                <p><span class="text-accent">aria-expanded</span> <span class="text-text-dim">// Stato menu espandibili</span></p>
+                <p><span class="text-accent">aria-live</span> <span class="text-text-dim">// Regioni dinamiche</span></p>
+                <p><span class="text-accent">role="button"</span> <span class="text-text-dim">// Semantica elementi custom</span></p>
+              </div>
+              <div class="mt-4 p-4 border border-accent bg-accent-dim">
+                <h4 class="font-bold text-sm mb-2">Semantic HTML</h4>
+                <p class="text-text-dim text-xs">
+                  Uso di &lt;header&gt;, &lt;main&gt;, &lt;nav&gt;, &lt;section&gt;, &lt;button&gt; per struttura accessibile nativa
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Accessibility -->
+          <div class="mt-6 grid grid-cols-3 gap-4">
+            <div class="p-4 border border-border-zero text-center">
+              <i class="ph ph-device-mobile text-accent text-2xl mb-2 block"></i>
+              <span class="font-tech text-xs">Mobile-first</span>
+            </div>
+            <div class="p-4 border border-border-zero text-center">
+              <i class="ph ph-sun-dim text-accent text-2xl mb-2 block"></i>
+              <span class="font-tech text-xs">Dark/Light Mode</span>
+            </div>
+            <div class="p-4 border border-border-zero text-center">
+              <i class="ph ph-arrows-out text-accent text-2xl mb-2 block"></i>
+              <span class="font-tech text-xs">Responsive Design</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Deployment Section -->
+      <section
+        id="deployment"
+        class="h-screen flex items-center py-20 border-t border-border-zero snap-start snap-always overflow-y-auto"
+      >
+        <div class="container-zero">
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">11 // Deployment</span>
+          <h2 class="text-4xl font-bold mb-8">Containerizzazione Docker</h2>
+
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- Docker Architecture -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">docker-compose.yml</h3>
+              <div class="space-y-3">
+                <div class="p-4 border border-border-zero flex items-center gap-4">
+                  <div class="w-12 h-12 border border-accent flex items-center justify-center">
+                    <i class="ph ph-database text-accent text-xl"></i>
+                  </div>
                   <div>
-                    <span class="font-bold">SEO</span>
-                    <div class="w-32 h-2 bg-border-zero mt-1">
-                      <div class="h-full bg-accent" style="width: 83%"></div>
-                    </div>
+                    <span class="font-bold">mongo</span>
+                    <p class="font-tech text-xs text-text-dim">Database MongoDB con volume persistente</p>
+                  </div>
+                </div>
+                <div class="p-4 border border-border-zero flex items-center gap-4">
+                  <div class="w-12 h-12 border border-accent flex items-center justify-center">
+                    <i class="ph ph-gear text-accent text-xl"></i>
+                  </div>
+                  <div>
+                    <span class="font-bold">server</span>
+                    <p class="font-tech text-xs text-text-dim">Express.js + Socket.io backend</p>
+                  </div>
+                </div>
+                <div class="p-4 border border-border-zero flex items-center gap-4">
+                  <div class="w-12 h-12 border border-accent flex items-center justify-center">
+                    <i class="ph ph-browser text-accent text-xl"></i>
+                  </div>
+                  <div>
+                    <span class="font-bold">client</span>
+                    <p class="font-tech text-xs text-text-dim">Vue.js SPA con Nginx</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Euristiche Nielsen -->
+            <!-- Benefits & Config -->
             <div>
-              <h3 class="font-tech text-sm text-text-dim uppercase mb-4">Euristiche di Nielsen</h3>
-              <div class="space-y-2 text-sm">
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Vantaggi</h3>
+              <div class="space-y-2">
                 <div class="p-3 border border-border-zero flex items-center gap-3">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Visibilita dello stato del sistema</span>
+                  <i class="ph ph-check text-accent"></i>
+                  <span class="text-sm">Ambiente isolato e riproducibile</span>
                 </div>
                 <div class="p-3 border border-border-zero flex items-center gap-3">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Corrispondenza sistema-mondo reale</span>
+                  <i class="ph ph-check text-accent"></i>
+                  <span class="text-sm">Deploy con singolo comando</span>
                 </div>
                 <div class="p-3 border border-border-zero flex items-center gap-3">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Controllo e liberta per l'utente</span>
+                  <i class="ph ph-check text-accent"></i>
+                  <span class="text-sm">Scalabilita orizzontale</span>
                 </div>
                 <div class="p-3 border border-border-zero flex items-center gap-3">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Consistenza e standard</span>
-                </div>
-                <div class="p-3 border border-border-zero flex items-center gap-3">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Prevenzione dall'errore</span>
+                  <i class="ph ph-check text-accent"></i>
+                  <span class="text-sm">Configurazione tramite .env</span>
                 </div>
               </div>
-              <p class="font-tech text-xs text-text-dim mt-4">
-                WCAG 2.1 Level AA // Touch target 44x44px // ARIA attributes
-              </p>
+              <div class="mt-4 p-4 border border-border-zero bg-surface-zero font-tech text-xs">
+                <p class="text-text-dim mb-2"># Quick Start</p>
+                <p class="text-accent">docker-compose up -d</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Network Diagram -->
+          <div class="mt-6 p-4 border border-accent bg-accent-dim">
+            <div class="flex items-center justify-center gap-4 font-tech text-xs text-center">
+              <div class="p-2 border border-border-zero bg-bg-zero">Client :80</div>
+              <i class="ph ph-arrow-right text-text-dim"></i>
+              <div class="p-2 border border-border-zero bg-bg-zero">Server :5000</div>
+              <i class="ph ph-arrow-right text-text-dim"></i>
+              <div class="p-2 border border-border-zero bg-bg-zero">MongoDB :27017</div>
             </div>
           </div>
         </div>
@@ -626,52 +1007,26 @@
         class="h-screen flex items-center py-20 border-t border-border-zero bg-surface-zero snap-start snap-always overflow-y-auto"
       >
         <div class="container-zero">
-          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">08 // Conclusioni</span>
-          <h2 class="text-4xl font-bold mb-12">Sviluppi futuri</h2>
+          <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">12 // Conclusioni</span>
+          <h2 class="text-4xl font-bold mb-8">Conclusione</h2>
 
-          <div class="grid md:grid-cols-3 gap-6 mb-12">
-            <div class="p-6 border border-border-zero bg-bg-zero">
-              <i class="ph ph-waveform text-3xl text-accent mb-4 block"></i>
-              <h3 class="font-bold mb-2">Player Audio Avanzato</h3>
-              <p class="text-text-dim text-sm">
-                Integrazione di funzionalita di editing audio base (trim, fade) e visualizzazione forma d'onda
-              </p>
-            </div>
-            <div class="p-6 border border-border-zero bg-bg-zero">
-              <i class="ph ph-cloud text-3xl text-accent mb-4 block"></i>
-              <h3 class="font-bold mb-2">Storage Cloud</h3>
-              <p class="text-text-dim text-sm">
-                Migrazione su AWS S3 o Cloudinary per migliorare scalabilita e affidabilita
-              </p>
-            </div>
-            <div class="p-6 border border-border-zero bg-bg-zero">
-              <i class="ph ph-star text-3xl text-accent mb-4 block"></i>
-              <h3 class="font-bold mb-2">Sistema Recensioni</h3>
-              <p class="text-text-dim text-sm">
-                Possibilita di lasciare feedback sui collaboratori incontrati tramite Gig Economy
-              </p>
-            </div>
-          </div>
-
-          <div class="border border-accent p-8 text-center">
-            <h3 class="text-2xl font-bold mb-4">Grazie per l'attenzione</h3>
-            <p class="text-text-dim mb-6">
-              L'idea di RiffBanks nasce da un'esigenza concreta riscontrata nel mondo della musica amatoriale
-            </p>
+          <!-- Final CTA -->
+          <div class="border border-accent p-6 text-center">
+            <h3 class="text-xl font-bold mb-3">Grazie per l'attenzione</h3>
             <div class="flex flex-col md:flex-row items-center justify-center gap-4">
               <button
                 @click="router.push({ name: 'auth' })"
-                class="px-8 py-4 bg-accent text-bg-zero font-tech text-sm uppercase tracking-wider hover:shadow-glow transition-all btn-press cursor-pointer"
+                class="px-6 py-3 bg-accent text-bg-zero font-tech text-xs uppercase tracking-wider hover:shadow-glow transition-all btn-press cursor-pointer"
               >
                 Prova RiffBanks
               </button>
               <a
                 href="https://github.com/LoryBug/RiffBanks"
                 target="_blank"
-                class="px-8 py-4 border border-border-zero text-text-main font-tech text-sm uppercase tracking-wider hover:border-accent transition-all btn-press flex items-center gap-2 cursor-pointer"
+                class="px-6 py-3 border border-border-zero text-text-main font-tech text-xs uppercase tracking-wider hover:border-accent transition-all btn-press flex items-center gap-2 cursor-pointer"
               >
                 <i class="ph ph-github-logo"></i>
-                GitHub Repository
+                GitHub
               </a>
             </div>
           </div>
@@ -696,11 +1051,15 @@ const sections = [
   { id: 'hero', label: 'Home' },
   { id: 'problema', label: 'Problema' },
   { id: 'soluzione', label: 'Soluzione' },
-  { id: 'target', label: 'Target' },
-  { id: 'tecnologie', label: 'Tech' },
-  { id: 'architettura', label: 'Design' },
-  { id: 'demo', label: 'Demo' },
+  { id: 'requisiti', label: 'Requisiti' },
+  { id: 'tecnologie', label: 'Stack' },
+  { id: 'frontend', label: 'Frontend' },
+  { id: 'backend', label: 'Backend' },
+  { id: 'database', label: 'Database' },
+  { id: 'realtime', label: 'Real-time' },
   { id: 'test', label: 'Test' },
+  { id: 'accessibility', label: 'A11y' },
+  { id: 'deployment', label: 'Deploy' },
   { id: 'conclusioni', label: 'Conclusioni' },
 ]
 
