@@ -17,7 +17,7 @@
           <ThemeToggle />
           <button
             @click="router.push({ name: 'auth' })"
-            class="px-4 py-2 border border-accent text-accent font-tech text-xs uppercase hover:bg-accent hover:text-bg-zero transition-all btn-press hover-glow"
+            class="px-4 py-2 border border-accent text-accent font-tech text-xs uppercase hover:bg-accent hover:text-bg-zero transition-all btn-press hover-glow cursor-pointer"
           >
             Login
           </button>
@@ -117,13 +117,13 @@
           <div class="flex flex-col md:flex-row items-center justify-center gap-4 mt-12">
             <button
               @click="router.push({ name: 'auth' })"
-              class="px-8 py-4 bg-accent text-bg-zero font-tech text-sm uppercase tracking-wider hover:shadow-glow transition-all btn-press"
+              class="px-8 py-4 bg-accent text-bg-zero font-tech text-sm uppercase tracking-wider hover:shadow-glow transition-all btn-press cursor-pointer"
             >
               Inizia Ora
             </button>
             <button
               @click="scrollToSection('problema')"
-              class="px-8 py-4 border border-border-zero text-text-main font-tech text-sm uppercase tracking-wider hover:border-accent transition-all btn-press"
+              class="px-8 py-4 border border-border-zero text-text-main font-tech text-sm uppercase tracking-wider hover:border-accent transition-all btn-press cursor-pointer"
             >
               Scopri di Piu
             </button>
@@ -518,7 +518,7 @@
           <div class="mt-12 text-center">
             <button
               @click="router.push({ name: 'auth' })"
-              class="px-8 py-4 bg-accent text-bg-zero font-tech text-sm uppercase tracking-wider hover:shadow-glow transition-all btn-press"
+              class="px-8 py-4 bg-accent text-bg-zero font-tech text-sm uppercase tracking-wider hover:shadow-glow transition-all btn-press cursor-pointer"
             >
               Prova l'Applicazione
             </button>
@@ -661,14 +661,14 @@
             <div class="flex flex-col md:flex-row items-center justify-center gap-4">
               <button
                 @click="router.push({ name: 'auth' })"
-                class="px-8 py-4 bg-accent text-bg-zero font-tech text-sm uppercase tracking-wider hover:shadow-glow transition-all btn-press"
+                class="px-8 py-4 bg-accent text-bg-zero font-tech text-sm uppercase tracking-wider hover:shadow-glow transition-all btn-press cursor-pointer"
               >
                 Prova RiffBanks
               </button>
               <a
                 href="https://github.com/LoryBug/RiffBanks"
                 target="_blank"
-                class="px-8 py-4 border border-border-zero text-text-main font-tech text-sm uppercase tracking-wider hover:border-accent transition-all btn-press flex items-center gap-2"
+                class="px-8 py-4 border border-border-zero text-text-main font-tech text-sm uppercase tracking-wider hover:border-accent transition-all btn-press flex items-center gap-2 cursor-pointer"
               >
                 <i class="ph ph-github-logo"></i>
                 GitHub Repository
