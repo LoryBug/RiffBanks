@@ -1,9 +1,6 @@
 @import "tailwindcss";
 
-/* CONFIGURAZIONE TEMA TAILWIND V4 
-  Qui mappiamo le variabili CSS alle utility di Tailwind (es. bg-bg-zero)
-  e definiamo le animazioni che generano automaticamente le classi.
-*/
+
 @theme {
   /* Mappatura Colori */
   --color-bg-zero: var(--bg-zero);
@@ -22,9 +19,6 @@
   /* Ombre */
   --shadow-glow: 0 0 20px var(--shadow-glow);
 
-  /* ANIMAZIONI GENERATE AUTOMATICAMENTE 
-     Definendo queste, Tailwind crea classi come: animate-fade-in, animate-pulse-slow, etc.
-  */
   --animate-fade-in: fadeIn 0.3s ease-out;
   --animate-slide-up: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-slide-down: slideDown 0.3s ease-out;
@@ -89,7 +83,7 @@
     --surface-zero: #121212;
     --border-zero: #333333;
     --text-main: #EDEDED;
-    --text-dim: #666666;
+    --text-dim: #888888;
     --accent: #FF3300;
     --accent-dim: rgba(255, 51, 0, 0.1);
     --scanline-color: rgba(0,0,0,0.2);
@@ -103,7 +97,7 @@
     --surface-zero: #FFFFFF;
     --border-zero: #E5E5E5;
     --text-main: #0A0A0A;
-    --text-dim: #999999;
+    --text-dim: #6B6B6B;
     --accent: #FF3300;
     --accent-dim: rgba(255, 51, 0, 0.08);
     --scanline-color: rgba(0,0,0,0.05);

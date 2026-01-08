@@ -5,7 +5,7 @@
       <!-- Branding -->
       <div class="mb-12 border-l-2 border-accent pl-6">
         <h1 class="text-5xl font-bold tracking-tighter mb-2 text-text-main">
-          RIFF<span class="text-accent">BANK</span>
+          RIFF<span class="text-accent">BANKS</span>
         </h1>
         <p class="font-tech text-xs text-text-dim uppercase tracking-[0.2em]">
           Zero_OS // v.3.0

@@ -17,7 +17,7 @@
 
 @layer base {
   :root {
-    --bg-zero: #000000; /* Example value */
-    --shadow-glow: rgba(255, 255, 255, 0.5); /* Example value */
+    --bg-zero: #000000;
+    --shadow-glow: rgba(255, 255, 255, 0.5); 
   }
 }
