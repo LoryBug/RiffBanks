@@ -463,12 +463,6 @@
                   <p class="text-text-dim text-xs">Services API con Axios + Backend</p>
                 </div>
               </div>
-              <!-- Data Binding -->
-              <div class="mt-4 p-3 border border-accent bg-accent-dim">
-                <p class="font-tech text-xs">
-                  <span class="text-accent">Two-way binding:</span> v-model + reattivita Vue
-                </p>
-              </div>
             </div>
 
             <!-- Structure -->
