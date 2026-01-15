@@ -323,7 +323,7 @@
                 <div class="p-4 border border-border-zero">
                   <div class="flex items-center gap-2 mb-2">
                     <i class="ph ph-eye text-accent"></i>
-                    <span class="font-bold text-sm">Accessibilita WCAG 2.1 AA</span>
+                    <span class="font-bold text-sm">Accessibilita WCAG 2.2 AA</span>
                   </div>
                   <p class="text-text-dim text-xs">Touch target 44x44px, ARIA attributes, contrasto</p>
                 </div>
@@ -780,6 +780,34 @@
           <h2 class="text-4xl font-bold mb-8">Test e Validazione</h2>
 
           <div class="grid md:grid-cols-2 gap-8">
+            <!-- Test Tecnici -->
+            <div>
+              <h3 class="font-tech text-sm text-accent uppercase mb-4">Test Tecnici</h3>
+              <div class="space-y-3">
+                <div class="p-4 border border-border-zero bg-surface-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-browsers text-accent"></i>
+                    <span class="font-bold text-sm">Cross-Browser Testing</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Chrome, Firefox, Edge + iOS e Android mobile</p>
+                </div>
+                <div class="p-4 border border-border-zero bg-surface-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-plugs-connected text-accent"></i>
+                    <span class="font-bold text-sm">API Testing (Postman)</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Collection completa: flussi nominali, errori, autenticazione JWT</p>
+                </div>
+                <div class="p-4 border border-border-zero bg-surface-zero">
+                  <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-lightning text-accent"></i>
+                    <span class="font-bold text-sm">Test Real-time</span>
+                  </div>
+                  <p class="text-text-dim text-xs">Connessioni multiple simultanee, propagazione eventi chat e notifiche</p>
+                </div>
+              </div>
+            </div>
+
             <!-- Lighthouse Scores -->
             <div>
               <h3 class="font-tech text-sm text-accent uppercase mb-4">Lighthouse Scores</h3>
@@ -810,33 +838,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- Nielsen Heuristics -->
-            <div>
-              <h3 class="font-tech text-sm text-accent uppercase mb-4">Euristiche di Nielsen</h3>
-              <div class="space-y-2 text-sm">
-                <div class="p-2 border border-border-zero flex items-center gap-2">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Visibilita dello stato del sistema</span>
-                </div>
-                <div class="p-2 border border-border-zero flex items-center gap-2">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Corrispondenza sistema-mondo reale</span>
-                </div>
-                <div class="p-2 border border-border-zero flex items-center gap-2">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Controllo e libertà per l'utente</span>
-                </div>
-                <div class="p-2 border border-border-zero flex items-center gap-2">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Consistenza e standard</span>
-                </div>
-                <div class="p-2 border border-border-zero flex items-center gap-2">
-                  <i class="ph ph-check-circle text-accent"></i>
-                  <span>Prevenzione dall'errore</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -848,7 +849,7 @@
       >
         <div class="container-zero">
           <span class="font-tech text-xs text-accent uppercase tracking-widest mb-4 block">10 // Accessibilita</span>
-          <h2 class="text-4xl font-bold mb-8">WCAG 2.1 Level AA</h2>
+          <h2 class="text-4xl font-bold mb-8">WCAG 2.2 Level AA</h2>
 
           <div class="grid md:grid-cols-2 gap-8">
             <!-- Standards -->
@@ -1012,7 +1013,6 @@
 
           <!-- Final CTA -->
           <div class="border border-accent p-6 text-center">
-            <h3 class="text-xl font-bold mb-3">Grazie per l'attenzione</h3>
             <div class="flex flex-col md:flex-row items-center justify-center gap-4">
               <button
                 @click="router.push({ name: 'auth' })"
